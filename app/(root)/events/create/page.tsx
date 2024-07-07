@@ -5,6 +5,7 @@ const CreateEvent = () => {
   const { sessionClaims } = auth();
 
   const userId = sessionClaims?.userId as string;
+  
 
   return (
     <>
