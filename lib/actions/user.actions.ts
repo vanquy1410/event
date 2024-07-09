@@ -47,16 +47,16 @@ export async function updateUser(clerkId: string, user: UpdateUserParams) {
   }
 }
 
-export async function deleteUser({ userId, path }: { userId: string, path: string }) {
-  try {
-    await connectToDatabase()
+// export async function deleteUser({ userId, path }: { userId: string, path: string }) {
+//   try {
+//     await connectToDatabase()
 
-    const deletedUser = await User.findByIdAndDelete(userId)
-    if (deletedUser) revalidatePath(path)
-  } catch (error) {
-    handleError(error)
-  }
-}
+//     const deletedUser = await User.findByIdAndDelete(userId)
+//     if (deletedUser) revalidatePath(path)
+//   } catch (error) {
+//     handleError(error)
+//   }
+// }
 
 export async function getAllUsers() {
   try {

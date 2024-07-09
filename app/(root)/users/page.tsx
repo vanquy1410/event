@@ -6,7 +6,7 @@ import Link from 'next/link';
 
 import { getAllUsers } from '@/lib/actions/user.actions';
 import { IUserItem } from '@/lib/database/models/user.model';
-import { DeleteUser } from '@/components/shared/DeleteUser';
+// import { DeleteUser } from '@/components/shared/DeleteUser';
 import { Input } from '@/components/ui/input';
 
 const UserList: React.FC = () => {
@@ -72,7 +72,7 @@ const UserList: React.FC = () => {
                       <Link href={`/users/${user.clerkId}/update`}>
                         <Image src="/assets/icons/edit.svg" alt="edit" width={20} height={20} />
                       </Link>
-                      <DeleteUser userId={user.clerkId} />
+                      {/* <DeleteUser userId={user.clerkId} /> */}
                     </td>
                   </tr>
                 ))}
