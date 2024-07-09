@@ -47,15 +47,15 @@ export async function updateUser(clerkId: string, user: UpdateUserParams) {
   }
 }
 
-export async function deleteUser(clerkId: string) {
+export async function deleteUser({ userId, path }: { userId: string, path: string }) {
   try {
-    await connectToDatabase()
+    await connectToDatabase();
 
     // Find user to delete
-    const userToDelete = await User.findOne({ clerkId })
+    const userToDelete = await User.findOne({ clerkId: userId });
 
     if (!userToDelete) {
-      throw new Error('User not found')
+      throw new Error('User not found');
     }
 
     // Unlink relationships
@@ -68,14 +68,26 @@ export async function deleteUser(clerkId: string) {
 
       // Update the 'orders' collection to remove references to the user
       Order.updateMany({ _id: { $in: userToDelete.orders } }, { $unset: { buyer: 1 } }),
-    ])
+    ]);
 
     // Delete user
-    const deletedUser = await User.findByIdAndDelete(userToDelete._id)
-    revalidatePath('/')
+    const deletedUser = await User.findByIdAndDelete(userToDelete._id);
+    revalidatePath(path);
 
-    return deletedUser ? JSON.parse(JSON.stringify(deletedUser)) : null
+    return deletedUser ? JSON.parse(JSON.stringify(deletedUser)) : null;
   } catch (error) {
-    handleError(error)
+    handleError(error);
+  }
+}
+
+
+export async function getAllUsers() {
+  try {
+    await connectToDatabase();
+
+    const users = await User.find({});
+    return JSON.parse(JSON.stringify(users));
+  } catch (error) {
+    handleError(error);
   }
 }
