@@ -8,6 +8,14 @@ const UserSchema = new Schema({
   lastName: {type: String, required: true },
   photo: { type: String, required: true },
 })
+export interface IUserItem extends Document{
+  clerkId: string;
+  email: string;
+  username: string;
+  firstName: string;
+  lastName: string;
+  photo: string;
+}
 
 const User = models.User || model('User', UserSchema);
 

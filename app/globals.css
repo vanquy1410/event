@@ -228,6 +228,88 @@ body {
   .toggle-switch {
     @apply bg-gray-300 !important;
   }
+  thead tr {
+    @apply bg-gray-200;
+  }
+  
+  /* Add hover effect on rows for better interactivity */
+  tbody tr {
+    @apply transition-colors duration-150 ease-in-out;
+    @apply hover:bg-gray-50;
+  }
+  
+  /* Improve the spacing and padding for a more spacious look */
+  th, td {
+    @apply py-3 px-6;
+  }
+  
+  /* Enhance the border color for better visibility */
+  th, td, .border {
+    @apply border-gray-400;
+  }
+  
+  /* Style the action buttons for a cleaner look */
+  .actions {
+    @apply flex items-center justify-center gap-4;
+  }
+  
+  /* Style the edit link for consistency */
+  .edit-link {
+    @apply inline-flex items-center justify-center text-blue-600 hover:text-blue-800;
+  }
+  
+  /* Adjust the font size for better readability */
+  h3 {
+    @apply text-3xl;
+  }
+  
+  /* Ensure the table is fully responsive */
+  .table-responsive {
+    @apply overflow-x-auto;
+  }
+  
+  /* Add a subtle shadow to the table for depth */
+  table {
+    @apply shadow-sm;
+  }
+  .table-container {
+    max-width: 70%; /* Decrease the maximum width for a narrower table */
+    margin: auto;
+  }
+  
+  /* Add a subtle box shadow for depth */
+  .table-container table {
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  }
+  
+  /* Adjust the table layout for a more compact and readable form */
+  .table-container th,
+  .table-container td {
+    text-align: center; /* Center align text for readability */
+    white-space: nowrap; /* Prevent wrapping to keep the table compact */
+  }
+  
+  /* Enhance the visual separation between rows */
+  .table-container tr {
+    border-bottom: 1px solid #ddd; /* Lighter border for a softer look */
+  }
+  
+  /* Last row border fix */
+  .table-container tr:last-child {
+    border-bottom: 2px solid #ccc; /* Slightly darker to mark the end of the table */
+  }
+  
+  /* Enhance the header visually */
+  .table-container thead tr {
+    background-color: #f8f8f8; /* Light background for the header row */
+    color: #333; /* Darker text for contrast */
+    font-weight: bold; /* Bold font for header labels */
+  }
+  
+  /* Hover effect for rows */
+  .table-container tbody tr:hover {
+    background-color: #f1f1f1; /* Slight highlight on hover */
+  }
 }
 
 /* ========================================== CLERK STYLES */

@@ -1,15 +1,19 @@
 export const headerLinks = [
   {
-    label: 'Home',
+    label: 'Trang chủ',
     route: '/',
   },
   {
-    label: 'Create Event',
+    label: 'Sự kiện',
     route: '/events/create',
   },
   {
-    label: 'My Profile',
+    label: 'Hồ sơ',
     route: '/profile',
+  },
+  {
+    label: 'Danh sách người dùng',
+    route: '/users',
   },
 ]
 
