@@ -15,6 +15,10 @@ export const headerLinks = [
     label: 'Danh sách người dùng',
     route: '/users',
   },
+  {
+    label: 'Dash Board',
+    route: '/admin/dashboard',
+  }
 ]
 
 export const eventDefaultValues = {
