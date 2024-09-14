@@ -3,6 +3,8 @@ import { getOrdersByEvent } from '@/lib/actions/order.actions'
 import { formatDateTime, formatPrice } from '@/lib/utils'
 import { SearchParamProps } from '@/types'
 import { IOrderItem } from '@/lib/database/models/order.model'
+import { DeleteOrder } from '@/components/shared/DeleteOrder'
+
 
 const Orders = async ({ searchParams }: SearchParamProps) => {
   const eventId = (searchParams?.eventId as string) || ''
@@ -29,12 +31,13 @@ const Orders = async ({ searchParams }: SearchParamProps) => {
               <th className="min-w-[150px] py-3 text-left">Buyer</th>
               <th className="min-w-[100px] py-3 text-left">Created</th>
               <th className="min-w-[100px] py-3 text-right">Amount</th>
+              <th className="min-w-[100px] py-3 text-center">Actions</th>
             </tr>
           </thead>
           <tbody>
             {orders && orders.length === 0 ? (
               <tr className="border-b">
-                <td colSpan={5} className="py-4 text-center text-gray-500">
+                <td colSpan={6} className="py-4 text-center text-gray-500">
                   No orders found.
                 </td>
               </tr>
@@ -54,6 +57,9 @@ const Orders = async ({ searchParams }: SearchParamProps) => {
                       </td>
                       <td className="min-w-[100px] py-4 text-right">
                         {formatPrice(row.totalAmount)}
+                      </td>
+                      <td className="min-w-[100px] py-4 text-center">
+                        <DeleteOrder orderId={row._id} />
                       </td>
                     </tr>
                   ))}

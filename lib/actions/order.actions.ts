@@ -9,6 +9,7 @@ import Order from '../database/models/order.model';
 import Event from '../database/models/event.model';
 import {ObjectId} from 'mongodb';
 import User from '../database/models/user.model';
+import { revalidatePath } from 'next/cache';
 
 export const checkoutOrder = async (order: CheckoutOrderParams) => {
   const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!);
@@ -144,5 +145,22 @@ export async function getOrdersByUser({ userId, limit = 3, page }: GetOrdersByUs
     return { data: JSON.parse(JSON.stringify(orders)), totalPages: Math.ceil(ordersCount / limit) }
   } catch (error) {
     handleError(error)
+  }
+}
+export async function deleteOrder(orderId: string) {
+  try {
+    await connectToDatabase();
+
+    const deletedOrder = await Order.findByIdAndDelete(orderId);
+
+    if (!deletedOrder) {
+      throw new Error('Order not found');
+    }
+
+    revalidatePath('/orders');
+
+    return JSON.parse(JSON.stringify(deletedOrder));
+  } catch (error) {
+    handleError(error);
   }
 }
