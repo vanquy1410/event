@@ -17,7 +17,6 @@ const ProfilePage = async ({ searchParams }: SearchParamProps) => {
 
   const orders = await getOrdersByUser({ userId, page: ordersPage})
 
-  const orderedEvents = orders?.data.map((order: IOrder) => order.event) || [];
   const organizedEvents = await getEventsByUser({ userId, page: eventsPage })
 
   return (
@@ -36,7 +35,7 @@ const ProfilePage = async ({ searchParams }: SearchParamProps) => {
 
       <section className="wrapper my-8">
         <Collection 
-          data={orderedEvents}
+          data={orders?.data || []}
           emptyTitle="No event tickets purchased yet"
           emptyStateSubtext="No worries - plenty of exciting events to explore!"
           collectionType="My_Tickets"
@@ -61,7 +60,7 @@ const ProfilePage = async ({ searchParams }: SearchParamProps) => {
 
       <section className="wrapper my-8">
         <Collection 
-          data={organizedEvents?.data}
+          data={organizedEvents?.data || []}
           emptyTitle="No events have been created yet"
           emptyStateSubtext="Go create some now"
           collectionType="Events_Organized"

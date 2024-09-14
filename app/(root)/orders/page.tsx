@@ -1,10 +1,9 @@
-import Search  from '@/components/shared/Search'
+import Search from '@/components/shared/Search'
 import { getOrdersByEvent } from '@/lib/actions/order.actions'
 import { formatDateTime, formatPrice } from '@/lib/utils'
 import { SearchParamProps } from '@/types'
 import { IOrderItem } from '@/lib/database/models/order.model'
 import { DeleteOrder } from '@/components/shared/DeleteOrder'
-
 
 const Orders = async ({ searchParams }: SearchParamProps) => {
   const eventId = (searchParams?.eventId as string) || ''
@@ -14,8 +13,8 @@ const Orders = async ({ searchParams }: SearchParamProps) => {
 
   return (
     <>
-      <section className=" bg-primary-50 bg-dotted-pattern bg-cover bg-center py-5 md:py-10">
-        <h3 className="wrapper h3-bold text-center sm:text-left ">Orders</h3>
+      <section className="bg-primary-50 bg-dotted-pattern bg-cover bg-center py-5 md:py-10">
+        <h3 className="wrapper h3-bold text-center sm:text-left">Orders</h3>
       </section>
 
       <section className="wrapper mt-8">
@@ -47,7 +46,7 @@ const Orders = async ({ searchParams }: SearchParamProps) => {
                   orders.map((row: IOrderItem) => (
                     <tr
                       key={row._id}
-                      className="p-regular-14 lg:p-regular-16 border-b "
+                      className="p-regular-14 lg:p-regular-16 border-b"
                       style={{ boxSizing: 'border-box' }}>
                       <td className="min-w-[250px] py-4 text-primary-500">{row._id}</td>
                       <td className="min-w-[200px] flex-1 py-4 pr-4">{row.eventTitle}</td>
