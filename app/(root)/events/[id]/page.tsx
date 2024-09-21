@@ -68,6 +68,14 @@ const EventDetails = async ({ params: { id }, searchParams }: SearchParamProps) 
               <Image src="/assets/icons/location.svg" alt="location" width={32} height={32} />
               <p className="p-medium-16 lg:p-regular-20">{event.location}</p>
             </div>
+
+            {/* Updated section to display participant limit with new icon */}
+            <div className="p-regular-20 flex items-center gap-3">
+              <Image src="/assets/icons/participant.svg" alt="participants" width={32} height={32} />
+              <p className="p-medium-16 lg:p-regular-20">
+                {event.currentParticipants} / {event.participantLimit} participants
+              </p>
+            </div>
           </div>
 
           <div className="flex flex-col gap-2">

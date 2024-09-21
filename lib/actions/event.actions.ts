@@ -35,7 +35,12 @@ export async function createEvent({ userId, event, path }: CreateEventParams) {
     const organizer = await User.findById(userId)
     if (!organizer) throw new Error('Organizer not found')
 
-    const newEvent = await Event.create({ ...event, category: event.categoryId, organizer: userId })
+    const newEvent = await Event.create({ 
+      ...event, 
+      category: event.categoryId, 
+      organizer: userId,
+      currentParticipants: 0
+    })
     revalidatePath(path)
 
     return JSON.parse(JSON.stringify(newEvent))
@@ -71,7 +76,11 @@ export async function updateEvent({ userId, event, path }: UpdateEventParams) {
 
     const updatedEvent = await Event.findByIdAndUpdate(
       event._id,
-      { ...event, category: event.categoryId },
+      { 
+        ...event, 
+        category: event.categoryId,
+        currentParticipants: event.currentParticipants || eventToUpdate.currentParticipants
+      },
       { new: true }
     )
     revalidatePath(path)

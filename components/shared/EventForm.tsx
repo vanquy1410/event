@@ -317,6 +317,35 @@ const EventForm = ({ userId, type, event, eventId }: EventFormProps) => {
             />
         </div>
 
+        <div className="flex flex-col gap-5 md:flex-row">
+          <FormField
+            control={form.control}
+            name="participantLimit"
+            render={({ field }) => (
+              <FormItem className="w-full">
+                <FormControl>
+                  <div className="flex-center h-[54px] w-full overflow-hidden rounded-full bg-grey-50 px-4 py-2">
+                    <Image
+                      src="/assets/icons/user.svg"
+                      alt="user"
+                      width={24}
+                      height={24}
+                      className="filter-grey"
+                    />
+                    <Input 
+                      type="number" 
+                      placeholder="Participant Limit" 
+                      {...field} 
+                      onChange={(e) => field.onChange(Number(e.target.value))}
+                      className="p-regular-16 border-0 bg-grey-50 outline-offset-0 focus:border-0 focus-visible:ring-0 focus-visible:ring-offset-0" 
+                    />
+                  </div>
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+        </div>
 
         <Button 
           type="submit"

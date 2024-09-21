@@ -11,12 +11,15 @@ const CheckoutButton = ({ event }: { event: IEvent }) => {
   const { user } = useUser();
   const userId = user?.publicMetadata.userId as string;
   const hasEventFinished = new Date(event.endDateTime) < new Date();
+  const isEventFull = event.currentParticipants >= event.participantLimit;
 
   return (
     <div className="flex items-center gap-3">
       {hasEventFinished ? (
         <p className="p-2 text-red-400">Sorry, tickets are no longer available.</p>
-      ): (
+      ) : isEventFull ? (
+        <p className="p-2 text-red-400">Sorry, this event is fully booked.</p>
+      ) : (
         <>
           <SignedOut>
             <Button asChild className="button rounded-full" size="lg">

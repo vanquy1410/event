@@ -47,6 +47,8 @@ export type UpdateEventParams = {
     price: string
     isFree: boolean
     url: string
+    participantLimit: number
+    currentParticipants?: number
   }
   path: string
 }

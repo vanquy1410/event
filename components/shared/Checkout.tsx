@@ -4,10 +4,12 @@ import { loadStripe } from '@stripe/stripe-js';
 import { IEvent } from '@/lib/database/models/event.model';
 import { Button } from '../ui/button';
 import { checkoutOrder } from '@/lib/actions/order.actions';
+import { updateEvent } from '@/lib/actions/event.actions';
+import { UpdateEventParams } from '@/types'; // Add this import
 
 loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY!);
 
-const Checkout = ({ event, userId }: { event: IEvent, userId: string }) => {
+const Checkout = ({ event, userId }: { event: IEvent; userId: string }) => {
   useEffect(() => {
     // Check to see if this is a redirect back from Checkout
     const query = new URLSearchParams(window.location.search);
@@ -30,6 +32,16 @@ const Checkout = ({ event, userId }: { event: IEvent, userId: string }) => {
     }
 
     await checkoutOrder(order);
+
+    // After successful checkout
+    await updateEvent({
+      userId,
+      event: {
+        _id: event._id,
+        currentParticipants: (event.currentParticipants || 0) + 1
+      } as UpdateEventParams['event'],
+      path: `/events/${event._id}`
+    })
   }
 
   return (
