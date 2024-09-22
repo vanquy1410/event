@@ -7,6 +7,7 @@ import Event from '@/lib/database/models/event.model'
 import User from '@/lib/database/models/user.model'
 import Category from '@/lib/database/models/category.model'
 import { handleError } from '@/lib/utils'
+import { auth } from '@clerk/nextjs';
 
 import {
   CreateEventParams,
@@ -67,27 +68,51 @@ export async function getEventById(eventId: string) {
 // UPDATE
 export async function updateEvent({ userId, event, path }: UpdateEventParams) {
   try {
-    await connectToDatabase()
+    await connectToDatabase();
 
-    const eventToUpdate = await Event.findById(event._id)
-    if (!eventToUpdate || eventToUpdate.organizer.toHexString() !== userId) {
-      throw new Error('Unauthorized or event not found')
+    const { sessionClaims } = auth();
+    const isAdmin = sessionClaims?.metadata.role === 'admin';
+
+    if (!isAdmin) {
+      // Check if the user is the organizer of the event
+      const existingEvent = await Event.findById(event._id);
+      if (!existingEvent || existingEvent.organizer.toString() !== userId) {
+        throw new Error('Unauthorized or event not found');
+      }
     }
 
     const updatedEvent = await Event.findByIdAndUpdate(
       event._id,
       { 
-        ...event, 
-        category: event.categoryId,
-        currentParticipants: event.currentParticipants || eventToUpdate.currentParticipants
+        $set: { 
+          title: event.title,
+          description: event.description,
+          location: event.location,
+          imageUrl: event.imageUrl,
+          startDateTime: event.startDateTime,
+          endDateTime: event.endDateTime,
+          categoryId: event.categoryId,
+          price: event.price,
+          isFree: event.isFree,
+          url: event.url,
+        },
+        $inc: { 
+          currentParticipants: event.currentParticipants ? 1 : 0,
+          // Remove the line that increases participantLimit
+        }
       },
       { new: true }
-    )
-    revalidatePath(path)
+    );
 
-    return JSON.parse(JSON.stringify(updatedEvent))
+    if (!updatedEvent) {
+      throw new Error('Event not found');
+    }
+
+    revalidatePath(path);
+
+    return JSON.parse(JSON.stringify(updatedEvent));
   } catch (error) {
-    handleError(error)
+    handleError(error);
   }
 }
 

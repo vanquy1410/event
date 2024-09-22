@@ -38,7 +38,8 @@ const Checkout = ({ event, userId }: { event: IEvent; userId: string }) => {
       userId,
       event: {
         _id: event._id,
-        currentParticipants: (event.currentParticipants || 0) + 1
+        currentParticipants: (event.currentParticipants || 0) + 1,
+        // Remove the line that increases participantLimit
       } as UpdateEventParams['event'],
       path: `/events/${event._id}`
     })
