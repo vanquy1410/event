@@ -1,15 +1,17 @@
-import React, { useEffect } from 'react'
+import React, { useEffect, useState } from 'react'
 import { loadStripe } from '@stripe/stripe-js';
 
 import { IEvent } from '@/lib/database/models/event.model';
 import { Button } from '../ui/button';
-import { checkoutOrder } from '@/lib/actions/order.actions';
+import { checkoutOrder, hasUserRegisteredForEvent } from '@/lib/actions/order.actions';
 import { updateEvent } from '@/lib/actions/event.actions';
 import { UpdateEventParams } from '@/types'; // Add this import
 
 loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY!);
 
 const Checkout = ({ event, userId }: { event: IEvent; userId: string }) => {
+  const [hasRegistered, setHasRegistered] = useState(false);
+
   useEffect(() => {
     // Check to see if this is a redirect back from Checkout
     const query = new URLSearchParams(window.location.search);
@@ -20,7 +22,15 @@ const Checkout = ({ event, userId }: { event: IEvent; userId: string }) => {
     if (query.get('canceled')) {
       console.log('Order canceled -- continue to shop around and checkout when you’re ready.');
     }
-  }, []);
+
+    // Check if user has already registered for the event
+    const checkRegistration = async () => {
+      const registered = await hasUserRegisteredForEvent(userId, event._id);
+      setHasRegistered(registered);
+    };
+
+    checkRegistration();
+  }, [event._id, userId]);
 
   const onCheckout = async () => {
     const order = {
@@ -47,9 +57,15 @@ const Checkout = ({ event, userId }: { event: IEvent; userId: string }) => {
 
   return (
     <form action={onCheckout} method="post">
-      <Button type="submit" role="link" size="lg" className="button sm:w-fit">
-        {event.isFree ? 'Get Ticket' : 'Buy Ticket'}
-      </Button>
+      {hasRegistered ? (
+        <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative" role="alert">
+          <span className="block sm:inline">You have already registered for this event.</span>
+        </div>
+      ) : (
+        <Button type="submit" role="link" size="lg" className="button sm:w-fit">
+          {event.isFree ? 'Get Ticket' : 'Buy Ticket'}
+        </Button>
+      )}
     </form>
   )
 }

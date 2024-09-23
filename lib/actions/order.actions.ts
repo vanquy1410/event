@@ -164,3 +164,15 @@ export async function deleteOrder(orderId: string) {
     handleError(error);
   }
 }
+
+export const hasUserRegisteredForEvent = async (userId: string, eventId: string) => {
+  try {
+    await connectToDatabase();
+
+    const order = await Order.findOne({ buyer: userId, event: eventId });
+    return !!order; // Return true if order exists, false otherwise
+  } catch (error) {
+    handleError(error);
+    return false;
+  }
+}
