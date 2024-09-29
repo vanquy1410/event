@@ -72,7 +72,7 @@ export async function updateEvent({ userId, event, path }: UpdateEventParams) {
     await connectToDatabase();
 
     const { sessionClaims } = auth();
-    console.log("Session claims:", sessionClaims);
+ 
 
     const eventToUpdate = await Event.findById(event._id);
     if (!eventToUpdate) {
