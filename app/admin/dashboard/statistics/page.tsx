@@ -1,11 +1,14 @@
 import StatisticsCard from "../_component/StatisticsCard";
-import { getMostPopularEvent, getOrderStatistics, getUserStatistics } from '@/lib/actions/statistics.actions';
+import { getMostPopularEvent, getOrderStatistics, getUserStatistics, getUserRegistrationTrend, getEventCategoriesDistribution, getRevenueOverTime } from '@/lib/actions/statistics.actions';
 import ChartSection from '../_component/ChartSection';
 
 export default async function StatisticsPage() {
   const popularEvent = await getMostPopularEvent();
   const orderStats = await getOrderStatistics();
   const userStats = await getUserStatistics();
+  const userTrend = await getUserRegistrationTrend();
+  const categoryDistribution = await getEventCategoriesDistribution();
+  const revenue = await getRevenueOverTime();
 
   return (
     <div>
@@ -27,7 +30,13 @@ export default async function StatisticsPage() {
           subValue={`${userStats.newUsers} người dùng mới trong tháng này`}
         />
       </div>
-      <ChartSection popularEvent={popularEvent} orderStats={orderStats} />
+      <ChartSection 
+        popularEvent={popularEvent} 
+        orderStats={orderStats} 
+        userTrend={userTrend}
+        categoryDistribution={categoryDistribution}
+        revenue={revenue}
+      />
     </div>
   );
 }

@@ -48,3 +48,59 @@ export async function getUserStatistics() {
 
   return { total, newUsers };
 }
+
+export async function getUserRegistrationTrend() {
+  try {
+    const userTrend = await User.aggregate([
+      {
+        $group: {
+          _id: { $dateToString: { format: "%Y-%m-%d", date: "$createdAt" } },
+          count: { $sum: 1 }
+        }
+      },
+      { $sort: { _id: 1 } },
+      { $limit: 30 }
+    ]);
+    return userTrend;
+  } catch (error) {
+    console.error(error);
+    throw error;
+  }
+}
+
+export async function getEventCategoriesDistribution() {
+  try {
+    const categoryDistribution = await Event.aggregate([
+      {
+        $group: {
+          _id: "$category",
+          count: { $sum: 1 }
+        }
+      },
+      { $sort: { count: -1 } }
+    ]);
+    return categoryDistribution;
+  } catch (error) {
+    console.error(error);
+    throw error;
+  }
+}
+
+export async function getRevenueOverTime() {
+  try {
+    const revenue = await Order.aggregate([
+      {
+        $group: {
+          _id: { $dateToString: { format: "%Y-%m-%d", date: "$createdAt" } },
+          totalRevenue: { $sum: "$totalAmount" }
+        }
+      },
+      { $sort: { _id: 1 } },
+      { $limit: 30 }
+    ]);
+    return revenue;
+  } catch (error) {
+    console.error(error);
+    throw error;
+  }
+}
