@@ -10,6 +10,15 @@ import { handleError } from '@/lib/utils'
 
 import { CreateUserParams, UpdateUserParams } from '@/types'
 
+export interface IUserItem {
+  clerkId: string;
+  firstName: string;
+  lastName: string;
+  email: string;
+  photo: string;
+  role?: string;
+}
+
 export async function createUser(user: CreateUserParams) {
   try {
     await connectToDatabase()
