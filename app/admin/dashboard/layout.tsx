@@ -22,9 +22,9 @@ export default function AdminDashboardLayout({
   }
 
   return (
-    <div className="flex">
+    <div className="flex h-screen">
       <Sidebar />
-      <main className="flex-1 p-8">{children}</main>
+      <main className="flex-1 p-8 overflow-auto">{children}</main>
     </div>
   );
 }

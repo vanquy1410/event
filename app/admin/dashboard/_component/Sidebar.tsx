@@ -13,7 +13,7 @@ export default function Sidebar() {
   const pathname = usePathname();
 
   return (
-    <nav className="w-64 bg-gray-800 text-white h-screen">
+    <nav className="w-64 bg-gray-800 text-white h-full overflow-y-auto">
       <div className="p-4">
         <h2 className="text-2xl font-bold mb-4">Admin Dashboard</h2>
         <ul>
