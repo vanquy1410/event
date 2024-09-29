@@ -11,5 +11,5 @@ export const eventFormSchema = z.object({
   price: z.string(),
   isFree: z.boolean(),
   url: z.string().url(),
-  participantLimit: z.number().min(1, 'Participant limit must be at least 1'),
+  participantLimit: z.number().min(1, 'Participant limit must be at least 1'), // Add this line
 })

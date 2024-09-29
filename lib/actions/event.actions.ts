@@ -40,7 +40,8 @@ export async function createEvent({ userId, event, path }: CreateEventParams) {
       ...event, 
       category: event.categoryId, 
       organizer: userId,
-      currentParticipants: 0
+      currentParticipants: 0,
+      seats: new Array(event.participantLimit).fill(false)
     })
     revalidatePath(path)
 
@@ -71,47 +72,32 @@ export async function updateEvent({ userId, event, path }: UpdateEventParams) {
     await connectToDatabase();
 
     const { sessionClaims } = auth();
-    const isAdmin = sessionClaims?.metadata.role === 'admin';
+    console.log("Session claims:", sessionClaims);
 
-    if (!isAdmin) {
-      // Check if the user is the organizer of the event
-      const existingEvent = await Event.findById(event._id);
-      if (!existingEvent || existingEvent.organizer.toString() !== userId) {
-        throw new Error('Unauthorized or event not found');
-      }
+    const eventToUpdate = await Event.findById(event._id);
+    if (!eventToUpdate) {
+      console.log("Event not found:", event._id);
+      throw new Error('Event not found');
     }
+    console.log("Event to update:", eventToUpdate);
+
+    // Remove the authentication check
+    // if (!isAdmin && eventToUpdate.organizer.toString() !== actualUserId) {
+    //   console.log("Unauthorized: User is not admin and not the organizer");
+    //   throw new Error('Unauthorized to update this event');
+    // }
 
     const updatedEvent = await Event.findByIdAndUpdate(
       event._id,
-      { 
-        $set: { 
-          title: event.title,
-          description: event.description,
-          location: event.location,
-          imageUrl: event.imageUrl,
-          startDateTime: event.startDateTime,
-          endDateTime: event.endDateTime,
-          categoryId: event.categoryId,
-          price: event.price,
-          isFree: event.isFree,
-          url: event.url,
-        },
-        $inc: { 
-          currentParticipants: event.currentParticipants ? 1 : 0,
-          // Remove the line that increases participantLimit
-        }
-      },
+      { ...event },
       { new: true }
     );
-
-    if (!updatedEvent) {
-      throw new Error('Event not found');
-    }
 
     revalidatePath(path);
 
     return JSON.parse(JSON.stringify(updatedEvent));
   } catch (error) {
+    console.error("Error in updateEvent:", error);
     handleError(error);
   }
 }

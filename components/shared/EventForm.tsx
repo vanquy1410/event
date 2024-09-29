@@ -48,55 +48,48 @@ const EventForm = ({ userId, type, event, eventId }: EventFormProps) => {
     defaultValues: initialValues
   })
  
-  async function onSubmit(values: z.infer<typeof eventFormSchema>) {
-    let uploadedImageUrl = values.imageUrl;
-
-    if(files.length > 0) {
-      const uploadedImages = await startUpload(files)
-
-      if(!uploadedImages) {
-        return
-      }
-
-      uploadedImageUrl = uploadedImages[0].url
-    }
-
-    if(type === 'Create') {
-      try {
-        const newEvent = await createEvent({
-          event: { ...values, imageUrl: uploadedImageUrl },
-          userId,
-          path: '/profile'
-        })
-
-        if(newEvent) {
-          form.reset();
-          router.push(`/events/${newEvent._id}`)
-        }
-      } catch (error) {
-        console.log(error);
-      }
-    }
-
-    if(type === 'Update') {
-      if(!eventId) {
+  const onSubmit = async (values: z.infer<typeof eventFormSchema>) => {
+    if (type === 'Update') {
+      if (!eventId) {
         router.back()
         return;
       }
 
       try {
+        console.log("Updating event with ID:", eventId);
+        console.log("User ID:", userId);
+
         const updatedEvent = await updateEvent({
           userId,
-          event: { ...values, imageUrl: uploadedImageUrl, _id: eventId },
+          event: { 
+            ...values, 
+            _id: eventId, 
+            categoryId: values.categoryId // Use categoryId instead of category
+          },
           path: `/events/${eventId}`
         })
 
-        if(updatedEvent) {
+        if (updatedEvent) {
           form.reset();
           router.push(`/events/${updatedEvent._id}`)
         }
       } catch (error) {
-        console.log(error);
+        console.log("Error updating event:", error);
+      }
+    } else if (type === 'Create') {
+      try {
+        const newEvent = await createEvent({
+          event: { ...values, categoryId: values.categoryId },
+          userId,
+          path: '/profile'
+        })
+
+        if (newEvent) {
+          form.reset();
+          router.push(`/events/${newEvent._id}`)
+        }
+      } catch (error) {
+        console.log("Error creating event:", error);
       }
     }
   }

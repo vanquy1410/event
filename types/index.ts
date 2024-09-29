@@ -29,28 +29,30 @@ export type CreateEventParams = {
     price: string
     isFree: boolean
     url: string
+    participantLimit: number // Add this line
   }
   path: string
 }
 
 export type UpdateEventParams = {
-  userId: string;
+  userId: string
   event: {
-    _id: string;
-    title?: string;
-    description?: string;
-    location?: string;
-    imageUrl?: string;
-    startDateTime?: Date;
-    endDateTime?: Date;
-    categoryId?: string;
-    price?: string;
-    isFree?: boolean;
-    url?: string;
-    currentParticipants?: number;
-    participantLimit?: number;
-  };
-  path: string;
+    _id: string
+    title?: string
+    description?: string
+    location?: string
+    imageUrl?: string
+    startDateTime?: Date
+    endDateTime?: Date
+    categoryId?: string
+    price?: string
+    isFree?: boolean
+    url?: string
+    participantLimit?: number // Add this line
+    currentParticipants?: number  // Add this line
+    seats?: boolean[]  // Make sure this is also included
+  }
+  path: string
 }
 
 export type DeleteEventParams = {

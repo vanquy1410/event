@@ -1,0 +1,65 @@
+import React, { useState } from 'react';
+import { Button } from '@/components/ui/button';
+
+type SeatSelectionPopupProps = {
+  isOpen: boolean;
+  onClose: () => void;
+  participantLimit: number;
+  seats: boolean[];
+  onSeatSelect: (selectedSeat: number) => void;
+};
+
+const SeatSelectionPopup: React.FC<SeatSelectionPopupProps> = ({
+  isOpen,
+  onClose,
+  participantLimit,
+  seats,
+  onSeatSelect,
+}) => {
+  const [selectedSeat, setSelectedSeat] = useState<number | null>(null);
+
+  if (!isOpen) return null;
+
+  const handleSeatClick = (index: number) => {
+    setSelectedSeat(index);
+  };
+
+  const handleConfirm = () => {
+    if (selectedSeat !== null) {
+      onSeatSelect(selectedSeat);
+      onClose();
+    }
+  };
+
+  return (
+    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+      <div className="bg-white p-6 rounded-lg">
+        <h2 className="text-xl font-bold mb-4">Select Your Seat</h2>
+        <div className="grid grid-cols-10 gap-2 mb-4">
+          {Array.from({ length: participantLimit }).map((_, index) => (
+            <Button
+              key={index}
+              className={`w-8 h-8 ${
+                seats[index]
+                  ? 'bg-red-500'
+                  : selectedSeat === index
+                  ? 'bg-blue-500'
+                  : 'bg-green-500'
+              }`}
+              onClick={() => handleSeatClick(index)}
+              disabled={seats[index]}
+            >
+              {index + 1}
+            </Button>
+          ))}
+        </div>
+        <div className="flex justify-end">
+          <Button onClick={onClose} className="mr-2">Cancel</Button>
+          <Button onClick={handleConfirm} disabled={selectedSeat === null}>Confirm Selection</Button>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export default SeatSelectionPopup;
