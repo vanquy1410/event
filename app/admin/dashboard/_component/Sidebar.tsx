@@ -2,11 +2,14 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { FaHome } from "react-icons/fa"; // Thêm import này
 
 const navItems = [
+  { href: "/", label: "Trang chủ", icon: FaHome }, // Thêm mục này
   { href: "/admin/dashboard", label: "Tổng quan" },
   { href: "/admin/dashboard/statistics", label: "Thống kê" },
   { href: "/admin/dashboard/user-management", label: "Quản lý người dùng" },
+  { href: "/admin/dashboard/event-management", label: "Quản lý sự kiện" }, // Add this line
 ];
 
 export default function Sidebar() {
@@ -21,10 +24,11 @@ export default function Sidebar() {
             <li key={item.href} className="mb-2">
               <Link
                 href={item.href}
-                className={`block p-2 rounded ${
+                className={`block p-2 rounded flex items-center ${
                   pathname === item.href ? "bg-gray-700" : "hover:bg-gray-700"
                 }`}
               >
+                {item.icon && <item.icon className="mr-2" />} {/* Thêm icon nếu có */}
                 {item.label}
               </Link>
             </li>

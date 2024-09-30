@@ -191,3 +191,16 @@ export async function getRelatedEventsByCategory({
     handleError(error)
   }
 }
+
+// GET ALL EVENTS FOR ADMIN
+export async function getAllEventsForAdmin() {
+  try {
+    await connectToDatabase()
+
+    const events = await populateEvent(Event.find().sort({ createdAt: 'desc' }))
+
+    return JSON.parse(JSON.stringify(events))
+  } catch (error) {
+    handleError(error)
+  }
+}
