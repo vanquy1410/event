@@ -3,21 +3,21 @@
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input';
 import { getAllEvents, deleteEvent } from '@/lib/actions/event.actions';
 import EventTable from '../_component/EventTable';
 
 const EventManagementPage: React.FC = () => {
   const [events, setEvents] = useState([]);
   const [query, setQuery] = useState('');
+  const [category, setCategory] = useState('');
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     const fetchEvents = async () => {
       try {
         const fetchedEvents = await getAllEvents({
-          query: '',
-          category: '',
+          query: query,
+          category: category,
           limit: 10,
           page: 1
         });
@@ -29,16 +29,12 @@ const EventManagementPage: React.FC = () => {
     };
 
     fetchEvents();
-  }, []);
+  }, [query, category]);
 
   const handleDelete = async (eventId: string) => {
     await deleteEvent({ eventId, path: '/admin/dashboard/event-management' });
     setEvents(events.filter((event: any) => event._id !== eventId));
   };
-
-  const filteredEvents = events.filter((event: any) =>
-    event.title.toLowerCase().includes(query.toLowerCase())
-  );
 
   return (
     <>
@@ -54,15 +50,14 @@ const EventManagementPage: React.FC = () => {
       </section>
 
       <section className="wrapper my-8">
-        <Input
-          type="text"
-          placeholder="Tìm kiếm sự kiện..."
-          value={query}
-          onChange={(e) => setQuery(e.target.value)}
-          className="mb-4"
+        <EventTable 
+          events={events} 
+          onDelete={handleDelete} 
+          onSearch={setQuery}
+          onCategoryChange={setCategory}
         />
-        <EventTable events={filteredEvents} onDelete={handleDelete} />
       </section>
+      {error && <p className="text-red-500">{error}</p>}
     </>
   );
 };
