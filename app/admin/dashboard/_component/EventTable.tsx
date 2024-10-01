@@ -6,6 +6,8 @@ import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useEffect, useState } from 'react';
 import { getAllCategories } from '@/lib/actions/category.actions';
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog"
+
 
 interface Event {
   _id: string;
@@ -36,6 +38,32 @@ export default function EventTable({ events, onDelete, onSearch, onCategoryChang
     };
     fetchCategories();
   }, []);
+
+  const DeleteConfirmation = ({ eventId, onDelete }: { eventId: string, onDelete: (id: string) => void }) => {
+    return (
+      <AlertDialog>
+        <AlertDialogTrigger asChild>
+          <Button variant="destructive" title="Delete">
+            <FaTrash />
+          </Button>
+        </AlertDialogTrigger>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Bạn có chắc chắn muốn xóa?</AlertDialogTitle>
+            <AlertDialogDescription>
+              <b>Hành động này không thể hoàn tác. Sự kiện này sẽ bị xóa vĩnh viễn khỏi hệ thống.</b>
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Hủy</AlertDialogCancel>
+            <AlertDialogAction onClick={() => onDelete(eventId)}>
+              Xóa
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+    );
+  };
 
   return (
     <>
@@ -97,9 +125,7 @@ export default function EventTable({ events, onDelete, onSearch, onCategoryChang
                     <FaEdit />
                   </Button>
                 </Link>
-                <Button variant="destructive" onClick={() => onDelete(event._id)} title="Delete">
-                  <FaTrash />
-                </Button>
+                <DeleteConfirmation eventId={event._id} onDelete={onDelete} />
               </td>
             </tr>
           ))}
