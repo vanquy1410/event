@@ -49,10 +49,20 @@ export const createOrder = async (order: CreateOrderParams) => {
   try {
     await connectToDatabase();
     
+    const event = await Event.findById(order.eventId);
+    const buyer = await User.findById(order.buyerId);
+    
+    if (!event || !buyer) {
+      throw new Error('Event or Buyer not found');
+    }
+    
     const newOrder = await Order.create({
       ...order,
       event: order.eventId,
       buyer: order.buyerId,
+      eventTitle: event.title,
+      buyerName: `${buyer.firstName} ${buyer.lastName}`,
+      username: buyer.username,
     });
 
     return JSON.parse(JSON.stringify(newOrder));
@@ -147,19 +157,54 @@ export async function getOrdersByUser({ userId, limit = 3, page }: GetOrdersByUs
     handleError(error)
   }
 }
-export async function deleteOrder(orderId: string) {
+
+export async function getAllOrders({
+  query,
+  limit = 10,
+  page = 1,
+}: {
+  query?: string;
+  limit?: number;
+  page?: number;
+}) {
+  try {
+    await connectToDatabase();
+
+    const skipAmount = (page - 1) * limit;
+
+    const conditions = query
+      ? {
+          $or: [
+            { eventTitle: { $regex: query, $options: 'i' } },
+            { buyerName: { $regex: query, $options: 'i' } },
+            { username: { $regex: query, $options: 'i' } },
+          ],
+        }
+      : {};
+
+    const orders = await Order.find(conditions)
+      .sort({ createdAt: 'desc' })
+      .skip(skipAmount)
+      .limit(limit);
+
+    const ordersCount = await Order.countDocuments(conditions);
+
+    return {
+      data: JSON.parse(JSON.stringify(orders)),
+      totalPages: Math.ceil(ordersCount / limit),
+    };
+  } catch (error) {
+    handleError(error);
+  }
+}
+
+export async function deleteOrder({ orderId, path }: { orderId: string; path: string }) {
   try {
     await connectToDatabase();
 
     const deletedOrder = await Order.findByIdAndDelete(orderId);
 
-    if (!deletedOrder) {
-      throw new Error('Order not found');
-    }
-
-    revalidatePath('/orders');
-
-    return JSON.parse(JSON.stringify(deletedOrder));
+    if (deletedOrder) revalidatePath(path);
   } catch (error) {
     handleError(error);
   }

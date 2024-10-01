@@ -10,6 +10,7 @@ const navItems = [
   { href: "/admin/dashboard/statistics", label: "Thống kê" },
   { href: "/admin/dashboard/user-management", label: "Quản lý người dùng" },
   { href: "/admin/dashboard/event-management", label: "Quản lý sự kiện" }, // Add this line
+  { href: "/admin/dashboard/order-management", label: "Quản lý đơn hàng" },
 ];
 
 export default function Sidebar() {
