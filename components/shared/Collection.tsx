@@ -37,8 +37,11 @@ const Collection = ({
               const event = 'event' in item ? item.event : item;
               const orderId = 'event' in item ? item._id : undefined;
 
+              // Add a null check for the event
+              if (!event) return null;
+
               return (
-                <li key={event._id} className="flex justify-center">
+                <li key={event._id || orderId} className="flex justify-center">
                   <Card 
                     event={event} 
                     hasOrderLink={hasOrderLink} 
