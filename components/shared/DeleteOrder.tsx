@@ -42,7 +42,7 @@ export const DeleteOrder = ({ orderId }: { orderId: string }) => {
           <AlertDialogAction
             onClick={() =>
               startTransition(async () => {
-                await deleteOrder(orderId)
+                await deleteOrder({ orderId, path: pathname })
               })
             }>
             {isPending ? 'Deleting...' : 'Delete'}
