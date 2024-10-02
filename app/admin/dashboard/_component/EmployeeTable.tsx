@@ -6,11 +6,11 @@ import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, 
 
 interface Employee {
   _id: string;
-  UserAccount: string;
-  Role: string;
-  PhoneNumber: string;
-  Email: string;
-  Position: string;
+  userAccount: string;
+  role: string;
+  phoneNumber: string;
+  email: string;
+  position: string;
 }
 
 interface EmployeeTableProps {
@@ -73,11 +73,11 @@ export default function EmployeeTable({ employees, onDelete, onSearch }: Employe
             employees.map((employee, index) => (
               <tr key={employee._id}>
                 <td className="py-2 px-4 border-b">{index + 1}</td>
-                <td className="py-2 px-4 border-b">{employee.UserAccount}</td>
-                <td className="py-2 px-4 border-b">{employee.Role}</td>
-                <td className="py-2 px-4 border-b">{employee.PhoneNumber}</td>
-                <td className="py-2 px-4 border-b">{employee.Email}</td>
-                <td className="py-2 px-4 border-b">{employee.Position}</td>
+                <td className="py-2 px-4 border-b">{employee.userAccount}</td>
+                <td className="py-2 px-4 border-b">{employee.role}</td>
+                <td className="py-2 px-4 border-b">{employee.phoneNumber}</td>
+                <td className="py-2 px-4 border-b">{employee.email}</td>
+                <td className="py-2 px-4 border-b">{employee.position}</td>
                 <td className="py-2 px-4 border-b">
                   <Link href={`/admin/dashboard/employee-management/${employee._id}/update`}>
                     <Button variant="outline" className="mr-2" title="Sửa">
