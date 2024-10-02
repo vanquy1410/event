@@ -12,6 +12,7 @@ const navItems = [
   { href: "/admin/dashboard/event-management", label: "Quản lý sự kiện" }, // Add this line
   { href: "/admin/dashboard/order-management", label: "Quản lý đơn hàng" },
   { href: "/admin/dashboard/employee-management", label: "Quản lý nhân viên" },
+  { href: "/admin/dashboard/contact-form-management", label: "Quản lý form liên hệ" },
 ];
 
 export default function Sidebar() {
