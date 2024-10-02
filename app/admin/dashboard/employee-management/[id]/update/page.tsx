@@ -9,12 +9,12 @@ import { updateEmployee, getAllEmployees } from '@/lib/actions/employee.actions'
 const UpdateEmployeePage = ({ params }: { params: { id: string } }) => {
   const router = useRouter();
   const [formData, setFormData] = useState({
-    UserAccount: '',
-    Role: '',
-    PhoneNumber: '',
-    Address: '',
-    Email: '',
-    Position: ''
+    userAccount: '',
+    role: '',
+    phoneNumber: '',
+    address: '',
+    email: '',
+    position: ''
   });
 
   useEffect(() => {
@@ -23,12 +23,12 @@ const UpdateEmployeePage = ({ params }: { params: { id: string } }) => {
       if (result && result.data && result.data.length > 0) {
         const employee = result.data[0];
         setFormData({
-          UserAccount: employee.UserAccount,
-          Role: employee.Role,
-          PhoneNumber: employee.PhoneNumber,
-          Address: employee.Address,
-          Email: employee.Email,
-          Position: employee.Position
+          userAccount: employee.userAccount || '',
+          role: employee.role || '',
+          phoneNumber: employee.phoneNumber || '',
+          address: employee.address || '',
+          email: employee.email || '',
+          position: employee.position || ''
         });
       }
     };
@@ -55,49 +55,49 @@ const UpdateEmployeePage = ({ params }: { params: { id: string } }) => {
       <form onSubmit={handleSubmit}>
         <Input
           type="text"
-          name="UserAccount"
+          name="userAccount"
           placeholder="Tên tài khoản"
-          value={formData.UserAccount}
+          value={formData.userAccount}
           onChange={handleChange}
           className="mb-3"
         />
         <Input
           type="text"
-          name="Role"
+          name="role"
           placeholder="Vai trò"
-          value={formData.Role}
+          value={formData.role}
           onChange={handleChange}
           className="mb-3"
         />
         <Input
           type="tel"
-          name="PhoneNumber"
+          name="phoneNumber"
           placeholder="Số điện thoại"
-          value={formData.PhoneNumber}
+          value={formData.phoneNumber}
           onChange={handleChange}
           className="mb-3"
         />
         <Input
           type="text"
-          name="Address"
+          name="address"
           placeholder="Địa chỉ"
-          value={formData.Address}
+          value={formData.address}
           onChange={handleChange}
           className="mb-3"
         />
         <Input
           type="email"
-          name="Email"
+          name="email"
           placeholder="Email"
-          value={formData.Email}
+          value={formData.email}
           onChange={handleChange}
           className="mb-3"
         />
         <Input
           type="text"
-          name="Position"
+          name="position"
           placeholder="Chức vụ"
-          value={formData.Position}
+          value={formData.position}
           onChange={handleChange}
           className="mb-3"
         />
