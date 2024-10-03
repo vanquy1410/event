@@ -12,12 +12,12 @@ export const headerLinks = [
     route: '/profile',
   },
   {
-    label: 'Danh sách người dùng',
-    route: '/users',
-  },
-  {
     label: 'Dash Board',
     route: '/admin/dashboard',
+  },
+  {
+    label: 'Đăng ký BTC',
+    route: '/organizer',
   }
 ]
 
