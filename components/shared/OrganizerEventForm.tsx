@@ -10,6 +10,7 @@ import { Textarea } from '@/components/ui/textarea';
 import DatePicker from 'react-datepicker';
 import "react-datepicker/dist/react-datepicker.css";
 import { IOrganizer } from '@/lib/database/models/organizer.model';
+import { getOrganizerEvents } from '@/lib/actions/organizer.actions';
 
 const formSchema = z.object({
   name: z.string().min(1, 'Họ và tên là bắt buộc'),
@@ -25,7 +26,7 @@ const formSchema = z.object({
   participantLimit: z.number().min(1, 'Số người tham dự phải lớn hơn 0'),
 });
 
-const OrganizerEventForm = () => {
+const OrganizerEventForm = ({ setOrganizers }: { setOrganizers: React.Dispatch<React.SetStateAction<IOrganizer[]>> }) => {
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -58,6 +59,9 @@ const OrganizerEventForm = () => {
         console.log('Event created:', data);
         alert('Sự kiện đã được gửi và đang chờ duyệt');
         form.reset();
+        // Refresh the organizer list
+        const updatedOrganizers = await getOrganizerEvents();
+        setOrganizers(updatedOrganizers);
       } else {
         const errorData = await response.json();
         throw new Error(errorData.error || 'Failed to create event');

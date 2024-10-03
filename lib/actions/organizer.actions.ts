@@ -1,53 +1,53 @@
-import { connectToDatabase } from '@/lib/database';
-import Organizer, { IOrganizer } from '@/lib/database/models/organizer.model';
+import { IOrganizer } from '@/lib/database/models/organizer.model';
 
 export async function createOrganizerEvent(eventData: Omit<IOrganizer, 'status'>) {
   try {
-    await connectToDatabase();
-
-    const newEvent = await Organizer.create({
-      ...eventData,
-      status: 'pending'
+    const response = await fetch('/api/organizer', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(eventData),
     });
-
-    return JSON.parse(JSON.stringify(newEvent));
-  } catch (error) {
-    console.error('Error creating organizer event:', error);
-    if (error instanceof Error) {
-      console.error('Error message:', error.message);
-      console.error('Error stack:', error.stack);
+    if (!response.ok) {
+      throw new Error('Lỗi khi tạo sự kiện');
     }
+    return await response.json();
+  } catch (error) {
+    console.error('Lỗi khi tạo sự kiện:', error);
     throw error;
   }
 }
 
 export async function getOrganizerEvents(status?: 'pending' | 'approved' | 'rejected') {
   try {
-    await connectToDatabase();
-
-    const query = status ? { status } : {};
-    const events = await Organizer.find(query);
-
-    return JSON.parse(JSON.stringify(events));
+    const url = status ? `/api/organizer?status=${status}` : '/api/organizer';
+    const response = await fetch(url);
+    if (!response.ok) {
+      throw new Error('Lỗi khi lấy danh sách sự kiện');
+    }
+    return await response.json();
   } catch (error) {
-    console.error('Error getting organizer events:', error);
+    console.error('Lỗi khi lấy danh sách sự kiện:', error);
     throw error;
   }
 }
 
 export async function updateOrganizerEventStatus(eventId: string, status: 'approved' | 'rejected') {
   try {
-    await connectToDatabase();
-
-    const updatedEvent = await Organizer.findByIdAndUpdate(
-      eventId,
-      { status },
-      { new: true }
-    );
-
-    return JSON.parse(JSON.stringify(updatedEvent));
+    const response = await fetch(`/api/organizer/${eventId}`, {
+      method: 'PATCH',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ status }),
+    });
+    if (!response.ok) {
+      throw new Error('Lỗi khi cập nhật trạng thái sự kiện');
+    }
+    return await response.json();
   } catch (error) {
-    console.error('Error updating organizer event status:', error);
+    console.error('Lỗi khi cập nhật trạng thái sự kiện:', error);
     throw error;
   }
 }
