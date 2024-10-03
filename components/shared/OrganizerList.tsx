@@ -34,7 +34,9 @@ const OrganizerList: React.FC<OrganizerListProps> = ({ organizers }) => {
                   organizer.status === 'pending' ? 'bg-yellow-200 text-yellow-800' :
                   'bg-red-200 text-red-800'
                 }`}>
-                  {organizer.status}
+                  {organizer.status === 'approved' ? 'Đã duyệt' :
+                   organizer.status === 'pending' ? 'Chờ duyệt' :
+                   'Từ chối'}
                 </span>
               </td>
             </tr>

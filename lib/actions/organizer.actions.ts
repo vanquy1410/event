@@ -19,7 +19,7 @@ export async function createOrganizerEvent(eventData: Omit<IOrganizer, 'status'>
   }
 }
 
-export async function getOrganizerEvents(status?: 'pending' | 'approved' | 'rejected') {
+export async function getOrganizerEvents(status?: 'Chờ duyệt' | 'Đã duyệt' | 'Từ chối') {
   try {
     const url = status ? `/api/organizer?status=${status}` : '/api/organizer';
     const response = await fetch(url);

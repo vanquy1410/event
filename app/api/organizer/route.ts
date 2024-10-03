@@ -23,7 +23,7 @@ export async function POST(request: Request) {
     await connectToDatabase();
     const newEvent = await Organizer.create({
       ...body,
-      status: 'pending'
+      status: 'Chờ duyệt'
     });
     return NextResponse.json(newEvent);
   } catch (error) {
