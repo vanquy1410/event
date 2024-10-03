@@ -1,6 +1,7 @@
 import { Schema, model, models, Document, Model } from 'mongoose';
 
 export interface IOrganizer {
+  _id: string;
   name: string;
   phoneNumber: string;
   email: string;
@@ -12,7 +13,7 @@ export interface IOrganizer {
   eventType: string;
   price: number;
   participantLimit: number;
-  status?: 'pending' | 'approved' | 'rejected';
+  status: 'pending' | 'approved' | 'rejected';
 }
 
 const OrganizerSchema = new Schema<IOrganizer>({

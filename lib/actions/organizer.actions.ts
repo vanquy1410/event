@@ -19,7 +19,7 @@ export async function createOrganizerEvent(eventData: Omit<IOrganizer, 'status'>
   }
 }
 
-export async function getOrganizerEvents(status?: 'Chờ duyệt' | 'Đã duyệt' | 'Từ chối') {
+export async function getOrganizerEvents(status?: 'pending' | 'approved' | 'rejected') {
   try {
     const url = status ? `/api/organizer?status=${status}` : '/api/organizer';
     const response = await fetch(url);
@@ -33,21 +33,25 @@ export async function getOrganizerEvents(status?: 'Chờ duyệt' | 'Đã duyệ
   }
 }
 
-export async function updateOrganizerEventStatus(eventId: string, status: 'approved' | 'rejected') {
+export async function updateOrganizerEventStatus(organizerId: string, status: 'approved' | 'rejected') {
   try {
-    const response = await fetch(`/api/organizer/${eventId}`, {
+    const response = await fetch(`/api/organizer/${organizerId}`, {
       method: 'PATCH',
       headers: {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({ status }),
     });
+    
     if (!response.ok) {
-      throw new Error('Lỗi khi cập nhật trạng thái sự kiện');
+      const errorText = await response.text();
+      console.error('Server response:', errorText);
+      throw new Error('Lỗi khi cập nhật trạng thái ban tổ chức');
     }
+    
     return await response.json();
   } catch (error) {
-    console.error('Lỗi khi cập nhật trạng thái sự kiện:', error);
+    console.error('Lỗi khi cập nhật trạng thái ban tổ chức:', error);
     throw error;
   }
 }
