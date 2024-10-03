@@ -1,14 +1,14 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   images: {
-    domains: ['utfs.io'],
-    remotePatterns: [
-      {
-        protocol: 'https',
-        hostname: 'utfs.io',
-        port: ''
-      }
-    ]
+    domains: ['vn1.vdrive.vn'],
+    // remotePatterns: [
+    //   {
+    //     protocol: 'https',
+    //     hostname: 'utfs.io',
+    //     port: ''
+    //   }
+    // ]
   }
 }
 
