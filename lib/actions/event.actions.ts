@@ -18,6 +18,8 @@ import {
   GetRelatedEventsByCategoryParams,
 } from '@/types'
 
+import { uploadToS3 } from '@/lib/s3Client';
+
 const getCategoryByName = async (name: string) => {
   return Category.findOne({ name: { $regex: name, $options: 'i' } })
 }
@@ -36,8 +38,17 @@ export async function createEvent({ userId, event, path }: CreateEventParams) {
     const organizer = await User.findById(userId)
     if (!organizer) throw new Error('Organizer not found')
 
+    let imageUrl = event.imageUrl;
+    if (event.imageFile) {
+      const buffer = await event.imageFile.arrayBuffer();
+      const fileName = event.imageFile.name;
+      const fileType = event.imageFile.type;
+      imageUrl = await uploadToS3(buffer, fileName, fileType);
+    }
+
     const newEvent = await Event.create({ 
       ...event, 
+      imageUrl,
       category: event.categoryId, 
       organizer: userId,
       currentParticipants: 0,
@@ -71,25 +82,23 @@ export async function updateEvent({ userId, event, path }: UpdateEventParams) {
   try {
     await connectToDatabase();
 
-    const { sessionClaims } = auth();
- 
-
     const eventToUpdate = await Event.findById(event._id);
     if (!eventToUpdate) {
       console.log("Event not found:", event._id);
       throw new Error('Event not found');
     }
-    console.log("Event to update:", eventToUpdate);
 
-    // Remove the authentication check
-    // if (!isAdmin && eventToUpdate.organizer.toString() !== actualUserId) {
-    //   console.log("Unauthorized: User is not admin and not the organizer");
-    //   throw new Error('Unauthorized to update this event');
-    // }
+    let imageUrl = event.imageUrl;
+    if (event.imageFile) {
+      const buffer = await event.imageFile.arrayBuffer();
+      const fileName = event.imageFile.name;
+      const fileType = event.imageFile.type;
+      imageUrl = await uploadToS3(buffer, fileName, fileType);
+    }
 
     const updatedEvent = await Event.findByIdAndUpdate(
       event._id,
-      { ...event },
+      { ...event, imageUrl },
       { new: true }
     );
 
