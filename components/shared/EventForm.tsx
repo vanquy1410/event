@@ -14,7 +14,6 @@ import { FileUploader } from "./FileUploader"
 import { useState } from "react"
 import Image from "next/image"
 import DatePicker from "react-datepicker";
-import { useUploadThing } from '@/lib/uploadthing'
 
 import "react-datepicker/dist/react-datepicker.css";
 import { Checkbox } from "../ui/checkbox"
@@ -41,45 +40,41 @@ const EventForm = ({ userId, type, event, eventId }: EventFormProps) => {
     : eventDefaultValues;
   const router = useRouter();
 
-  const { startUpload } = useUploadThing('imageUploader')
-
   const form = useForm<z.infer<typeof eventFormSchema>>({
     resolver: zodResolver(eventFormSchema),
     defaultValues: initialValues
   })
  
   const onSubmit = async (values: z.infer<typeof eventFormSchema>) => {
-    if (type === 'Update') {
-      if (!eventId) {
-        router.back()
-        return;
-      }
+    let uploadedImageUrl = values.imageUrl;
+
+    if (files.length > 0) {
+      const formData = new FormData();
+      formData.append('file', files[0]);
+      formData.append('eventId', eventId || 'new'); // Sử dụng 'new' nếu là sự kiện mới
 
       try {
-        console.log("Updating event with ID:", eventId);
-        console.log("User ID:", userId);
+        const response = await fetch('/api/s3-storage', {
+          method: 'POST',
+          body: formData,
+        });
 
-        const updatedEvent = await updateEvent({
-          userId,
-          event: { 
-            ...values, 
-            _id: eventId, 
-            categoryId: values.categoryId // Use categoryId instead of category
-          },
-          path: `/events/${eventId}`
-        })
-
-        if (updatedEvent) {
-          form.reset();
-          router.push(`/events/${updatedEvent._id}`)
+        if (!response.ok) {
+          throw new Error('Upload ảnh thất bại');
         }
+
+        const data = await response.json();
+        uploadedImageUrl = data.updatedEvent.images[data.updatedEvent.images.length - 1];
       } catch (error) {
-        console.log("Error updating event:", error);
+        console.error('Lỗi khi upload ảnh:', error);
+        // Xử lý lỗi ở đây (ví dụ: hiển thị thông báo lỗi)
       }
-    } else if (type === 'Create') {
+    }
+
+    if (type === 'Create') {
       try {
         const newEvent = await createEvent({
-          event: { ...values, categoryId: values.categoryId },
+          event: { ...values, imageUrl: uploadedImageUrl, categoryId: values.categoryId },
           userId,
           path: '/profile'
         })
@@ -89,7 +84,34 @@ const EventForm = ({ userId, type, event, eventId }: EventFormProps) => {
           router.push(`/events/${newEvent._id}`)
         }
       } catch (error) {
-        console.log("Error creating event:", error);
+        console.log("Lỗi khi tạo sự kiện:", error);
+      }
+    }
+
+    if (type === 'Update') {
+      if (!eventId) {
+        router.back()
+        return;
+      }
+
+      try {
+        const updatedEvent = await updateEvent({
+          userId,
+          event: { 
+            ...values, 
+            _id: eventId, 
+            imageUrl: uploadedImageUrl,
+            categoryId: values.categoryId
+          },
+          path: `/events/${eventId}`
+        })
+
+        if (updatedEvent) {
+          form.reset();
+          router.push(`/events/${updatedEvent._id}`)
+        }
+      } catch (error) {
+        console.log("Lỗi khi cập nhật sự kiện:", error);
       }
     }
   }
@@ -147,6 +169,7 @@ const EventForm = ({ userId, type, event, eventId }: EventFormProps) => {
                       onFieldChange={field.onChange}
                       imageUrl={field.value}
                       setFiles={setFiles}
+                      eventId={eventId || 'new'} // Thêm prop eventId
                     />
                   </FormControl>
                   <FormMessage />
