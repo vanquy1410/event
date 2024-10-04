@@ -4,6 +4,10 @@ export const headerLinks = [
     route: '/',
   },
   {
+    label: 'Lịch',
+    route: '/event-calendar',
+  },
+  {
     label: 'Sự kiện',
     route: '/events/create',
   },
@@ -12,13 +16,13 @@ export const headerLinks = [
     route: '/profile',
   },
   {
+    label: 'Đăng ký BTC',
+    route: '/organizer',
+  },
+  {
     label: 'Dash Board',
     route: '/admin/dashboard',
   },
-  {
-    label: 'Đăng ký BTC',
-    route: '/organizer',
-  }
 ]
 
 export const eventDefaultValues = {
