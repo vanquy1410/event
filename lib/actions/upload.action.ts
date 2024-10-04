@@ -21,7 +21,7 @@ export async function uploadFileToS3(file: Buffer, fileName: string) {
       fileUrl,
     };
   } catch (err) {
-    console.error("Error", err);
+    console.error("Lỗi", err);
     throw err;
   }
 }
