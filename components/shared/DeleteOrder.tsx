@@ -30,9 +30,9 @@ export const DeleteOrder = ({ orderId }: { orderId: string }) => {
 
       <AlertDialogContent className="bg-white">
         <AlertDialogHeader>
-          <AlertDialogTitle>Are you sure you want to delete this ticket?</AlertDialogTitle>
+          <AlertDialogTitle>Bạn có chắc chắn muốn xóa?</AlertDialogTitle>
           <AlertDialogDescription className="p-regular-16 text-grey-600">
-            This will permanently delete this ticket
+            Điều này sẽ xóa đơn hàng vĩnh viễn
           </AlertDialogDescription>
         </AlertDialogHeader>
 

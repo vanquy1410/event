@@ -33,8 +33,9 @@ export default async function AdminDashboard(params: {
 
   return (
     <>
-      <h1>This is the admin dashboard</h1>
-      <p>This page is restricted to users with the 'admin' role.</p>
+      <h1>Đây là trang admin</h1>
+      <br></br>
+      <p>Trang này chỉ dành cho người dùng có quyền admin.</p>
 
       <SearchUsers />
 

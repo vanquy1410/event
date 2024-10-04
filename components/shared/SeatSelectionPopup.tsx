@@ -34,7 +34,7 @@ const SeatSelectionPopup: React.FC<SeatSelectionPopupProps> = ({
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
       <div className="bg-white p-6 rounded-lg">
-        <h2 className="text-xl font-bold mb-4">Select Your Seat</h2>
+        <h2 className="text-xl font-bold mb-4">Chọn chỗ ngồi</h2>
         <div className="grid grid-cols-10 gap-2 mb-4">
           {Array.from({ length: participantLimit }).map((_, index) => (
             <Button
@@ -54,8 +54,8 @@ const SeatSelectionPopup: React.FC<SeatSelectionPopupProps> = ({
           ))}
         </div>
         <div className="flex justify-end">
-          <Button onClick={onClose} className="mr-2">Cancel</Button>
-          <Button onClick={handleConfirm} disabled={selectedSeat === null}>Confirm Selection</Button>
+          <Button onClick={onClose} className="mr-2">Hủy</Button>
+          <Button onClick={handleConfirm} disabled={selectedSeat === null}>Xác nhận</Button>
         </div>
       </div>
     </div>
