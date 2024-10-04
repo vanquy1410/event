@@ -115,31 +115,40 @@ export async function deleteEvent({ eventId, path }: DeleteEventParams) {
 }
 
 // GET ALL EVENTS
-export async function getAllEvents({ query, limit = 6, page, category }: GetAllEventsParams) {
+export async function getAllEvents({ query, category, limit, page }: GetAllEventsParams = {}) {
   try {
     await connectToDatabase()
 
     const titleCondition = query ? { title: { $regex: query, $options: 'i' } } : {}
-    const categoryCondition = category ? await getCategoryByName(category) : null
+    const categoryCondition = category ? { category: category } : {}
+
     const conditions = {
-      $and: [titleCondition, categoryCondition ? { category: categoryCondition._id } : {}],
+      $and: [titleCondition, categoryCondition],
     }
 
-    const skipAmount = (Number(page) - 1) * limit
+    const skipAmount = (page && limit) ? (page - 1) * limit : 0
+
     const eventsQuery = Event.find(conditions)
       .sort({ createdAt: 'desc' })
       .skip(skipAmount)
-      .limit(limit)
 
-    const events = await populateEvent(eventsQuery)
+    if (limit) {
+      eventsQuery.limit(limit)
+    }
+
+    const events = await eventsQuery.exec()
     const eventsCount = await Event.countDocuments(conditions)
 
     return {
       data: JSON.parse(JSON.stringify(events)),
-      totalPages: Math.ceil(eventsCount / limit),
+      totalPages: limit ? Math.ceil(eventsCount / limit) : 1,
     }
   } catch (error) {
-    handleError(error)
+    console.error('Lỗi khi lấy sự kiện:', error)
+    return {
+      data: [],
+      totalPages: 0,
+    }
   }
 }
 
