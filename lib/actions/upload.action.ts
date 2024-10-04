@@ -7,7 +7,8 @@ export async function uploadFileToS3(file: Buffer, fileName: string) {
     Bucket: process.env.S3_BUCKET_NAME,
     Key: fileName,
     Body: file,
-    ACL: "public-read-write",
+    // ACL: "public-read-write",
+    ACL: 'public-read-write' as const,
   };
 
   try {

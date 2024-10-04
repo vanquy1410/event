@@ -1,15 +1,16 @@
 'use client'
 
-import { useState, useCallback } from 'react'
+import { useState, useCallback, Dispatch, SetStateAction } from 'react'
 import { useDropzone } from 'react-dropzone'
 
 import { Button } from '@/components/ui/button'
 import Image from 'next/image'
 
-type FileUploaderProps = {
-  onFieldChange: (url: string) => void
-  imageUrl: string
-  eventId: string
+interface FileUploaderProps {
+  imageUrl: string;
+  onFieldChange: (...event: any[]) => void;
+  setFiles: Dispatch<SetStateAction<File[]>>;
+  eventId: string;
 }
 
 export function FileUploader({ imageUrl, onFieldChange }: FileUploaderProps) {
