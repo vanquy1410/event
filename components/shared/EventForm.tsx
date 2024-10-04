@@ -14,7 +14,6 @@ import { FileUploader } from "./FileUploader"
 import { useState } from "react"
 import Image from "next/image"
 import DatePicker from "react-datepicker";
-import { useUploadThing } from '@/lib/uploadthing'
 
 import "react-datepicker/dist/react-datepicker.css";
 import { Checkbox } from "../ui/checkbox"
@@ -41,45 +40,41 @@ const EventForm = ({ userId, type, event, eventId }: EventFormProps) => {
     : eventDefaultValues;
   const router = useRouter();
 
-  const { startUpload } = useUploadThing('imageUploader')
-
   const form = useForm<z.infer<typeof eventFormSchema>>({
     resolver: zodResolver(eventFormSchema),
     defaultValues: initialValues
   })
  
   const onSubmit = async (values: z.infer<typeof eventFormSchema>) => {
-    if (type === 'Update') {
-      if (!eventId) {
-        router.back()
-        return;
-      }
+    let uploadedImageUrl = values.imageUrl;
+
+    if (files.length > 0) {
+      const formData = new FormData();
+      formData.append('file', files[0]);
+      formData.append('eventId', eventId || 'new'); // Sử dụng 'new' nếu là sự kiện mới
 
       try {
-        console.log("Updating event with ID:", eventId);
-        console.log("User ID:", userId);
+        const response = await fetch('/api/s3-storage', {
+          method: 'POST',
+          body: formData,
+        });
 
-        const updatedEvent = await updateEvent({
-          userId,
-          event: { 
-            ...values, 
-            _id: eventId, 
-            categoryId: values.categoryId // Use categoryId instead of category
-          },
-          path: `/events/${eventId}`
-        })
-
-        if (updatedEvent) {
-          form.reset();
-          router.push(`/events/${updatedEvent._id}`)
+        if (!response.ok) {
+          throw new Error('Upload ảnh thất bại');
         }
+
+        const data = await response.json();
+        uploadedImageUrl = data.updatedEvent.images[data.updatedEvent.images.length - 1];
       } catch (error) {
-        console.log("Error updating event:", error);
+        console.error('Lỗi khi upload ảnh:', error);
+        // Xử lý lỗi ở đây (ví dụ: hiển thị thông báo lỗi)
       }
-    } else if (type === 'Create') {
+    }
+
+    if (type === 'Create') {
       try {
         const newEvent = await createEvent({
-          event: { ...values, categoryId: values.categoryId },
+          event: { ...values, imageUrl: uploadedImageUrl, categoryId: values.categoryId },
           userId,
           path: '/profile'
         })
@@ -89,7 +84,34 @@ const EventForm = ({ userId, type, event, eventId }: EventFormProps) => {
           router.push(`/events/${newEvent._id}`)
         }
       } catch (error) {
-        console.log("Error creating event:", error);
+        console.log("Lỗi khi tạo sự kiện:", error);
+      }
+    }
+
+    if (type === 'Update') {
+      if (!eventId) {
+        router.back()
+        return;
+      }
+
+      try {
+        const updatedEvent = await updateEvent({
+          userId,
+          event: { 
+            ...values, 
+            _id: eventId, 
+            imageUrl: uploadedImageUrl,
+            categoryId: values.categoryId
+          },
+          path: `/events/${eventId}`
+        })
+
+        if (updatedEvent) {
+          form.reset();
+          router.push(`/events/${updatedEvent._id}`)
+        }
+      } catch (error) {
+        console.log("Lỗi khi cập nhật sự kiện:", error);
       }
     }
   }
@@ -104,7 +126,7 @@ const EventForm = ({ userId, type, event, eventId }: EventFormProps) => {
             render={({ field }) => (
               <FormItem className="w-full">
                 <FormControl>
-                  <Input placeholder="Event title" {...field} className="input-field" />
+                  <Input placeholder="Tên sự kiện" {...field} className="input-field" />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -131,7 +153,7 @@ const EventForm = ({ userId, type, event, eventId }: EventFormProps) => {
               render={({ field }) => (
                 <FormItem className="w-full">
                   <FormControl className="h-72">
-                    <Textarea placeholder="Description" {...field} className="textarea rounded-2xl" />
+                    <Textarea placeholder="Mô tả" {...field} className="textarea rounded-2xl" />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -147,6 +169,7 @@ const EventForm = ({ userId, type, event, eventId }: EventFormProps) => {
                       onFieldChange={field.onChange}
                       imageUrl={field.value}
                       setFiles={setFiles}
+                      eventId={eventId || 'new'} // Thêm prop eventId
                     />
                   </FormControl>
                   <FormMessage />
@@ -170,7 +193,7 @@ const EventForm = ({ userId, type, event, eventId }: EventFormProps) => {
                         height={24}
                       />
 
-                      <Input placeholder="Event location or Online" {...field} className="input-field" />
+                      <Input placeholder="Địa điểm hoặc trực tuyến" {...field} className="input-field" />
                     </div>
 
                   </FormControl>
@@ -195,7 +218,7 @@ const EventForm = ({ userId, type, event, eventId }: EventFormProps) => {
                         height={24}
                         className="filter-grey"
                       />
-                      <p className="ml-3 whitespace-nowrap text-grey-600">Start Date:</p>
+                      <p className="ml-3 whitespace-nowrap text-grey-600">Ngày bắt đầu:</p>
                       <DatePicker 
                         selected={field.value} 
                         onChange={(date: Date) => field.onChange(date)} 
@@ -226,7 +249,7 @@ const EventForm = ({ userId, type, event, eventId }: EventFormProps) => {
                         height={24}
                         className="filter-grey"
                       />
-                      <p className="ml-3 whitespace-nowrap text-grey-600">End Date:</p>
+                      <p className="ml-3 whitespace-nowrap text-grey-600">Ngày kết thúc:</p>
                       <DatePicker 
                         selected={field.value} 
                         onChange={(date: Date) => field.onChange(date)} 
@@ -259,7 +282,7 @@ const EventForm = ({ userId, type, event, eventId }: EventFormProps) => {
                         height={24}
                         className="filter-grey"
                       />
-                      <Input type="number" placeholder="Price" {...field} className="p-regular-16 border-0 bg-grey-50 outline-offset-0 focus:border-0 focus-visible:ring-0 focus-visible:ring-offset-0" />
+                      <Input type="number" placeholder="Giá" {...field} className="p-regular-16 border-0 bg-grey-50 outline-offset-0 focus:border-0 focus-visible:ring-0 focus-visible:ring-offset-0" />
                       <FormField
                         control={form.control}
                         name="isFree"
@@ -267,7 +290,7 @@ const EventForm = ({ userId, type, event, eventId }: EventFormProps) => {
                           <FormItem>
                             <FormControl>
                               <div className="flex items-center">
-                                <label htmlFor="isFree" className="whitespace-nowrap pr-3 leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">Free Ticket</label>
+                                <label htmlFor="isFree" className="whitespace-nowrap pr-3 leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">Miễn phí</label>
                                 <Checkbox
                                   onCheckedChange={field.onChange}
                                   checked={field.value}
@@ -327,7 +350,7 @@ const EventForm = ({ userId, type, event, eventId }: EventFormProps) => {
                     />
                     <Input 
                       type="number" 
-                      placeholder="Participant Limit" 
+                      placeholder="Số lượng người tham gia" 
                       {...field} 
                       onChange={(e) => field.onChange(Number(e.target.value))}
                       className="p-regular-16 border-0 bg-grey-50 outline-offset-0 focus:border-0 focus-visible:ring-0 focus-visible:ring-offset-0" 

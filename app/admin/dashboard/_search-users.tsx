@@ -17,9 +17,9 @@ export const SearchUsers = () => {
           router.push(pathname + "?search=" + queryTerm);
         }}
       >
-        <label htmlFor="search">Search for Users</label>
+        <label htmlFor="search"></label>
         <input id="search" name="search" type="text" />
-        <button type="submit">Submit</button>
+        <button type="submit"></button>
       </form>
     </div>
   );

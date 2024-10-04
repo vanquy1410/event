@@ -23,22 +23,22 @@ const CheckoutButton = ({ event }: { event: IEvent }) => {
   return (
     <div className="flex items-center gap-3">
       {hasEventFinished ? (
-        <p className="p-2 text-red-400">Sorry, tickets are no longer available.</p>
+        <p className="p-2 text-red-400">Sự kiện đã kết thúc, không thể đặt vé.</p>
       ) : isEventFull ? (
-        <p className="p-2 text-red-400">Sorry, this event is fully booked.</p>
+        <p className="p-2 text-red-400">Sự kiện đã đầy, không thể đặt vé.</p>
       ) : (
         <>
           <SignedOut>
             <Button asChild className="button rounded-full" size="lg">
               <Link href="/sign-in">
-                Get Tickets
+                Mua Vé
               </Link>
             </Button>
           </SignedOut>
 
           <SignedIn>
             <Button onClick={() => setIsPopupOpen(true)} className="button rounded-full" size="lg">
-              Select Seat
+              Đặt chổ
             </Button>
             <SeatSelectionPopup
               isOpen={isPopupOpen}
