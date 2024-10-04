@@ -5,6 +5,7 @@ export async function POST(request: NextRequest) {
   try {
     const formData = await request.formData();
     const file = formData.get('file') as File;
+    const fileType = formData.get('fileType') as string;
 
     if (!file) {
       return NextResponse.json({ error: 'Không có file được cung cấp' }, { status: 400 });
@@ -13,7 +14,7 @@ export async function POST(request: NextRequest) {
     const buffer = await file.arrayBuffer();
     const fileName = file.name;
 
-    const result = await uploadFileToS3(Buffer.from(buffer), fileName);
+    const result = await uploadFileToS3(Buffer.from(buffer), fileName, file.type);
 
     return NextResponse.json({
       message: 'Upload thành công',
