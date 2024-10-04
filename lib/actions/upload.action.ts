@@ -2,13 +2,13 @@ import { PutObjectCommand } from "@aws-sdk/client-s3";
 import s3Client from "../s3Client";
 import Event from "../database/models/event.model";
 
-export async function uploadFileToS3(file: Buffer, fileName: string) {
+export async function uploadFileToS3(file: Buffer, fileName: string, fileType: string) {
   const uploadParams = {
     Bucket: process.env.S3_BUCKET_NAME,
     Key: fileName,
     Body: file,
-    // ACL: "public-read-write",
     ACL: 'public-read-write' as const,
+    ContentType: fileType,
   };
 
   try {
