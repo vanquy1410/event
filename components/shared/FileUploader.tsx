@@ -19,6 +19,19 @@ export function FileUploader({ imageUrl, documentUrl, onImageChange, onDocumentC
   const [isUploadingDocument, setIsUploadingDocument] = useState(false)
   const [uploadedDocument, setUploadedDocument] = useState<{ name: string, url: string } | null>(null);
 
+  const getFileIcon = (fileName: string) => {
+    const extension = fileName.split('.').pop()?.toLowerCase();
+    switch (extension) {
+      case 'pdf':
+        return '/assets/icons/pdf.svg';
+      case 'doc':
+      case 'docx':
+        return '/assets/icons/word.svg';
+      default:
+        return '/assets/icons/document.svg';
+    }
+  };
+
   const onDropImage = useCallback(async (acceptedFiles: File[]) => {
     if (acceptedFiles.length > 0) {
       setIsUploadingImage(true)
@@ -130,7 +143,12 @@ export function FileUploader({ imageUrl, documentUrl, onImageChange, onDocumentC
 
         {uploadedDocument ? (
           <div className="flex-center flex-col">
-            <img src="/assets/icons/pdf.svg" width={40} height={40} alt="PDF icon" />
+            <Image
+              src={getFileIcon(uploadedDocument.name)}
+              width={40}
+              height={40}
+              alt="File icon"
+            />
             <p className="mt-2 text-sm">{uploadedDocument.name}</p>
             <a href={uploadedDocument.url} target="_blank" rel="noopener noreferrer" className="mt-2 text-blue-500 hover:underline">
             </a>
