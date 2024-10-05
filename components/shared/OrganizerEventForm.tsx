@@ -207,7 +207,7 @@ const OrganizerEventForm = ({ setOrganizers }: { setOrganizers: React.Dispatch<R
           name="price"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Giá vé (VND)</FormLabel>
+              <FormLabel>Giá vé ($)</FormLabel>
               <FormControl>
                 <Input {...field} type="number" onChange={e => field.onChange(parseFloat(e.target.value))} />
               </FormControl>
