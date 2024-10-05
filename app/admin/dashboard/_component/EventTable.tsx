@@ -19,6 +19,7 @@ interface Event {
   category: {
     name: string;
   };
+  documentUrl: string;
 }
 
 interface EventTableProps {
@@ -98,6 +99,7 @@ export default function EventTable({ events, onDelete, onSearch, onCategoryChang
             <th className="py-2 px-4 border-b">Loại sự kiện</th>
             <th className="py-2 px-4 border-b">Thời gian bắt đầu</th>
             <th className="py-2 px-4 border-b">Thời gian kết thúc</th>
+            <th className="py-2 px-4 border-b">Tài liệu</th>
             <th className="py-2 px-4 border-b">Hành động</th>
           </tr>
         </thead>
@@ -119,6 +121,13 @@ export default function EventTable({ events, onDelete, onSearch, onCategoryChang
               <td className="py-2 px-4 border-b">{event.category.name}</td>
               <td className="py-2 px-4 border-b">{new Date(event.startDateTime).toLocaleString()}</td>
               <td className="py-2 px-4 border-b">{new Date(event.endDateTime).toLocaleString()}</td>
+              <td className="py-2 px-4 border-b">
+                {(event as Event & { url: string }).url ? (
+                  <a href={(event as Event & { url: string }).url} target="_blank" rel="noopener noreferrer" className="text-blue-500 hover:underline">
+                    Xem tài liệu
+                  </a>
+                ) : null}
+              </td>
               <td className="py-2 px-4 border-b">
                 <Link href={`/events/${event._id}/update`}>
                   <Button variant="outline" className="mr-2" title="Edit">

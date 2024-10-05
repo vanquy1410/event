@@ -42,7 +42,10 @@ const EventForm = ({ userId, type, event, eventId }: EventFormProps) => {
 
   const form = useForm<z.infer<typeof eventFormSchema>>({
     resolver: zodResolver(eventFormSchema),
-    defaultValues: initialValues
+    defaultValues: {
+      ...initialValues,
+      // documentUrl: '',
+    }
   })
  
   const onSubmit = async (values: z.infer<typeof eventFormSchema>) => {
@@ -166,8 +169,10 @@ const EventForm = ({ userId, type, event, eventId }: EventFormProps) => {
                 <FormItem className="w-full">
                   <FormControl className="h-72">
                     <FileUploader 
-                      onFieldChange={field.onChange}
-                      imageUrl={field.value}
+                      onImageChange={(value) => form.setValue('imageUrl', value)}
+                      onDocumentChange={(value) => form.setValue('url', value)}
+                      imageUrl={form.watch('imageUrl')}
+                      documentUrl={form.watch('url')}
                       setFiles={setFiles}
                       eventId={eventId || 'new'} // Thêm prop eventId
                     />
