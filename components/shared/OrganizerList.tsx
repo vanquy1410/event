@@ -15,7 +15,7 @@ const OrganizerList: React.FC<OrganizerListProps> = ({ organizers }) => {
             <th className="py-3 px-4 text-left">Tên</th>
             <th className="py-3 px-4 text-left">Sự kiện</th>
             <th className="py-3 px-4 text-left">Mô tả</th>
-            <th className="py-3 px-4 text-left">Giá (VND)</th>
+            <th className="py-3 px-4 text-left">Giá ($)</th>
             <th className="py-3 px-4 text-left">Địa điểm</th>
             <th className="py-3 px-4 text-left">Trạng thái</th>
           </tr>
