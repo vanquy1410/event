@@ -28,7 +28,11 @@ const OrganizerSchema = new Schema<IOrganizer>({
   eventType: { type: String, required: true },
   price: { type: Number, required: true },
   participantLimit: { type: Number, required: true },
-  status: { type: String, enum: ['pending', 'approved', 'rejected'], default: 'pending' }
+  status: {
+    type: String,
+    enum: ['pending', 'approved', 'rejected'],
+    default: 'pending'
+  }
 });
 
 let Organizer: Model<IOrganizer>;

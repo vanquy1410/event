@@ -1,8 +1,10 @@
 import { IOrganizer } from '@/lib/database/models/organizer.model';
 
+const API_BASE_URL = typeof window !== 'undefined' ? window.location.origin : 'http://localhost:3000';
+
 export async function createOrganizerEvent(eventData: Omit<IOrganizer, 'status'>) {
   try {
-    const response = await fetch('/api/organizer', {
+    const response = await fetch('/api/createOrganizerEvent', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -10,7 +12,8 @@ export async function createOrganizerEvent(eventData: Omit<IOrganizer, 'status'>
       body: JSON.stringify(eventData),
     });
     if (!response.ok) {
-      throw new Error('Lỗi khi tạo sự kiện');
+      const errorData = await response.json();
+      throw new Error(errorData.error || 'Lỗi khi tạo sự kiện');
     }
     return await response.json();
   } catch (error) {
