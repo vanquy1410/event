@@ -17,7 +17,12 @@ const EventCalendarPage = () => {
   useEffect(() => {
     const fetchEvents = async () => {
       try {
-        const fetchedEvents = await getAllEvents();
+        const fetchedEvents = await getAllEvents({
+          query: '',
+          category: '',
+          page: 1,
+          limit: 10
+        });
         if (fetchedEvents && fetchedEvents.data) {
           setEvents(fetchedEvents.data);
         } else {
