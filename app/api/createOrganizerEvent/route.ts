@@ -1,15 +1,24 @@
 import { NextResponse } from 'next/server';
-import { createOrganizerEvent } from '@/lib/actions/organizer.actions';
+import { connectToDatabase } from '@/lib/database';
+import Organizer from '@/lib/database/models/organizer.model';
 
 export async function POST(request: Request) {
   try {
+    await connectToDatabase();
     const eventData = await request.json();
-    const newEvent = await createOrganizerEvent(eventData);
+    const newEvent = await Organizer.create({
+      ...eventData,
+      status: 'pending'
+    });
     return NextResponse.json(newEvent, { status: 200 });
   } catch (error) {
-    console.error('Error in API route:', error);
+    console.error('Lỗi trong API route:', error);
     return NextResponse.json(
-      { error: 'Error creating event', details: error instanceof Error ? error.message : String(error) },
+      { 
+        error: 'Lỗi khi tạo sự kiện', 
+        details: error instanceof Error ? error.message : String(error),
+        stack: error instanceof Error ? error.stack : undefined
+      },
       { status: 500 }
     );
   }

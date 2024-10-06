@@ -54,20 +54,20 @@ const OrganizerEventForm = ({ setOrganizers }: { setOrganizers: React.Dispatch<R
         body: JSON.stringify(values),
       });
 
-      if (response.ok) {
-        const data = await response.json();
-        console.log('Event created:', data);
-        alert('Sự kiện đã được gửi và đang chờ duyệt');
-        form.reset();
-        // Refresh the organizer list
-        const updatedOrganizers = await getOrganizerEvents();
-        setOrganizers(updatedOrganizers);
-      } else {
+      if (!response.ok) {
         const errorData = await response.json();
-        throw new Error(errorData.error || 'Failed to create event');
+        throw new Error(errorData.error || 'Không thể tạo sự kiện');
       }
+
+      const data = await response.json();
+      console.log('Event created:', data);
+      alert('Sự kiện đã được gửi và đang chờ duyệt (pending)');
+      form.reset();
+      // Refresh the organizer list
+      const updatedOrganizers = await getOrganizerEvents();
+      setOrganizers(updatedOrganizers);
     } catch (error) {
-      console.error('Error submitting event:', error);
+      console.error('Lỗi khi gửi sự kiện:', error);
       alert('Có lỗi xảy ra khi gửi sự kiện: ' + (error instanceof Error ? error.message : String(error)));
     }
   };
