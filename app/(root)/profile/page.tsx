@@ -2,11 +2,11 @@ import Collection from '@/components/shared/Collection'
 import { Button } from '@/components/ui/button'
 import { getEventsByUser } from '@/lib/actions/event.actions'
 import { getOrdersByUser } from '@/lib/actions/order.actions'
-import { IOrder } from '@/lib/database/models/order.model'
-import { SearchParamProps } from '@/types'
+import { IOrder, SearchParamProps } from '@/types'
 import { auth } from '@clerk/nextjs'
 import Link from 'next/link'
 import React from 'react'
+import TicketList from '@/components/shared/TicketList'
 
 const ProfilePage = async ({ searchParams }: SearchParamProps) => {
   const { sessionClaims } = auth();
@@ -34,15 +34,9 @@ const ProfilePage = async ({ searchParams }: SearchParamProps) => {
       </section>
 
       <section className="wrapper my-8">
-        <Collection 
-          data={orders?.data || []}
-          emptyTitle="No event tickets purchased yet"
-          emptyStateSubtext="No worries - plenty of exciting events to explore!"
-          collectionType="My_Tickets"
-          limit={3}
+        <TicketList 
+          userId={userId}
           page={ordersPage}
-          urlParamName="ordersPage"
-          totalPages={orders?.totalPages}
         />
       </section>
 

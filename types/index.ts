@@ -1,3 +1,26 @@
+import { Document } from 'mongoose';
+
+export interface IEvent {
+  _id: string;
+  title: string;
+  description: string;
+  imageUrl: string;
+  startDateTime: Date;
+  endDateTime: Date;
+  price: string;
+  // Add other fields as needed
+}
+
+export interface IOrder extends Document {
+  _id: string;
+  createdAt: Date;
+  stripeId: string;
+  totalAmount: string;
+  event: IEvent;
+  buyer: string;
+  // Add other fields as needed
+}
+
 // ====== USER PARAMS
 export type CreateUserParams = {
   clerkId: string
@@ -148,6 +171,5 @@ export type RemoveUrlQueryParams = {
 }
 
 export type SearchParamProps = {
-  params: { id: string }
   searchParams: { [key: string]: string | string[] | undefined }
 }
