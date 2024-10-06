@@ -17,6 +17,7 @@ export default async function Home({ searchParams }: SearchParamProps) {
   const endDate = searchParams?.endDate as string;
   const minPrice = searchParams?.minPrice ? Number(searchParams.minPrice) : undefined;
   const maxPrice = searchParams?.maxPrice ? Number(searchParams.maxPrice) : undefined;
+  const isFree = searchParams?.isFree === 'true'; // Thêm dòng này
 
   const events = await getAllEvents({
     query: searchText,
@@ -26,7 +27,8 @@ export default async function Home({ searchParams }: SearchParamProps) {
     startDate,
     endDate,
     minPrice,
-    maxPrice
+    maxPrice,
+    isFree // Thêm tham số này
   })
 
   return (

@@ -3,29 +3,35 @@
 import React, { useState } from 'react';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { FaChevronDown, FaChevronUp } from 'react-icons/fa';
 
 const AdvancedSearch = () => {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const [isAdvancedOpen, setIsAdvancedOpen] = useState(false);
-  const [searchParams, setSearchParams] = useState({
-    query: '',
-    startDate: '',
-    endDate: '',
-    minPrice: '',
-    maxPrice: '',
+  const [searchValues, setSearchValues] = useState({
+    query: searchParams.get('query') || '',
+    startDate: searchParams.get('startDate') || '',
+    endDate: searchParams.get('endDate') || '',
+    minPrice: searchParams.get('minPrice') || '',
+    maxPrice: searchParams.get('maxPrice') || '',
+    isFree: searchParams.get('isFree') === 'true',
   });
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
-    setSearchParams(prev => ({ ...prev, [name]: value }));
+    setSearchValues(prev => ({ ...prev, [name]: value }));
+  };
+
+  const handleFreeToggle = () => {
+    setSearchValues(prev => ({ ...prev, isFree: !prev.isFree }));
   };
 
   const handleSearch = () => {
     const queryString = new URLSearchParams();
-    Object.entries(searchParams).forEach(([key, value]) => {
-      if (value) queryString.append(key, value);
+    Object.entries(searchValues).forEach(([key, value]) => {
+      if (value !== '' && value !== false) queryString.append(key, String(value));
     });
     router.push(`/?${queryString.toString()}`);
   };
@@ -37,7 +43,7 @@ const AdvancedSearch = () => {
           type="text"
           name="query"
           placeholder="Tìm kiếm sự kiện..."
-          value={searchParams.query}
+          value={searchValues.query}
           onChange={handleInputChange}
           className="flex-grow"
         />
@@ -57,14 +63,14 @@ const AdvancedSearch = () => {
               type="date"
               name="startDate"
               placeholder="Ngày bắt đầu"
-              value={searchParams.startDate}
+              value={searchValues.startDate}
               onChange={handleInputChange}
             />
             <Input
               type="date"
               name="endDate"
               placeholder="Ngày kết thúc"
-              value={searchParams.endDate}
+              value={searchValues.endDate}
               onChange={handleInputChange}
             />
           </div>
@@ -73,16 +79,24 @@ const AdvancedSearch = () => {
               type="number"
               name="minPrice"
               placeholder="Giá thấp nhất"
-              value={searchParams.minPrice}
+              value={searchValues.minPrice}
               onChange={handleInputChange}
             />
             <Input
               type="number"
               name="maxPrice"
               placeholder="Giá cao nhất"
-              value={searchParams.maxPrice}
+              value={searchValues.maxPrice}
               onChange={handleInputChange}
             />
+          </div>
+          <div className="flex items-center space-x-2">
+            <Button 
+              onClick={handleFreeToggle}
+              variant={searchValues.isFree ? "default" : "outline"}
+            >
+              {searchValues.isFree ? "Tất cả sự kiện" : "Chỉ sự kiện miễn phí"}
+            </Button>
           </div>
           <Button onClick={handleSearch} className="w-full">Tìm kiếm nâng cao</Button>
         </div>

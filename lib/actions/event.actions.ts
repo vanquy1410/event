@@ -123,12 +123,14 @@ export async function getAllEvents({
   startDate,
   endDate,
   minPrice,
-  maxPrice
+  maxPrice,
+  isFree
 }: GetAllEventsParams & {
   startDate?: string;
   endDate?: string;
   minPrice?: number;
   maxPrice?: number;
+  isFree?: boolean;
 }) {
   try {
     await connectToDatabase()
@@ -151,12 +153,16 @@ export async function getAllEvents({
       conditions.endDateTime = { $lte: new Date(endDate) }
     }
 
-    if (minPrice !== undefined) {
-      conditions.price = { $gte: minPrice }
-    }
+    if (isFree) {
+      conditions.isFree = true
+    } else {
+      if (minPrice !== undefined) {
+        conditions.price = { $gte: minPrice }
+      }
 
-    if (maxPrice !== undefined) {
-      conditions.price = { ...conditions.price, $lte: maxPrice }
+      if (maxPrice !== undefined) {
+        conditions.price = { ...conditions.price, $lte: maxPrice }
+      }
     }
 
     const skipAmount = (Number(page) - 1) * limit
