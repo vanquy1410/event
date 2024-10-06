@@ -115,40 +115,66 @@ export async function deleteEvent({ eventId, path }: DeleteEventParams) {
 }
 
 // GET ALL EVENTS
-export async function getAllEvents({ query, category, limit, page }: GetAllEventsParams = {}) {
+export async function getAllEvents({
+  query,
+  category,
+  page = 1,
+  limit = 6,
+  startDate,
+  endDate,
+  minPrice,
+  maxPrice
+}: GetAllEventsParams & {
+  startDate?: string;
+  endDate?: string;
+  minPrice?: number;
+  maxPrice?: number;
+}) {
   try {
     await connectToDatabase()
 
-    const titleCondition = query ? { title: { $regex: query, $options: 'i' } } : {}
-    const categoryCondition = category ? { category: category } : {}
+    const conditions: any = {}
 
-    const conditions = {
-      $and: [titleCondition, categoryCondition],
+    if (query) {
+      conditions.title = { $regex: query, $options: 'i' }
     }
 
-    const skipAmount = (page && limit) ? (page - 1) * limit : 0
+    if (category) {
+      conditions.category = category
+    }
+
+    if (startDate) {
+      conditions.startDateTime = { $gte: new Date(startDate) }
+    }
+
+    if (endDate) {
+      conditions.endDateTime = { $lte: new Date(endDate) }
+    }
+
+    if (minPrice !== undefined) {
+      conditions.price = { $gte: minPrice }
+    }
+
+    if (maxPrice !== undefined) {
+      conditions.price = { ...conditions.price, $lte: maxPrice }
+    }
+
+    const skipAmount = (Number(page) - 1) * limit
 
     const eventsQuery = Event.find(conditions)
       .sort({ createdAt: 'desc' })
       .skip(skipAmount)
+      .limit(limit)
 
-    if (limit) {
-      eventsQuery.limit(limit)
-    }
-
-    const events = await eventsQuery.exec()
+    const events = await populateEvent(eventsQuery)
     const eventsCount = await Event.countDocuments(conditions)
 
     return {
       data: JSON.parse(JSON.stringify(events)),
-      totalPages: limit ? Math.ceil(eventsCount / limit) : 1,
+      totalPages: Math.ceil(eventsCount / limit)
     }
   } catch (error) {
-    console.error('Lỗi khi lấy sự kiện:', error)
-    return {
-      data: [],
-      totalPages: 0,
-    }
+    handleError(error)
   }
 }
 
@@ -158,7 +184,7 @@ export async function getEventsByUser({ userId, limit = 6, page }: GetEventsByUs
     await connectToDatabase()
 
     const conditions = { organizer: userId }
-    const skipAmount = (page - 1) * limit
+    const skipAmount = (Number(page) - 1) * limit
 
     const eventsQuery = Event.find(conditions)
       .sort({ createdAt: 'desc' })
