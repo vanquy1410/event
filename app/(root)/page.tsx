@@ -1,11 +1,11 @@
 import CategoryFilter from '@/components/shared/CategoryFilter';
 import Collection from '@/components/shared/Collection'
-import Search from '@/components/shared/Search';
 import { Button } from '@/components/ui/button'
 import { getAllEvents } from '@/lib/actions/event.actions';
 import { SearchParamProps } from '@/types';
 import Image from 'next/image'
 import Link from 'next/link'
+import AdvancedSearch from '@/components/shared/AdvancedSearch';
 // import ChatbotScript from '@/components/shared/Chatbot';
 
 
@@ -13,12 +13,22 @@ export default async function Home({ searchParams }: SearchParamProps) {
   const page = Number(searchParams?.page) || 1;
   const searchText = (searchParams?.query as string) || '';
   const category = (searchParams?.category as string) || '';
+  const startDate = searchParams?.startDate as string;
+  const endDate = searchParams?.endDate as string;
+  const minPrice = searchParams?.minPrice ? Number(searchParams.minPrice) : undefined;
+  const maxPrice = searchParams?.maxPrice ? Number(searchParams.maxPrice) : undefined;
+  const isFree = searchParams?.isFree === 'true'; // Thêm dòng này
 
   const events = await getAllEvents({
     query: searchText,
     category,
     page,
-    limit: 6
+    limit: 6,
+    startDate,
+    endDate,
+    minPrice,
+    maxPrice,
+    isFree // Thêm tham số này
   })
 
   return (
@@ -49,21 +59,24 @@ export default async function Home({ searchParams }: SearchParamProps) {
         <h2 className="h2-bold">Khám phá Sự kiện</h2>
 
         <div className="flex w-full flex-col gap-5 md:flex-row">
-          <Search />
-          <CategoryFilter />
+          <div className="flex-1 w-full md:w-1/2">
+            <AdvancedSearch />
+          </div>
+          <div className="flex-1 w-full md:w-1/2">
+            <CategoryFilter />
+          </div>
         </div>
 
         <Collection 
           data={events?.data}
-          emptyTitle="No Events Found"
-          emptyStateSubtext="Come back later"
+          emptyTitle="Không tìm thấy sự kiện nào"
+          emptyStateSubtext="Hãy thử tìm kiếm khác"
           collectionType="All_Events"
           limit={6}
           page={page}
           totalPages={events?.totalPages}
         />
       </section>
-      {/* <ChatbotScript /> */}
     </>
   )
 }

@@ -5,8 +5,8 @@ import { formatDateTime } from '@/lib/utils';
 import { SearchParamProps } from '@/types'
 import Image from 'next/image';
 
-const EventDetails = async ({ params: { id }, searchParams }: SearchParamProps) => {
-  const event = await getEventById(id);
+const EventDetails = async ({ params, searchParams }: SearchParamProps) => {
+  const event = await getEventById(params.id);
 
   const relatedEvents = await getRelatedEventsByCategory({
     categoryId: event.category._id,
