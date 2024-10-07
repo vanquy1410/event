@@ -94,7 +94,18 @@ const EventDetails = async ({ params, searchParams }: SearchParamProps) => {
         </div>
       </div>
     </section>
-
+    <div className="wrapper my-8">
+      <h2 className="h2-bold mb-4">Đánh giá</h2>
+      <ReviewList reviews={reviews} />
+      {userId && user && (
+        <ReviewForm 
+          eventId={params.id} 
+          userId={userId}
+          userFirstName={user.firstName ?? ''}
+          userLastName={user.lastName ?? ''}
+        />
+      )}
+    </div>
     {/* EVENTS with the same category */}
     <section className="wrapper my-8 flex flex-col gap-8 md:gap-12">
       <h2 className="h2-bold">Sự kiện liên quan</h2>
@@ -110,18 +121,7 @@ const EventDetails = async ({ params, searchParams }: SearchParamProps) => {
         />
     </section>
 
-    <div className="wrapper my-8">
-      <h2 className="h2-bold mb-4">Đánh giá</h2>
-      <ReviewList reviews={reviews} />
-      {userId && user && (
-        <ReviewForm 
-          eventId={params.id} 
-          userId={userId}
-          userFirstName={user.firstName ?? ''}
-          userLastName={user.lastName ?? ''}
-        />
-      )}
-    </div>
+    
     </>
   )
 }

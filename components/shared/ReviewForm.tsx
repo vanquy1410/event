@@ -1,13 +1,13 @@
 'use client';
 
 import { useState } from 'react';
-import { useForm } from 'react-hook-form';
+import { useForm, Controller } from 'react-hook-form';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { createReview } from '@/lib/actions/review.actions';
 import { useRouter } from 'next/navigation';
 import { toast } from 'react-hot-toast';
+import ReactStars from 'react-rating-stars-component';
 
 type ReviewFormProps = {
   eventId: string;
@@ -17,7 +17,7 @@ type ReviewFormProps = {
 };
 
 const ReviewForm = ({ eventId, userId, userFirstName, userLastName }: ReviewFormProps) => {
-  const { register, handleSubmit, reset } = useForm();
+  const { control, handleSubmit, reset } = useForm();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const router = useRouter();
 
@@ -31,7 +31,7 @@ const ReviewForm = ({ eventId, userId, userFirstName, userLastName }: ReviewForm
           firstName: userFirstName,
           lastName: userLastName
         },
-        rating: parseInt(data.rating),
+        rating: data.rating,
         comment: data.comment,
       });
       reset();
@@ -55,23 +55,38 @@ const ReviewForm = ({ eventId, userId, userFirstName, userLastName }: ReviewForm
         <label htmlFor="rating" className="block text-sm font-medium text-gray-700">
           Đánh giá
         </label>
-        <Input
-          type="number"
-          id="rating"
-          {...register('rating', { required: true, min: 1, max: 5 })}
-          min="1"
-          max="5"
-          className="mt-1"
+        <Controller
+          name="rating"
+          control={control}
+          defaultValue={0}
+          rules={{ required: true }}
+          render={({ field: { onChange, value } }) => (
+            <ReactStars
+              count={5}
+              onChange={onChange}
+              size={24}
+              activeColor="#ffd700"
+              value={value}
+            />
+          )}
         />
       </div>
       <div>
         <label htmlFor="comment" className="block text-sm font-medium text-gray-700">
           Bình luận
         </label>
-        <Textarea
-          id="comment"
-          {...register('comment', { required: true })}
-          className="mt-1"
+        <Controller
+          name="comment"
+          control={control}
+          defaultValue=""
+          rules={{ required: true }}
+          render={({ field }) => (
+            <Textarea
+              id="comment"
+              {...field}
+              className="mt-1"
+            />
+          )}
         />
       </div>
       <Button type="submit" disabled={isSubmitting}>

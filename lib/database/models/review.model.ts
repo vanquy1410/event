@@ -22,7 +22,7 @@ const ReviewSchema = new mongoose.Schema<IReview>({
     firstName: { type: String, required: true },
     lastName: { type: String, required: true }
   },
-  rating: { type: Number, required: true, min: 1, max: 5 },
+  rating: { type: Number, required: true, min: 0, max: 5 },
   comment: { type: String, required: true },
 }, { timestamps: true });
 
