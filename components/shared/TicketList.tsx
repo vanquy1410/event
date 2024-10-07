@@ -14,15 +14,16 @@ import {
   DialogClose
 } from "@/components/ui/dialog"
 import { IOrder } from '@/types'
+import Pagination from './Pagination'
 
 interface TicketListProps {
   userId: string
+  orders: IOrder[]
   page: number
+  totalPages: number
 }
 
-const TicketList = async ({ userId, page }: TicketListProps) => {
-  const orders = await getOrdersByUser({ userId, page })
-
+const TicketList = ({ userId, orders, page, totalPages }: TicketListProps) => {
   return (
     <div className="overflow-x-auto">
       <table className="min-w-full divide-y divide-gray-200">
@@ -39,7 +40,7 @@ const TicketList = async ({ userId, page }: TicketListProps) => {
           </tr>
         </thead>
         <tbody className="bg-white divide-y divide-gray-200">
-          {orders?.data.map((order: IOrder, index: number) => (
+          {orders?.map((order: IOrder, index: number) => (
             <tr key={order._id} className="hover:bg-gray-50">
               <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{index + 1}</td>
               <td className="px-6 py-4 whitespace-nowrap">
@@ -93,6 +94,15 @@ const TicketList = async ({ userId, page }: TicketListProps) => {
           ))}
         </tbody>
       </table>
+      {totalPages > 1 && (
+        <div className="flex justify-center mt-4">
+          <Pagination 
+            page={page}
+            totalPages={totalPages}
+            urlParamName="ordersPage"
+          />
+        </div>
+      )}
     </div>
   )
 }

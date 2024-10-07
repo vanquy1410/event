@@ -15,7 +15,9 @@ const ProfilePage = async ({ searchParams }: SearchParamProps) => {
   const ordersPage = Number(searchParams?.ordersPage) || 1;
   const eventsPage = Number(searchParams?.eventsPage) || 1;
 
-  const orders = await getOrdersByUser({ userId, page: ordersPage})
+  const ordersData = await getOrdersByUser({ userId, page: ordersPage, limit: 10 })
+  const orders = ordersData?.data || []
+  const ordersTotalPages = ordersData?.totalPages || 1
 
   const organizedEvents = await getEventsByUser({ userId, page: eventsPage })
 
@@ -36,7 +38,9 @@ const ProfilePage = async ({ searchParams }: SearchParamProps) => {
       <section className="wrapper my-8">
         <TicketList 
           userId={userId}
+          orders={orders}
           page={ordersPage}
+          totalPages={ordersTotalPages}
         />
       </section>
 
