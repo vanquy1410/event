@@ -62,12 +62,10 @@ const EventDetails = async ({ params, searchParams }: SearchParamProps) => {
               <Image src="/assets/icons/calendar.svg" alt="calendar" width={32} height={32} />
               <div className="p-medium-16 lg:p-regular-20 flex flex-wrap items-center">
                 <p>
-                  {formatDateTime(event.startDateTime).dateOnly} - {' '}
-                  {formatDateTime(event.startDateTime).timeOnly}
+                  {event.startDateTime ? formatDateTime(event.startDateTime).dateTime : 'Chưa có ngày'}
                 </p>
                 <p>
-                  {formatDateTime(event.endDateTime).dateOnly} -  {' '}
-                  {formatDateTime(event.endDateTime).timeOnly}
+                  {event.endDateTime ? formatDateTime(event.endDateTime).dateTime : 'Chưa có ngày'}
                 </p>
               </div>
             </div>
