@@ -4,6 +4,10 @@ import { getEventById, getRelatedEventsByCategory } from '@/lib/actions/event.ac
 import { formatDateTime } from '@/lib/utils';
 import { SearchParamProps } from '@/types'
 import Image from 'next/image';
+import ReviewForm from '@/components/shared/ReviewForm';
+import ReviewList from '@/components/shared/ReviewList';
+import { getReviewsByEvent } from '@/lib/actions/review.actions';
+import { auth, currentUser } from "@clerk/nextjs";
 
 const EventDetails = async ({ params, searchParams }: SearchParamProps) => {
   const event = await getEventById(params.id);
@@ -13,6 +17,10 @@ const EventDetails = async ({ params, searchParams }: SearchParamProps) => {
     eventId: event._id,
     page: searchParams.page as string,
   })
+
+  const reviews = await getReviewsByEvent(params.id);
+  const { userId } = auth();
+  const user = await currentUser();
 
   return (
     <>
@@ -86,7 +94,18 @@ const EventDetails = async ({ params, searchParams }: SearchParamProps) => {
         </div>
       </div>
     </section>
-
+    <div className="wrapper my-8">
+      <h2 className="h2-bold mb-4">Đánh giá</h2>
+      <ReviewList reviews={reviews} />
+      {userId && user && (
+        <ReviewForm 
+          eventId={params.id} 
+          userId={userId}
+          userFirstName={user.firstName ?? ''}
+          userLastName={user.lastName ?? ''}
+        />
+      )}
+    </div>
     {/* EVENTS with the same category */}
     <section className="wrapper my-8 flex flex-col gap-8 md:gap-12">
       <h2 className="h2-bold">Sự kiện liên quan</h2>
@@ -101,6 +120,8 @@ const EventDetails = async ({ params, searchParams }: SearchParamProps) => {
           totalPages={relatedEvents?.totalPages}
         />
     </section>
+
+    
     </>
   )
 }
