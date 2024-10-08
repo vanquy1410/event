@@ -5,7 +5,7 @@ import { clerkClient } from "@clerk/nextjs/server";
 
 export async function setRole(formData: FormData) {
   // Check that the user trying to set the role is an admin or employee
-  if (!checkRole(["admin", "employee"])) {
+  if (!checkRole(["admin", "organizer"])) {
     return { message: "Not Authorized" };
   }
 
