@@ -20,6 +20,7 @@ const OrganizerPage = () => {
     email: '',
     description: '',
     price: 0,
+    status: '',
   });
   const [editingOrganizerId, setEditingOrganizerId] = useState<string | null>(null);
 
@@ -78,16 +79,21 @@ const OrganizerPage = () => {
   };
 
   const handleEdit = (id: string) => {
-    setEditingOrganizerId(id);
     const organizerToEdit = organizers.find(org => org._id === id);
     if (organizerToEdit) {
-      setOrganizerData({
-        name: organizerToEdit.name,
-        email: organizerToEdit.email,
-        description: organizerToEdit.description,
-        price: organizerToEdit.price,
-      });
-      setIsEditing(true);
+      if (organizerToEdit.status === 'pending') {
+        setEditingOrganizerId(id);
+        setOrganizerData({
+          name: organizerToEdit.name,
+          email: organizerToEdit.email,
+          description: organizerToEdit.description,
+          price: organizerToEdit.price,
+          status: organizerToEdit.status,
+        });
+        setIsEditing(true);
+      } else {
+        alert('Chỉ có thể chỉnh sửa phiếu đang ở trạng thái chờ duyệt.');
+      }
     } else {
       console.error('Không tìm thấy ban tổ chức với ID:', id);
     }
