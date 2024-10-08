@@ -12,7 +12,7 @@ const waitFor = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
 export default async function AdminDashboard(params: {
   searchParams: { search?: string };
 }) {
-  if (!checkRole(["admin", "employee"])) {
+  if (!checkRole(["admin", "organizer"])) {
     // Hiển thị thông báo không có quyền truy cập
     return (
       <div className="flex items-center justify-center min-h-screen">
