@@ -245,3 +245,21 @@ export async function getAllEventsForAdmin() {
     handleError(error)
   }
 }
+
+export async function getUpcomingEvents(limit: number = 5) {
+  try {
+    await connectToDatabase();
+
+    const today = new Date();
+    const events = await Event.find({ startDateTime: { $gte: today } })
+      .select('title startDateTime imageUrl') // Thêm 'imageUrl' vào đây
+      .sort({ startDateTime: 1 })
+      .limit(limit)
+      .lean();
+
+    return JSON.parse(JSON.stringify(events));
+  } catch (error) {
+    console.error('Lỗi khi lấy sự kiện sắp diễn ra:', error);
+    throw error;
+  }
+}
