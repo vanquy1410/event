@@ -1,11 +1,13 @@
 import React from 'react';
 import { IOrganizer } from '@/lib/database/models/organizer.model';
+import { Button } from '@/components/ui/button';
 
 interface OrganizerListProps {
   organizers: IOrganizer[];
+  onEdit: (id: string) => void;
 }
 
-const OrganizerList: React.FC<OrganizerListProps> = ({ organizers }) => {
+const OrganizerList: React.FC<OrganizerListProps> = ({ organizers, onEdit }) => {
   return (
     <div className="mt-6 overflow-x-auto">
       <h2 className="text-xl font-semibold mb-4">Danh sách Ban Tổ Chức</h2>
@@ -18,6 +20,7 @@ const OrganizerList: React.FC<OrganizerListProps> = ({ organizers }) => {
             <th className="py-3 px-4 text-left">Giá ($)</th>
             <th className="py-3 px-4 text-left">Địa điểm</th>
             <th className="py-3 px-4 text-left">Trạng thái</th>
+            <th className="py-2 px-4 border-b">Hành động</th>
           </tr>
         </thead>
         <tbody>
@@ -38,6 +41,11 @@ const OrganizerList: React.FC<OrganizerListProps> = ({ organizers }) => {
                    organizer.status === 'pending' ? 'Chờ duyệt' :
                    'Từ chối'}
                 </span>
+              </td>
+              <td className="py-2 px-4 border-b">
+                <Button onClick={() => onEdit(organizer._id)} variant="outline" size="sm">
+                  Sửa
+                </Button>
               </td>
             </tr>
           ))}

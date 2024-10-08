@@ -1,4 +1,6 @@
 import { IOrganizer } from '@/lib/database/models/organizer.model';
+import { connectToDatabase } from '@/lib/database';
+import Organizer from '@/lib/database/models/organizer.model';
 
 const API_BASE_URL = typeof window !== 'undefined' ? window.location.origin : 'http://localhost:3000';
 
@@ -32,6 +34,24 @@ export async function getOrganizerEvents(status?: 'pending' | 'approved' | 'reje
     return await response.json();
   } catch (error) {
     console.error('Lỗi khi lấy danh sách sự kiện:', error);
+    throw error;
+  }
+}
+
+export async function updateOrganizerEvent(id: string, eventData: Partial<IOrganizer>) {
+  try {
+    await connectToDatabase();
+    const updatedOrganizer = await Organizer.findByIdAndUpdate(
+      id,
+      { $set: eventData },
+      { new: true }
+    );
+    if (!updatedOrganizer) {
+      throw new Error('Không tìm thấy ban tổ chức');
+    }
+    return updatedOrganizer.toObject();
+  } catch (error) {
+    console.error('Lỗi khi cập nhật thông tin ban tổ chức:', error);
     throw error;
   }
 }
