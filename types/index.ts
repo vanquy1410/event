@@ -174,3 +174,8 @@ export type SearchParamProps = {
   params: { id: string };
   searchParams: { [key: string]: string | string[] | undefined };
 };
+
+type Organizer = {
+  // ... other properties
+  status: "pending" | "approved" | "rejected" | "cancelled";
+};

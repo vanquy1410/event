@@ -13,7 +13,7 @@ export interface IOrganizer {
   eventType: string;
   price: number;
   participantLimit: number;
-  status: 'pending' | 'approved' | 'rejected';
+  status: 'pending' | 'approved' | 'rejected' | 'cancelled';
 }
 
 const OrganizerSchema = new Schema<IOrganizer>({
@@ -30,7 +30,7 @@ const OrganizerSchema = new Schema<IOrganizer>({
   participantLimit: { type: Number, required: true },
   status: {
     type: String,
-    enum: ['pending', 'approved', 'rejected'],
+    enum: ['pending', 'approved', 'rejected', 'cancelled'],
     default: 'pending'
   }
 });

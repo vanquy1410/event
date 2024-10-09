@@ -7,7 +7,7 @@ interface Organizer {
   name: string;
   eventTitle: string;
   description: string;
-  status: 'pending' | 'approved' | 'rejected';
+  status: 'pending' | 'approved' | 'rejected' | 'cancelled';
 }
 
 interface OrganizerTableProps {
