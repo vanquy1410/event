@@ -5,9 +5,10 @@ import { Button } from '@/components/ui/button';
 interface OrganizerListProps {
   organizers: IOrganizer[];
   onEdit: (id: string) => void;
+  onCancel: (id: string) => void;
 }
 
-const OrganizerList: React.FC<OrganizerListProps> = ({ organizers, onEdit }) => {
+const OrganizerList: React.FC<OrganizerListProps> = ({ organizers, onEdit, onCancel }) => {
   return (
     <div className="mt-6 overflow-x-auto">
       <h2 className="text-xl font-semibold mb-4">Danh sách Ban Tổ Chức</h2>
@@ -32,7 +33,7 @@ const OrganizerList: React.FC<OrganizerListProps> = ({ organizers, onEdit }) => 
               <td className="py-3 px-4 border-b">{organizer.price.toLocaleString('vi-VN')}</td>
               <td className="py-3 px-4 border-b">{organizer.location}</td>
               <td className="py-3 px-4 border-b">
-                <span className={`px-2 py-1 rounded-full text-xs ${
+                <span className={`px-3 py-1 rounded-full text-sm font-medium inline-block min-w-[100px] text-center ${
                   organizer.status === 'approved' ? 'bg-green-200 text-green-800' :
                   organizer.status === 'pending' ? 'bg-yellow-200 text-yellow-800' :
                   'bg-red-200 text-red-800'
@@ -43,9 +44,12 @@ const OrganizerList: React.FC<OrganizerListProps> = ({ organizers, onEdit }) => 
                 </span>
               </td>
               <td className="py-2 px-4 border-b">
-                <Button onClick={() => onEdit(organizer._id)} variant="outline" size="sm">
-                  Sửa
-                </Button>
+                {organizer.status === 'pending' && (
+                  <div className="flex space-x-2">
+                    <Button onClick={() => onEdit(organizer._id)} size="sm">Chỉnh sửa</Button>
+                    <Button onClick={() => onCancel(organizer._id)} variant="destructive" size="sm">Hủy</Button>
+                  </div>
+                )}
               </td>
             </tr>
           ))}
