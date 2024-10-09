@@ -44,13 +44,19 @@ const TicketList = ({ userId, orders, page, totalPages }: TicketListProps) => {
             <tr key={order._id} className="hover:bg-gray-50">
               <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{index + 1}</td>
               <td className="px-6 py-4 whitespace-nowrap">
-                <Image
-                  src={order.event.imageUrl}
-                  alt={order.event.title}
-                  width={50}
-                  height={50}
-                  className="rounded-full"
-                />
+                {order.event && order.event.imageUrl ? (
+                  <Image
+                    src={order.event.imageUrl}
+                    alt={order.event.title || 'Event image'}
+                    width={50}
+                    height={50}
+                    className="rounded-full"
+                  />
+                ) : (
+                  <div className="w-12 h-12 bg-gray-200 rounded-full flex items-center justify-center">
+                    <span className="text-gray-500">No image</span>
+                  </div>
+                )}
               </td>
               <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{order.event.title}</td>
               <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{order.event.description.substring(0, 50)}...</td>
