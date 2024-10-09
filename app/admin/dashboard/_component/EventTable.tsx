@@ -118,7 +118,7 @@ export default function EventTable({ events, onDelete, onSearch, onCategoryChang
               </td>
               <td className="py-2 px-4 border-b">{event.title}</td>
               <td className="py-2 px-4 border-b">{event.description.substring(0, 50)}...</td>
-              <td className="py-2 px-4 border-b">{event.category.name}</td>
+              <td className="py-2 px-4 border-b">{event.category?.name || 'Uncategorized'}</td>
               <td className="py-2 px-4 border-b">{new Date(event.startDateTime).toLocaleString()}</td>
               <td className="py-2 px-4 border-b">{new Date(event.endDateTime).toLocaleString()}</td>
               <td className="py-2 px-4 border-b">

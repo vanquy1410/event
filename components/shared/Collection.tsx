@@ -26,7 +26,7 @@ const Collection = ({
 }: CollectionProps) => {
   return (
     <>
-      {data.length > 0 ? (
+      {data && data.length > 0 ? (
         <div className="flex flex-col items-center gap-10">
           <ul className="grid w-full grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3 xl:gap-10">
             {data.map((item) => {
@@ -41,12 +41,12 @@ const Collection = ({
               if (!event) return null;
 
               return (
-                <li key={event._id || orderId} className="flex justify-center">
+                <li key={event._id?.toString() || orderId?.toString()} className="flex justify-center">
                   <Card 
-                    event={event} 
+                    event={event as IEvent} 
                     hasOrderLink={hasOrderLink} 
                     hidePrice={hidePrice}
-                    orderId={orderId}
+                    orderId={orderId?.toString()}
                   />
                 </li>
               )
