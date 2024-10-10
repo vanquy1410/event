@@ -20,7 +20,6 @@ export interface IOrder extends Document {
   buyer: string;
   // Add other fields as needed
 }
-
 // ====== USER PARAMS
 export type CreateUserParams = {
   clerkId: string
@@ -53,6 +52,7 @@ export type CreateEventParams = {
     isFree: boolean
     url: string
     participantLimit: number // Add this line
+    document?: string;
   }
   path: string
 }
@@ -74,6 +74,7 @@ export type UpdateEventParams = {
     participantLimit?: number // Add this line
     currentParticipants?: number  // Add this line
     seats?: boolean[]  // Make sure this is also included
+    document?: string;
   }
   path: string
 }
@@ -170,12 +171,3 @@ export type RemoveUrlQueryParams = {
   keysToRemove: string[]
 }
 
-export type SearchParamProps = {
-  params: { id: string };
-  searchParams: { [key: string]: string | string[] | undefined };
-};
-
-type Organizer = {
-  // ... other properties
-  status: "pending" | "approved" | "rejected" | "cancelled";
-};
