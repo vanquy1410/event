@@ -16,6 +16,7 @@ import {
 import { IOrder } from '@/types'
 import Pagination from './Pagination'
 import { deleteOrderClient } from '@/lib/actions/order.actions';
+import Link from 'next/link';
 
 interface TicketListProps {
   userId: string
@@ -57,7 +58,7 @@ const TicketList = ({ userId, orders, page, totalPages }: TicketListProps) => {
 
   return (
     <div className="overflow-x-auto">
-      <table className="min-w-full divide-y divide-gray-200">
+      <table className="min-w-full divide-y divide-gray-200 w-full"> {/* Thêm w-full để bảng chiếm toàn bộ chiều rộng */}
         <thead className="bg-primary-50">
           <tr>
             <th scope="col" className="px-6 py-3 text-left text-sm font-bold text-black uppercase tracking-wider">STT</th>
@@ -68,6 +69,7 @@ const TicketList = ({ userId, orders, page, totalPages }: TicketListProps) => {
             <th scope="col" className="px-6 py-3 text-left text-sm font-bold text-black uppercase tracking-wider">Ngày bắt đầu</th>
             <th scope="col" className="px-6 py-3 text-left text-sm font-bold text-black uppercase tracking-wider">Ngày kết thúc</th>
             <th scope="col" className="px-6 py-3 text-left text-sm font-bold text-black uppercase tracking-wider">Chi tiết</th>
+            <th scope="col" className="px-6 py-3 text-left text-sm font-bold text-black uppercase tracking-wider">Tài liệu</th>
           </tr>
         </thead>
         <tbody className="bg-white divide-y divide-gray-200">
@@ -91,7 +93,7 @@ const TicketList = ({ userId, orders, page, totalPages }: TicketListProps) => {
               </td>
               <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{order.event.title}</td>
               <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{order.event.description.substring(0, 50)}...</td>
-              <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{order.totalAmount}</td>
+              <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{order.totalAmount}$</td>
               <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{formatDateTime(order.event.startDateTime).dateTime}</td>
               <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{formatDateTime(order.event.endDateTime).dateTime}</td>
               <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
@@ -130,6 +132,14 @@ const TicketList = ({ userId, orders, page, totalPages }: TicketListProps) => {
                     </DialogFooter>
                   </DialogContent>
                 </Dialog>
+              </td>
+              <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                        {/* Thêm nút "Xem tài liệu" ở đây */}
+                        <Button variant="outline" className="text-primary-500 hover:text-primary-600 hover:bg-primary-50 transition-colors">
+                        <Link href={order.event.url} target="_blank">
+                          Tải tài liệu
+                        </Link>
+                      </Button>
               </td>
             </tr>
           ))} 

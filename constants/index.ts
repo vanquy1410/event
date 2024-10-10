@@ -12,7 +12,7 @@ export const headerLinks = [
   //   route: '/events/create',
   // },
   {
-    label: 'Xem vé',
+    label: 'Vé của bạn',
     route: '/profile',
   },
   {
