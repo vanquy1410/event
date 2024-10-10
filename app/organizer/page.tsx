@@ -99,6 +99,44 @@ const OrganizerPage = () => {
     }
   };
 
+  const handleCancel = async (id: string) => {
+    const organizerToCancel = organizers.find(org => org._id === id);
+    if (organizerToCancel) {
+      if (organizerToCancel.status === 'pending') {
+        if (confirm('Bạn có chắc chắn muốn hủy đăng ký này không?')) {
+          try {
+            const response = await fetch('/api/cancelOrganizer', {
+              method: 'PUT',
+              headers: {
+                'Content-Type': 'application/json',
+              },
+              body: JSON.stringify({ id }),
+            });
+            if (!response.ok) {
+              const errorText = await response.text();
+              console.error('Server response:', errorText);
+              throw new Error('Lỗi khi hủy đăng ký');
+            }
+            const updatedOrganizer = await response.json();
+            setOrganizers(prevOrganizers => 
+              prevOrganizers.map(org => 
+                org._id === id ? updatedOrganizer : org
+              )
+            );
+            alert('Đã hủy đăng ký thành công.');
+          } catch (error) {
+            console.error('Lỗi khi hủy đăng ký:', error);
+            alert('Có lỗi xảy ra khi hủy đăng ký. Vui lòng thử lại sau.');
+          }
+        }
+      } else {
+        alert('Chỉ có thể hủy đăng ký đang ở trạng thái chờ duyệt.');
+      }
+    } else {
+      console.error('Không tìm thấy ban tổ chức với ID:', id);
+    }
+  };
+
   return (
     <div className="container mx-auto py-10">
       <h1 className="text-2xl font-bold mb-5">Đăng ký ban tổ chức sự kiện</h1>
@@ -108,7 +146,13 @@ const OrganizerPage = () => {
       {showForm && <OrganizerEventForm setOrganizers={setOrganizers} />}
       {loading && <p>Đang tải...</p>}
       {error && <p className="text-red-500">{error}</p>}
-      {!loading && !error && <OrganizerList organizers={organizers} onEdit={handleEdit} />}
+      {!loading && !error && (
+        <OrganizerList 
+          organizers={organizers} 
+          onEdit={handleEdit} 
+          onCancel={handleCancel}
+        />
+      )}
       {isEditing && (
         <div className="mt-8 bg-white p-6 rounded-lg shadow-md">
           <h2 className="text-2xl font-semibold mb-4">Chỉnh sửa thông tin ban tổ chức</h2>

@@ -14,6 +14,7 @@ const navItems = [
   { href: "/admin/dashboard/employee-management", label: "Quản lý nhân viên" },
   { href: "/admin/dashboard/contact-form-management", label: "Quản lý form liên hệ" },
   { href: "/admin/dashboard/organizer-management", label: "Quản lý ban tổ chức" },
+  { href: "/admin/dashboard/resource-management", label: "Quản lý tài nguyên" },
 ];
 
 export default function Sidebar() {
