@@ -8,7 +8,7 @@ export interface IEvent {
   startDateTime: Date;
   endDateTime: Date;
   price: string;
-  // Add other fields as needed
+  url?: string;
 }
 
 export interface IOrder extends Document {

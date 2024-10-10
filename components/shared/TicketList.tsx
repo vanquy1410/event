@@ -136,8 +136,8 @@ const TicketList = ({ userId, orders, page, totalPages }: TicketListProps) => {
               <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                         {/* Thêm nút "Xem tài liệu" ở đây */}
                         <Button variant="outline" className="text-primary-500 hover:text-primary-600 hover:bg-primary-50 transition-colors">
-                        <Link href={order.event.url} target="_blank">
-                          Tải tài liệu
+                        <Link href={order.event.url || '#'} target="_blank">
+                        Tải tài liệu
                         </Link>
                       </Button>
               </td>
