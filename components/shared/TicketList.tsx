@@ -1,5 +1,5 @@
-import React, { useState } from 'react'
-import { getOrdersByUser } from '@/lib/actions/order.actions'
+'use client'
+import React, { useState, useEffect } from 'react'
 import Image from 'next/image'
 import { formatDateTime } from '@/lib/utils'
 import { Button } from '@/components/ui/button'
@@ -15,6 +15,7 @@ import {
 } from "@/components/ui/dialog"
 import { IOrder } from '@/types'
 import Pagination from './Pagination'
+import { deleteOrderClient } from '@/lib/actions/order.actions';
 
 interface TicketListProps {
   userId: string
@@ -24,6 +25,36 @@ interface TicketListProps {
 }
 
 const TicketList = ({ userId, orders, page, totalPages }: TicketListProps) => {
+  const [orderList, setOrderList] = useState(orders);
+  const [selectedOrderId, setSelectedOrderId] = useState<string | null>(null);
+  const [isConfirming, setIsConfirming] = useState(false); // Thêm state để kiểm soát xác nhận
+
+  const handleCancelOrder = async () => {
+    if (!selectedOrderId) return;
+
+    try {
+      await deleteOrderClient(selectedOrderId);
+      setOrderList(orderList.filter(order => order._id !== selectedOrderId));
+      setSelectedOrderId(null);
+      setIsConfirming(false); // Đặt lại trạng thái xác nhận
+    } catch (error) {
+      console.error('Lỗi khi hủy đơn hàng:', error);
+      alert('Có lỗi xảy ra khi hủy đơn hàng. Vui lòng thử lại.');
+    }
+  };
+
+  useEffect(() => {
+    if (isConfirming) {
+      const confirmCancel = window.confirm("Bạn có chắc chắn muốn hủy vé này?");
+      if (confirmCancel) {
+        handleCancelOrder();
+      } else {
+        setSelectedOrderId(null); // Reset ID nếu không xác nhận
+        setIsConfirming(false); // Đặt lại trạng thái xác nhận
+      }
+    }
+  }, [isConfirming]);
+
   return (
     <div className="overflow-x-auto">
       <table className="min-w-full divide-y divide-gray-200">
@@ -40,17 +71,23 @@ const TicketList = ({ userId, orders, page, totalPages }: TicketListProps) => {
           </tr>
         </thead>
         <tbody className="bg-white divide-y divide-gray-200">
-          {orders?.map((order: IOrder, index: number) => (
+          {orderList?.map((order: IOrder, index: number) => (
             <tr key={order._id} className="hover:bg-gray-50">
               <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{index + 1}</td>
               <td className="px-6 py-4 whitespace-nowrap">
-                <Image
-                  src={order.event.imageUrl}
-                  alt={order.event.title}
-                  width={50}
-                  height={50}
-                  className="rounded-full"
-                />
+                {order.event && order.event.imageUrl ? (
+                  <Image
+                    src={order.event.imageUrl}
+                    alt={order.event.title || 'Event image'}
+                    width={50}
+                    height={50}
+                    className="rounded-full"
+                  />
+                ) : (
+                  <div className="w-12 h-12 bg-gray-200 rounded-full flex items-center justify-center">
+                    <span className="text-gray-500">No image</span>
+                  </div>
+                )}
               </td>
               <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{order.event.title}</td>
               <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{order.event.description.substring(0, 50)}...</td>
@@ -84,14 +121,18 @@ const TicketList = ({ userId, orders, page, totalPages }: TicketListProps) => {
                     </div>
                     <DialogFooter>
                       <DialogClose asChild>
-                        <Button variant="outline" className="w-full mt-4 bg-primary-500 text-white hover:bg-primary-600 transition-colors">Đóng</Button>
+                        <Button variant="outline" className="mt-4 bg-primary-500 text-white hover:bg-primary-600 transition-colors">Đóng</Button>
                       </DialogClose>
+                      <Button variant="destructive" className="mt-4" onClick={() => {
+                        setSelectedOrderId(order._id);
+                        setIsConfirming(true); // Đặt trạng thái xác nhận
+                      }}>Hủy vé</Button>
                     </DialogFooter>
                   </DialogContent>
                 </Dialog>
               </td>
             </tr>
-          ))}
+          ))} 
         </tbody>
       </table>
       {totalPages > 1 && (
