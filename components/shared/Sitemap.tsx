@@ -7,7 +7,7 @@ const Sitemap = () => {
       <ul className="list-disc pl-5 col-span-1"> {/* Cột đầu tiên */}
         <li><Link href="/">Trang chủ</Link></li>
         <li><Link href="/event-page">Danh sách sự kiện</Link></li>
-        <li><Link href="/event-calender">Lịch</Link></li>
+        <li><Link href="/event-calendar">Lịch</Link></li>
 
       </ul>
       <ul className="list-disc pl-5 col-span-1"> {/* Cột thứ hai */}
