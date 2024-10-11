@@ -50,7 +50,7 @@ const Checkout = ({ event, userId, selectedSeat }: { event: IEvent; userId: stri
   return (
     <form action={onCheckout} method="post">
       <Button type="submit" role="link" size="lg" className="button sm:w-fit">
-        {event.isFree ? 'Get Ticket' : `Buy Ticket for Seat ${selectedSeat + 1}`}
+        {event.isFree ? 'Mua vé' : `Mua vé cho vị trí ghế số ${selectedSeat + 1}`}
       </Button>
     </form>
   )
