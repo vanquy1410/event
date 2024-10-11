@@ -220,3 +220,15 @@ export async function deleteOrder({ orderId, path }: { orderId: string; path: st
     handleError(error);
   }
 }
+
+export async function deleteOrderClient(orderId: string) {
+  try {
+    await connectToDatabase();
+
+    const deletedOrder = await Order.findByIdAndDelete(orderId);
+
+    return deletedOrder; // Trả về đơn hàng đã xóa
+  } catch (error) {
+    handleError(error);
+  }
+}

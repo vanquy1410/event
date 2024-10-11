@@ -7,20 +7,20 @@ export const headerLinks = [
     label: 'Lịch',
     route: '/event-calendar',
   },
+  // {
+  //   label: 'Sự kiện',
+  //   route: '/events/create',
+  // },
   {
-    label: 'Sự kiện',
-    route: '/events/create',
-  },
-  {
-    label: 'Hồ sơ',
+    label: 'Vé của bạn',
     route: '/profile',
   },
   {
-    label: 'Đăng ký BTC',
+    label: 'Đăng ký ban tổ chức',
     route: '/organizer',
   },
   {
-    label: 'Dash Board',
+    label: 'Dashboard',
     route: '/admin/dashboard',
   },
 ]
