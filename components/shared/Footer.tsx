@@ -12,6 +12,7 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog"
+import Sitemap from './Sitemap'
 
 const Footer = () => {
   const [showContactForm, setShowContactForm] = useState(false)
@@ -45,6 +46,7 @@ const Footer = () => {
             </DialogContent>
           </Dialog>
         </div>
+        <Sitemap />
         <p>Star Event Website by VanQuy.</p>
       </div>
     </footer>
