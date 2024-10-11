@@ -5,8 +5,10 @@ import { getAllEvents } from '@/lib/actions/event.actions';
 
 export default async function SearchPage({ searchParams }: { searchParams: { [key: string]: string | string[] | undefined } }) {
   const page = Number(searchParams?.page) || 1;
+  const query = searchParams.query as string || '';
+  
   const events = await getAllEvents({
-    query: searchParams.query as string,
+    query,
     category: searchParams.category as string,
     page,
     limit: 6
@@ -15,7 +17,7 @@ export default async function SearchPage({ searchParams }: { searchParams: { [ke
   return (
     <>
       <section className="bg-primary-50 bg-dotted-pattern bg-cover bg-center py-5 md:py-10">
-        <h1 className="wrapper h1-bold text-center sm:text-left">Kết quả tìm kiếm</h1>
+        <h1 className="wrapper h1-bold text-center sm:text-left">Kết quả tìm kiếm cho: "{query}"</h1>
       </section>
 
       <section className="wrapper my-8">

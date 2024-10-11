@@ -38,7 +38,7 @@ const CheckoutButton = ({ event }: { event: IEvent }) => {
 
           <SignedIn>
             <Button onClick={() => setIsPopupOpen(true)} className="button rounded-full" size="lg">
-              Đặt chổ
+              Đặt chỗ
             </Button>
             <SeatSelectionPopup
               isOpen={isPopupOpen}

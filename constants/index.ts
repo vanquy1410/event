@@ -7,12 +7,12 @@ export const headerLinks = [
     label: 'Lịch',
     route: '/event-calendar',
   },
-  // {
-  //   label: 'Sự kiện',
-  //   route: '/events/create',
-  // },
   {
-    label: 'Vé của bạn',
+    label: 'Danh sách sự kiện',
+    route: '/event-page',
+  },
+  {
+    label: 'Vé',
     route: '/profile',
   },
   {
