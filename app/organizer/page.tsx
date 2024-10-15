@@ -8,6 +8,8 @@ import { IOrganizer } from '@/lib/database/models/organizer.model';
 // import EditOrganizerButton from '@/components/shared/EditOrganizerButton';
 import EditOrganizerForm from '@/components/shared/EditOrganizerForm';
 import { updateOrganizerEvent } from '@/lib/actions/organizer.actions';
+import { useRouter } from 'next/navigation';
+import { useUser } from '@clerk/nextjs';
 
 const OrganizerPage = () => {
   const [showForm, setShowForm] = useState(false);
@@ -23,6 +25,21 @@ const OrganizerPage = () => {
     status: '',
   });
   const [editingOrganizerId, setEditingOrganizerId] = useState<string | null>(null);
+  const [userData, setUserData] = useState({
+    name: '',
+    email: '',
+  });
+  const router = useRouter();
+  const { user } = useUser();
+
+  useEffect(() => {
+    if (user) {
+      setUserData({
+        name: `${user.firstName} ${user.lastName}`,
+        email: user.primaryEmailAddress?.emailAddress || '',
+      });
+    }
+  }, [user]);
 
   useEffect(() => {
     const fetchOrganizers = async () => {
@@ -70,7 +87,7 @@ const OrganizerPage = () => {
       setEditingOrganizerId(null);
     } catch (error) {
       console.error('Lỗi khi cập nhật thông tin ban tổ chức:', error);
-      // Xử lý lỗi (ví dụ: hiển thị thông báo lỗi cho người dùng)
+      // Xử l lỗi (ví dụ: hiển thị thông báo lỗi cho người dùng)
     }
   };
 
@@ -84,8 +101,8 @@ const OrganizerPage = () => {
       if (organizerToEdit.status === 'pending') {
         setEditingOrganizerId(id);
         setOrganizerData({
-          name: organizerToEdit.name,
-          email: organizerToEdit.email,
+          name: organizerToEdit.name, // Keep the original name
+          email: organizerToEdit.email, // Keep the original email
           description: organizerToEdit.description,
           price: organizerToEdit.price,
           status: organizerToEdit.status,
@@ -143,7 +160,7 @@ const OrganizerPage = () => {
       <Button onClick={() => setShowForm(!showForm)}>
         {showForm ? 'Ẩn form' : 'Tạo sự kiện ban tổ chức'}
       </Button>
-      {showForm && <OrganizerEventForm setOrganizers={setOrganizers} />}
+      {showForm && <OrganizerEventForm setOrganizers={setOrganizers} userData={userData} />}
       {loading && <p>Đang tải...</p>}
       {error && <p className="text-red-500">{error}</p>}
       {!loading && !error && (
@@ -151,6 +168,7 @@ const OrganizerPage = () => {
           organizers={organizers} 
           onEdit={handleEdit} 
           onCancel={handleCancel}
+          onViewDashboard={(id) => router.push(`/admin/dashboard?organizerId=${id}`)}
         />
       )}
       {isEditing && (

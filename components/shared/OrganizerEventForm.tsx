@@ -1,5 +1,5 @@
 "use client"
-import React from 'react';
+import React, { useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
@@ -11,11 +11,12 @@ import DatePicker from 'react-datepicker';
 import "react-datepicker/dist/react-datepicker.css";
 import { IOrganizer } from '@/lib/database/models/organizer.model';
 import { getOrganizerEvents } from '@/lib/actions/organizer.actions';
+import toast from 'react-hot-toast';
 
 const formSchema = z.object({
   name: z.string().min(1, 'Họ và tên là bắt buộc'),
-  phoneNumber: z.string().min(1, 'Số điện thoại là bắt buộc'),
   email: z.string().email('Email không hợp lệ'),
+  phoneNumber: z.string().min(1, 'Số điện thoại là bắt buộc'),
   eventTitle: z.string().min(1, 'Tên sự kiện là bắt buộc'),
   description: z.string().min(1, 'Mô tả là bắt buộc'),
   location: z.string().min(1, 'Địa điểm là bắt buộc'),
@@ -26,13 +27,21 @@ const formSchema = z.object({
   participantLimit: z.number().min(1, 'Số người tham dự phải lớn hơn 0'),
 });
 
-const OrganizerEventForm = ({ setOrganizers }: { setOrganizers: React.Dispatch<React.SetStateAction<IOrganizer[]>> }) => {
+interface OrganizerEventFormProps {
+  setOrganizers: React.Dispatch<React.SetStateAction<IOrganizer[]>>;
+  userData: {
+    name: string;
+    email: string;
+  };
+}
+
+const OrganizerEventForm: React.FC<OrganizerEventFormProps> = ({ setOrganizers, userData }) => {
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
       name: '',
-      phoneNumber: '',
       email: '',
+      phoneNumber: '',
       eventTitle: '',
       description: '',
       location: '',
@@ -44,31 +53,36 @@ const OrganizerEventForm = ({ setOrganizers }: { setOrganizers: React.Dispatch<R
     },
   });
 
-  const onSubmit = async (values: z.infer<typeof formSchema>) => {
+  useEffect(() => {
+    form.setValue('name', userData.name);
+    form.setValue('email', userData.email);
+  }, [userData, form]);
+
+  const onSubmit = async (data: z.infer<typeof formSchema>) => {
     try {
-      const response = await fetch('/api/createOrganizerEvent', {
+      const response = await fetch('/api/organizer', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify(values),
+        body: JSON.stringify(data),
       });
 
       if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.error || 'Không thể tạo sự kiện');
+        throw new Error('Lỗi khi gửi form');
       }
 
-      const data = await response.json();
-      console.log('Event created:', data);
-      alert('Sự kiện đã được gửi và đang chờ duyệt (pending)');
+      const newOrganizer = await response.json();
+      setOrganizers(prev => [...prev, newOrganizer]);
       form.reset();
-      // Refresh the organizer list
-      const updatedOrganizers = await getOrganizerEvents();
-      setOrganizers(updatedOrganizers);
+      toast.success('Đăng ký ban tổ chức thành công! Phiếu đang ở trạng thái chờ duyệt.', {
+        duration: 5000,
+        position: 'top-center',
+        icon: '🎉',
+      });
     } catch (error) {
-      console.error('Lỗi khi gửi sự kiện:', error);
-      alert('Có lỗi xảy ra khi gửi sự kiện: ' + (error instanceof Error ? error.message : String(error)));
+      console.error('Lỗi:', error);
+      toast.error('Có lỗi xảy ra khi đăng ký. Vui lòng thử lại sau.');
     }
   };
 
@@ -82,7 +96,7 @@ const OrganizerEventForm = ({ setOrganizers }: { setOrganizers: React.Dispatch<R
             <FormItem>
               <FormLabel>Họ và tên</FormLabel>
               <FormControl>
-                <Input {...field} />
+                <Input {...field} disabled />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -108,7 +122,7 @@ const OrganizerEventForm = ({ setOrganizers }: { setOrganizers: React.Dispatch<R
             <FormItem>
               <FormLabel>Email</FormLabel>
               <FormControl>
-                <Input {...field} type="email" />
+                <Input {...field} type="email" disabled />
               </FormControl>
               <FormMessage />
             </FormItem>

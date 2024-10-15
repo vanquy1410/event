@@ -104,3 +104,60 @@ export async function getRevenueOverTime() {
     throw error;
   }
 }
+
+export async function getRevenueTrend() {
+  try {
+    // Thực hiện truy vấn database để lấy dữ liệu doanh thu theo thời gian
+    // Ví dụ:
+    const revenueTrend = await Order.aggregate([
+      {
+        $group: {
+          _id: { $dateToString: { format: "%Y-%m", date: "$createdAt" } },
+          totalRevenue: { $sum: "$amount" }
+        }
+      },
+      { $sort: { "_id": 1 } }
+    ]);
+
+    // Xử lý dữ liệu để phù hợp với format của biểu đồ
+    const labels = revenueTrend.map(item => item._id);
+    const data = revenueTrend.map(item => item.totalRevenue);
+
+    return {
+      labels,
+      datasets: [
+        {
+          label: 'Doanh thu',
+          data,
+          borderColor: 'rgb(75, 192, 192)',
+          backgroundColor: 'rgba(75, 192, 192, 0.5)',
+        }
+      ]
+    };
+  } catch (error) {
+    console.error('Error fetching revenue trend:', error);
+    throw error;
+  }
+}
+
+export async function getEventCategoryDistribution() {
+  try {
+    const events = await Event.find().populate('category');
+    const categoryCount = events.reduce((acc, event) => {
+      const categoryName = event.category ? event.category.name : 'Không phân loại';
+      acc[categoryName] = (acc[categoryName] || 0) + 1;
+      return acc;
+    }, {});
+
+    const total = events.length;
+    const distribution = Object.entries(categoryCount).map(([name, count]) => ({
+      name,
+      value: Number(((count as number / total) * 100).toFixed(2))
+    }));
+
+    return distribution;
+  } catch (error) {
+    console.error('Lỗi khi lấy phân bố loại sự kiện:', error);
+    throw error;
+  }
+}

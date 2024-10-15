@@ -30,7 +30,7 @@ const OrganizerSchema = new Schema<IOrganizer>({
   participantLimit: { type: Number, required: true },
   status: {
     type: String,
-    enum: ['pending', 'approved', 'rejected', 'cancelled'],
+    enum: ['pending', 'approved', 'rejected'],
     default: 'pending'
   }
 });

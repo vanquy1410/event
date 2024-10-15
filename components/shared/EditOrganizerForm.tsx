@@ -18,25 +18,27 @@ const EditOrganizerForm: React.FC<EditOrganizerFormProps> = ({ initialData, onSu
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
-    setFormData(prev => ({ ...prev, [name]: name === 'price' ? parseFloat(value) : value }));
+    if (name === 'description' || name === 'price') {
+      setFormData({ ...formData, [name]: value });
+    }
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    onSubmit({ ...formData, id: organizerId });
+    onSubmit({ description: formData.description, price: formData.price });
   };
 
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
       <div>
-        <label htmlFor="name" className="block text-sm font-medium text-gray-700">Tên</label>
+        <label htmlFor="name" className="block text-sm font-medium text-gray-700">Họ và tên</label>
         <input
           type="text"
           id="name"
           name="name"
           value={formData.name}
-          onChange={handleChange}
-          className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
+          disabled
+          className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50 bg-gray-100"
         />
       </div>
       <div>
@@ -46,8 +48,8 @@ const EditOrganizerForm: React.FC<EditOrganizerFormProps> = ({ initialData, onSu
           id="email"
           name="email"
           value={formData.email}
-          onChange={handleChange}
-          className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
+          disabled
+          className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50 bg-gray-100"
         />
       </div>
       <div>
