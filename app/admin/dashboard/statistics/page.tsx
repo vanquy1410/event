@@ -1,5 +1,5 @@
 import StatisticsCard from "../_component/StatisticsCard";
-import { getMostPopularEvent, getOrderStatistics, getUserStatistics, getUserRegistrationTrend, getEventCategoriesDistribution, getRevenueOverTime } from '@/lib/actions/statistics.actions';
+import { getMostPopularEvent, getOrderStatistics, getUserStatistics, getUserRegistrationTrend, getEventCategoriesDistribution, getRevenueOverTime, getRevenueTrend, getEventCategoryDistribution } from '@/lib/actions/statistics.actions';
 import ChartSection from '../_component/ChartSection';
 
 export default async function StatisticsPage() {
@@ -9,6 +9,8 @@ export default async function StatisticsPage() {
   const userTrend = await getUserRegistrationTrend();
   const categoryDistribution = await getEventCategoriesDistribution();
   const revenue = await getRevenueOverTime();
+  const revenueTrend = await getRevenueTrend();
+  const eventCategoryDistribution = await getEventCategoryDistribution();
 
   return (
     <div>
@@ -17,7 +19,7 @@ export default async function StatisticsPage() {
         <StatisticsCard
           title="Sự kiện phổ biến nhất"
           value={popularEvent.name}
-          subValue={`${popularEvent.participants} người tham gia`}
+          subValue={`${popularEvent.participants} ngưi tham gia`}
         />
         <StatisticsCard
           title="Tổng số đơn hàng"
@@ -36,6 +38,8 @@ export default async function StatisticsPage() {
         userTrend={userTrend}
         categoryDistribution={categoryDistribution}
         revenue={revenue}
+        revenueTrend={revenueTrend}
+        eventCategoryDistribution={eventCategoryDistribution}
       />
     </div>
   );
