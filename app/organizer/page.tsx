@@ -101,8 +101,8 @@ const OrganizerPage = () => {
       if (organizerToEdit.status === 'pending') {
         setEditingOrganizerId(id);
         setOrganizerData({
-          name: organizerToEdit.name,
-          email: organizerToEdit.email,
+          name: organizerToEdit.name, // Keep the original name
+          email: organizerToEdit.email, // Keep the original email
           description: organizerToEdit.description,
           price: organizerToEdit.price,
           status: organizerToEdit.status,
