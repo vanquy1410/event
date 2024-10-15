@@ -9,6 +9,7 @@ import { IOrganizer } from '@/lib/database/models/organizer.model';
 import EditOrganizerForm from '@/components/shared/EditOrganizerForm';
 import { updateOrganizerEvent } from '@/lib/actions/organizer.actions';
 import { useRouter } from 'next/navigation';
+import { useUser } from '@clerk/nextjs';
 
 const OrganizerPage = () => {
   const [showForm, setShowForm] = useState(false);
@@ -24,7 +25,21 @@ const OrganizerPage = () => {
     status: '',
   });
   const [editingOrganizerId, setEditingOrganizerId] = useState<string | null>(null);
+  const [userData, setUserData] = useState({
+    name: '',
+    email: '',
+  });
   const router = useRouter();
+  const { user } = useUser();
+
+  useEffect(() => {
+    if (user) {
+      setUserData({
+        name: `${user.firstName} ${user.lastName}`,
+        email: user.primaryEmailAddress?.emailAddress || '',
+      });
+    }
+  }, [user]);
 
   useEffect(() => {
     const fetchOrganizers = async () => {
@@ -72,7 +87,7 @@ const OrganizerPage = () => {
       setEditingOrganizerId(null);
     } catch (error) {
       console.error('Lỗi khi cập nhật thông tin ban tổ chức:', error);
-      // Xử l�� lỗi (ví dụ: hiển thị thông báo lỗi cho người dùng)
+      // Xử l lỗi (ví dụ: hiển thị thông báo lỗi cho người dùng)
     }
   };
 
@@ -145,7 +160,7 @@ const OrganizerPage = () => {
       <Button onClick={() => setShowForm(!showForm)}>
         {showForm ? 'Ẩn form' : 'Tạo sự kiện ban tổ chức'}
       </Button>
-      {showForm && <OrganizerEventForm setOrganizers={setOrganizers} />}
+      {showForm && <OrganizerEventForm setOrganizers={setOrganizers} userData={userData} />}
       {loading && <p>Đang tải...</p>}
       {error && <p className="text-red-500">{error}</p>}
       {!loading && !error && (
