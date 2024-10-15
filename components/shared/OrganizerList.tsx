@@ -6,9 +6,10 @@ interface OrganizerListProps {
   organizers: IOrganizer[];
   onEdit: (id: string) => void;
   onCancel: (id: string) => void;
+  onViewDashboard: (id: string) => void;
 }
 
-const OrganizerList: React.FC<OrganizerListProps> = ({ organizers, onEdit, onCancel }) => {
+const OrganizerList: React.FC<OrganizerListProps> = ({ organizers, onEdit, onCancel, onViewDashboard }) => {
   return (
     <div className="mt-6 overflow-x-auto">
       <h2 className="text-xl font-semibold mb-4">Danh sách Ban Tổ Chức</h2>
@@ -49,6 +50,14 @@ const OrganizerList: React.FC<OrganizerListProps> = ({ organizers, onEdit, onCan
                     <Button onClick={() => onEdit(organizer._id)} size="sm">Chỉnh sửa</Button>
                     <Button onClick={() => onCancel(organizer._id)} variant="destructive" size="sm">Hủy</Button>
                   </div>
+                )}
+                {organizer.status === 'approved' && (
+                  <Button
+                    onClick={() => onViewDashboard(organizer._id)}
+                    className="bg-blue-500 text-white px-4 py-2 rounded"
+                  >
+                    Xem Dashboard
+                  </Button>
                 )}
               </td>
             </tr>

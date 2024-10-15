@@ -8,6 +8,7 @@ import { IOrganizer } from '@/lib/database/models/organizer.model';
 // import EditOrganizerButton from '@/components/shared/EditOrganizerButton';
 import EditOrganizerForm from '@/components/shared/EditOrganizerForm';
 import { updateOrganizerEvent } from '@/lib/actions/organizer.actions';
+import { useRouter } from 'next/navigation';
 
 const OrganizerPage = () => {
   const [showForm, setShowForm] = useState(false);
@@ -23,6 +24,7 @@ const OrganizerPage = () => {
     status: '',
   });
   const [editingOrganizerId, setEditingOrganizerId] = useState<string | null>(null);
+  const router = useRouter();
 
   useEffect(() => {
     const fetchOrganizers = async () => {
@@ -70,7 +72,7 @@ const OrganizerPage = () => {
       setEditingOrganizerId(null);
     } catch (error) {
       console.error('Lỗi khi cập nhật thông tin ban tổ chức:', error);
-      // Xử lý lỗi (ví dụ: hiển thị thông báo lỗi cho người dùng)
+      // Xử l�� lỗi (ví dụ: hiển thị thông báo lỗi cho người dùng)
     }
   };
 
@@ -151,6 +153,7 @@ const OrganizerPage = () => {
           organizers={organizers} 
           onEdit={handleEdit} 
           onCancel={handleCancel}
+          onViewDashboard={(id) => router.push(`/admin/dashboard?organizerId=${id}`)}
         />
       )}
       {isEditing && (
