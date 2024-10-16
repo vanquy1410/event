@@ -55,6 +55,7 @@ const EventManagementPage: React.FC = () => {
           onDelete={handleDelete} 
           onSearch={setQuery}
           onCategoryChange={setCategory}
+          filterType="all"
         />
       </section>
       {error && <p className="text-red-500">{error}</p>}
