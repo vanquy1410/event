@@ -8,6 +8,7 @@ import User from '@/lib/database/models/user.model'
 import Category from '@/lib/database/models/category.model'
 import { handleError } from '@/lib/utils'
 import { auth } from '@clerk/nextjs';
+import Notification from '@/lib/database/models/notification.model';
 
 import {
   CreateEventParams,
@@ -29,20 +30,25 @@ const populateEvent = (query: any) => {
 }
 
 // CREATE
-export async function createEvent({ userId, event, path }: CreateEventParams) {
+export async function createEvent({ event, userId, path }: CreateEventParams) {
   try {
     await connectToDatabase()
 
     const organizer = await User.findById(userId)
     if (!organizer) throw new Error('Organizer not found')
 
-    const newEvent = await Event.create({ 
-      ...event, 
-      category: event.categoryId, 
-      organizer: userId,
-      currentParticipants: 0,
-      seats: new Array(event.participantLimit).fill(false)
+    const newEvent = await Event.create({
+      ...event,
+      category: event.categoryId,
+      organizer: userId
     })
+
+    // Tạo thông báo mới
+    await Notification.create({
+      message: `Sự kiện mới "${newEvent.title}" đã được tạo`,
+      eventId: newEvent._id
+    });
+
     revalidatePath(path)
 
     return JSON.parse(JSON.stringify(newEvent))
@@ -263,3 +269,4 @@ export async function getUpcomingEvents(limit: number = 5) {
     throw error;
   }
 }
+
