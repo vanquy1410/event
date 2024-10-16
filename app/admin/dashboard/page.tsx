@@ -34,9 +34,12 @@ export default async function AdminDashboard(params: {
 
   return (
     <>
-      <h1>Đây là trang admin</h1>
-      <br />
-      <p>Trang này chỉ dành cho người dùng có quyền admin.</p>
+      <h1 className="text-3xl font-bold text-center text-purple-600 mb-4 shadow-lg p-4 bg-gradient-to-r from-purple-100 to-pink-100 rounded-lg">
+        Đây là trang admin
+      </h1>
+      <p className="text-xl text-center text-gray-700 bg-yellow-100 border-l-4 border-yellow-500 p-4 rounded-r-lg shadow">
+        Trang này chỉ dành cho người dùng có quyền admin.
+      </p>
 
       <SearchUsers />
 

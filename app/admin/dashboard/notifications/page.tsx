@@ -8,6 +8,7 @@ interface Notification {
   _id: string;
   message: string;
   createdAt: string;
+  eventId: string; // Thêm trường này
 }
 
 export default function AllNotificationsPage() {
@@ -43,10 +44,17 @@ export default function AllNotificationsPage() {
           <ul className="space-y-4">
             {notifications.map((notification) => (
               <li key={notification._id} className="bg-white shadow-md rounded-lg p-4">
-                <p className="text-lg">{notification.message}</p>
-                <small className="text-gray-500">
-                  {new Date(notification.createdAt).toLocaleString()}
-                </small>
+                <div className="flex justify-between items-center">
+                  <div>
+                    <p className="text-lg">{notification.message}</p>
+                    <small className="text-gray-500">
+                      {new Date(notification.createdAt).toLocaleString()}
+                    </small>
+                  </div>
+                  <Button asChild className="ml-4">
+                    <Link href={`/events/${notification.eventId}`}>Xem chi tiết sự kiện</Link>
+                  </Button>
+                </div>
               </li>
             ))}
           </ul>
