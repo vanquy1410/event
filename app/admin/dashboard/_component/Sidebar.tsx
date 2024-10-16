@@ -9,7 +9,14 @@ const navItems = [
   { href: "/admin/dashboard", label: "Tổng quan" },
   { href: "/admin/dashboard/statistics", label: "Thống kê" },
   { href: "/admin/dashboard/user-management", label: "Quản lý người dùng" },
-  { href: "/admin/dashboard/event-management", label: "Quản lý sự kiện" }, // Add this line
+  { 
+    href: "/admin/dashboard/event-management", 
+    label: "Quản lý sự kiện",
+    subItems: [
+      { href: "/admin/dashboard/event-management/ending-soon", label: "Sự kiện sắp kết thúc" },
+      { href: "/admin/dashboard/event-management/ended", label: "Sự kiện đã kết thúc" }
+    ]
+  },
   { href: "/admin/dashboard/order-management", label: "Quản lý đơn hàng" },
   { href: "/admin/dashboard/employee-management", label: "Quản lý nhân viên" },
   { href: "/admin/dashboard/contact-form-management", label: "Quản lý form liên hệ" },
@@ -34,9 +41,25 @@ export default function Sidebar() {
                   pathname === item.href ? "bg-gray-700" : "hover:bg-gray-700"
                 }`}
               >
-                {item.icon && <item.icon className="mr-2" />} {/* Thêm icon nếu có */}
+                {item.icon && <item.icon className="mr-2" />}
                 {item.label}
               </Link>
+              {item.subItems && (
+                <ul className="ml-4 mt-2">
+                  {item.subItems.map((subItem) => (
+                    <li key={subItem.href}>
+                      <Link
+                        href={subItem.href}
+                        className={`block p-2 rounded ${
+                          pathname === subItem.href ? "bg-gray-700" : "hover:bg-gray-700"
+                        }`}
+                      >
+                        {subItem.label}
+                      </Link>
+                    </li>
+                  ))}
+                </ul>
+              )}
             </li>
           ))}
         </ul>

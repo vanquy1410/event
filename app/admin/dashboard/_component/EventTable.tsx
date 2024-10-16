@@ -27,9 +27,10 @@ interface EventTableProps {
   onDelete: (id: string) => void;
   onSearch: (query: string) => void;
   onCategoryChange: (category: string) => void;
+  filterType: 'all' | 'ending-soon' | 'ended';
 }
 
-export default function EventTable({ events, onDelete, onSearch, onCategoryChange }: EventTableProps) {
+export default function EventTable({ events, onDelete, onSearch, onCategoryChange, filterType }: EventTableProps) {
   const [categories, setCategories] = useState<{_id: string, name: string}[]>([]);
 
   useEffect(() => {
@@ -97,7 +98,7 @@ export default function EventTable({ events, onDelete, onSearch, onCategoryChang
             <th className="py-2 px-4 border-b">Tiêu đề</th>
             <th className="py-2 px-4 border-b">Mô tả</th>
             <th className="py-2 px-4 border-b">Loại sự kiện</th>
-            <th className="py-2 px-4 border-b">Thời gian bắt đầu</th>
+            {filterType !== 'ended' && <th className="py-2 px-4 border-b">Thời gian bắt đầu</th>}
             <th className="py-2 px-4 border-b">Thời gian kết thúc</th>
             <th className="py-2 px-4 border-b">Tài liệu</th>
             <th className="py-2 px-4 border-b">Hành động</th>
