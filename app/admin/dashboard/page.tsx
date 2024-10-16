@@ -5,6 +5,7 @@ import { setRole } from "./_actions";
 import { SearchUsers } from "./_search-users";
 import { clerkClient } from "@clerk/nextjs/server";
 import Link from "next/link";
+import NotificationList from './_component/NotificationList';
 
 // Hàm waitFor để tạo một thời gian chờ
 const waitFor = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
@@ -34,10 +35,12 @@ export default async function AdminDashboard(params: {
   return (
     <>
       <h1>Đây là trang admin</h1>
-      <br></br>
+      <br />
       <p>Trang này chỉ dành cho người dùng có quyền admin.</p>
 
       <SearchUsers />
+
+      <NotificationList />
 
       {users.map((user) => {
         return (
