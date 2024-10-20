@@ -6,6 +6,18 @@ import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { DatePicker } from '@/components/ui/date-picker';
 import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from '@/components/ui/select';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
+import { FaTrash } from 'react-icons/fa';
 
 interface User {
   id: string;
@@ -130,8 +142,30 @@ export default function TaskManagementPage() {
       }
     } catch (error) {
       console.error('Error updating task status:', error);
-      // Hiển thị thông báo lỗi cho người dùng
+      // Hiển thị thông báo lỗi cho ngư���i dùng
       // Ví dụ: setError('Đã xảy ra lỗi khi cập nhật trạng thái công việc');
+    }
+  };
+
+  const handleDeleteTask = async (taskId: string) => {
+    try {
+      const response = await fetch(`/api/tasks/${taskId}`, {
+        method: 'DELETE',
+      });
+
+      if (response.ok) {
+        setTasks(tasks.filter(task => task._id !== taskId));
+        // Có thể thêm thông báo thành công ở đây
+      } else {
+        const errorData = await response.json();
+        console.error('Failed to delete task:', errorData.message);
+        // Hiển thị thông báo lỗi cho người dùng
+        // Ví dụ: setError(errorData.message);
+      }
+    } catch (error) {
+      console.error('Error deleting task:', error);
+      // Hiển thị thông báo lỗi cho người dùng
+      // Ví dụ: setError('Đã xảy ra lỗi khi xóa công việc');
     }
   };
 
@@ -162,7 +196,7 @@ export default function TaskManagementPage() {
             <SelectValue placeholder="Chọn người được giao" />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="default" disabled>Chọn người được giao</SelectItem>
+            <SelectItem value="default" disabled>Chọn nguời được giao</SelectItem>
             {users.map((user) => (
               <SelectItem key={user.id} value={user.id}>
                 {user.username}
@@ -202,20 +236,43 @@ export default function TaskManagementPage() {
                   <p>Người được giao: {users.find(user => user.id === task.assignedTo)?.username || 'Chưa xác định'}</p>
                   <p>Bắt đầu: {new Date(task.startDate).toLocaleDateString()}</p>
                   <p>Kết thúc: {new Date(task.endDate).toLocaleDateString()}</p>
-                  <div className="mt-2">
-                    {status === 'pending' && (
-                      <Button onClick={() => handleStatusChange(task._id, 'in-progress')} className="mr-2">
-                        Bắt đầu thực hiện
-                      </Button>
-                    )}
-                    {status === 'in-progress' && (
-                      <Button onClick={() => handleStatusChange(task._id, 'completed')} className="mr-2">
-                        Hoàn thành
-                      </Button>
-                    )}
-                    {status === 'completed' && (
-                      <span className="text-green-600 font-semibold">Đã hoàn thành</span>
-                    )}
+                  <div className="mt-2 flex justify-between items-center">
+                    <div>
+                      {status === 'pending' && (
+                        <Button onClick={() => handleStatusChange(task._id, 'in-progress')} className="mr-2">
+                          Bắt đầu thực hiện
+                        </Button>
+                      )}
+                      {status === 'in-progress' && (
+                        <Button onClick={() => handleStatusChange(task._id, 'completed')} className="mr-2">
+                          Hoàn thành
+                        </Button>
+                      )}
+                      {status === 'completed' && (
+                        <span className="text-green-600 font-semibold">Đã hoàn thành</span>
+                      )}
+                    </div>
+                    <AlertDialog>
+                      <AlertDialogTrigger asChild>
+                        <Button variant="destructive" title="Xóa">
+                          <FaTrash />
+                        </Button>
+                      </AlertDialogTrigger>
+                      <AlertDialogContent>
+                        <AlertDialogHeader>
+                          <AlertDialogTitle>Bạn có chắc chắn muốn xóa?</AlertDialogTitle>
+                          <AlertDialogDescription>
+                            Hành động này không thể hoàn tác. Công việc này sẽ bị xóa vĩnh viễn khỏi hệ thống.
+                          </AlertDialogDescription>
+                        </AlertDialogHeader>
+                        <AlertDialogFooter>
+                          <AlertDialogCancel>Hủy</AlertDialogCancel>
+                          <AlertDialogAction onClick={() => handleDeleteTask(task._id)}>
+                            Xóa
+                          </AlertDialogAction>
+                        </AlertDialogFooter>
+                      </AlertDialogContent>
+                    </AlertDialog>
                   </div>
                 </div>
               ))}
