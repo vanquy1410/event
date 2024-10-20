@@ -62,3 +62,32 @@ export async function DELETE(
     );
   }
 }
+
+export async function PUT(
+  req: Request,
+  { params }: { params: { id: string } }
+) {
+  try {
+    const { id } = params;
+    const body = await req.json();
+
+    await connectToDatabase();
+
+    const updatedTask = await Task.findByIdAndUpdate(id, body, { new: true });
+
+    if (!updatedTask) {
+      return NextResponse.json(
+        { message: 'Task not found' },
+        { status: 404 }
+      );
+    }
+
+    return NextResponse.json(updatedTask);
+  } catch (error) {
+    console.error('Error updating task:', error);
+    return NextResponse.json(
+      { message: 'Error updating task' },
+      { status: 500 }
+    );
+  }
+}

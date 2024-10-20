@@ -17,7 +17,16 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
-import { FaTrash } from 'react-icons/fa';
+import { FaTrash, FaEdit } from 'react-icons/fa';
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+import { toast } from 'react-hot-toast';
+
 
 interface User {
   id: string;
@@ -142,7 +151,7 @@ export default function TaskManagementPage() {
       }
     } catch (error) {
       console.error('Error updating task status:', error);
-      // Hiển thị thông báo lỗi cho ngư���i dùng
+      // Hiển thị thông báo lỗi cho người dùng
       // Ví dụ: setError('Đã xảy ra lỗi khi cập nhật trạng thái công việc');
     }
   };
@@ -167,6 +176,98 @@ export default function TaskManagementPage() {
       // Hiển thị thông báo lỗi cho người dùng
       // Ví dụ: setError('Đã xảy ra lỗi khi xóa công việc');
     }
+  };
+
+  const handleUpdateTask = async (updatedTask: Task) => {
+    try {
+      const response = await fetch(`/api/tasks/${updatedTask._id}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(updatedTask),
+      });
+
+      if (response.ok) {
+        const updatedTaskData = await response.json();
+        setTasks(tasks.map(task => 
+          task._id === updatedTaskData._id ? updatedTaskData : task
+        ));
+        toast.success('Cập nhật thông tin công việc thành công');
+      } else {
+        const errorData = await response.json();
+        console.error('Failed to update task:', errorData.message);
+        toast.error('Cập nhật thông tin công việc thất bại');
+      }
+    } catch (error) {
+      console.error('Error updating task:', error);
+      toast.error('Đã xảy ra lỗi khi cập nhật công việc');
+    }
+  };
+
+  const EditTaskForm = ({ task, onSave, users }: { task: Task, onSave: (updatedTask: Task) => void, users: User[] }) => {
+    const [editedTask, setEditedTask] = useState(task);
+
+    const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
+      setEditedTask({ ...editedTask, [e.target.name]: e.target.value });
+    };
+
+    const handleDateChange = (date: Date | null, field: 'startDate' | 'endDate') => {
+      if (date) {
+        setEditedTask({ ...editedTask, [field]: date });
+      }
+    };
+
+    const handleSubmit = (e: React.FormEvent) => {
+      e.preventDefault();
+      onSave(editedTask);
+    };
+
+    return (
+      <form onSubmit={handleSubmit}>
+        <Input
+          name="title"
+          value={editedTask.title}
+          onChange={handleInputChange}
+          placeholder="Tiêu đề công việc"
+          className="mb-2"
+        />
+        <Textarea
+          name="description"
+          value={editedTask.description}
+          onChange={handleInputChange}
+          placeholder="Mô tả công việc"
+          className="mb-2"
+        />
+        <Select
+          value={editedTask.assignedTo || "default"}
+          onValueChange={(value) => setEditedTask(prevTask => ({ ...prevTask, assignedTo: value }))}
+        >
+          <SelectTrigger className="mb-2">
+            <SelectValue placeholder="Chọn người được giao" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="default" disabled>Chọn người được giao</SelectItem>
+            {users.map((user) => (
+              <SelectItem key={user.id} value={user.id}>
+                {user.username}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+        <div className="flex gap-2 mb-2">
+          <DatePicker
+            selected={new Date(editedTask.startDate)}
+            onChange={(date) => handleDateChange(date, 'startDate')}
+            placeholderText="Ngày bắt đầu"
+          />
+          <DatePicker
+            selected={new Date(editedTask.endDate)}
+            onChange={(date) => handleDateChange(date, 'endDate')}
+            placeholderText="Ngày kết thúc"
+          />
+        </div>
+        <Button type="submit">Lưu thay đổi</Button>
+      </form>
+    );
   };
 
   return (
@@ -231,7 +332,24 @@ export default function TaskManagementPage() {
               .filter((task) => task.status === status)
               .map((task) => (
                 <div key={task._id} className="border p-2 mb-2 rounded bg-white">
-                  <h3 className="font-bold">{task.title}</h3>
+                  <div className="flex justify-between items-start mb-2">
+                    <h3 className="font-bold">{task.title}</h3>
+                    {status === 'pending' && (
+                      <Dialog>
+                        <DialogTrigger asChild>
+                          <Button variant="ghost" className="p-1">
+                            <FaEdit />
+                          </Button>
+                        </DialogTrigger>
+                        <DialogContent>
+                          <DialogHeader>
+                            <DialogTitle>Chỉnh sửa công việc</DialogTitle>
+                          </DialogHeader>
+                          <EditTaskForm task={task} onSave={handleUpdateTask} users={users} />
+                        </DialogContent>
+                      </Dialog>
+                    )}
+                  </div>
                   <p>{task.description}</p>
                   <p>Người được giao: {users.find(user => user.id === task.assignedTo)?.username || 'Chưa xác định'}</p>
                   <p>Bắt đầu: {new Date(task.startDate).toLocaleDateString()}</p>
