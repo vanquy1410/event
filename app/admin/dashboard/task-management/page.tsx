@@ -53,6 +53,7 @@ export default function TaskManagementPage() {
     startDate: new Date(),
     endDate: new Date(),
   });
+  const [showForm, setShowForm] = useState(false);
 
   useEffect(() => {
     fetchTasks();
@@ -274,51 +275,59 @@ export default function TaskManagementPage() {
     <div className="p-4">
       <h1 className="text-2xl font-bold mb-4">Quản lý công việc</h1>
       
-      <form onSubmit={handleSubmit} className="mb-8">
-        <Input
-          name="title"
-          value={newTask.title}
-          onChange={handleInputChange}
-          placeholder="Tiêu đề công việc"
-          className="mb-2"
-        />
-        <Textarea
-          name="description"
-          value={newTask.description}
-          onChange={handleInputChange}
-          placeholder="Mô tả công việc"
-          className="mb-2"
-        />
-        <Select
-          value={newTask.assignedTo || "default"}
-          onValueChange={(value) => setNewTask(prevTask => ({ ...prevTask, assignedTo: value }))}
-        >
-          <SelectTrigger className="mb-2">
-            <SelectValue placeholder="Chọn người được giao" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="default" disabled>Chọn nguời được giao</SelectItem>
-            {users.map((user) => (
-              <SelectItem key={user.id} value={user.id}>
-                {user.username}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
-        <div className="flex gap-2 mb-2">
-          <DatePicker
-            selected={newTask.startDate}
-            onChange={(date) => handleDateChange(date, 'startDate')}
-            placeholderText="Ngày bắt đầu"
+      <Button onClick={() => setShowForm(!showForm)} className="mb-4">
+        {showForm ? 'Ẩn form' : 'Thêm công việc mới'}
+      </Button>
+
+      {showForm && (
+        <form onSubmit={handleSubmit} className="mb-8">
+          <Input
+            name="title"
+            value={newTask.title}
+            onChange={handleInputChange}
+            placeholder="Tiêu đề công việc"
+            className="mb-2"
           />
-          <DatePicker
-            selected={newTask.endDate}
-            onChange={(date) => handleDateChange(date, 'endDate')}
-            placeholderText="Ngày kết thúc"
+          <Textarea
+            name="description"
+            value={newTask.description}
+            onChange={handleInputChange}
+            placeholder="Mô tả công việc"
+            className="mb-2"
           />
-        </div>
-        <Button type="submit">Thêm công việc</Button>
-      </form>
+          <Select
+            value={newTask.assignedTo || "default"}
+            onValueChange={(value) => setNewTask(prevTask => ({ ...prevTask, assignedTo: value }))}
+          >
+            <SelectTrigger className="mb-2">
+              <SelectValue placeholder="Chọn người được giao" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="default" disabled>Chọn nguời được giao</SelectItem>
+              {users.map((user) => (
+                <SelectItem key={user.id} value={user.id}>
+                  {user.username}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+          <div className="flex gap-2 mb-2">
+            <DatePicker
+              selected={newTask.startDate}
+              onChange={(date) => handleDateChange(date, 'startDate')}
+              placeholderText="Ngày bắt đầu"
+            />
+            <DatePicker
+              selected={newTask.endDate}
+              onChange={(date) => handleDateChange(date, 'endDate')}
+              placeholderText="Ngày kết thúc"
+            />
+          </div>
+          <Button type="submit">Thêm công việc</Button>
+        </form>
+      )}
+
+      <h2 className="text-3xl font-bold mb-6 text-center text-primary">Danh sách công việc</h2>
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         {['pending', 'in-progress', 'completed'].map((status) => (
