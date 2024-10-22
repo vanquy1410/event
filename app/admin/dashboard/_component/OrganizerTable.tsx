@@ -1,6 +1,10 @@
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog"
+import { FaUpload, FaEye } from 'react-icons/fa';
+import UploadDocumentModal from './UploadDocumentModal';
+import ViewDocumentsModal from './ViewDocumentsModal';
+import { useState } from 'react';
 
 interface Organizer {
   _id: string;
@@ -8,15 +12,21 @@ interface Organizer {
   eventTitle: string;
   description: string;
   status: 'pending' | 'approved' | 'rejected' | 'cancelled';
+  documents: string[];
 }
 
 interface OrganizerTableProps {
   organizers: Organizer[];
   onStatusUpdate: (id: string, status: 'approved' | 'rejected') => void;
   onSearch: (query: string) => void;
+  onDocumentUpdate: (organizerId: string, newDocument: string) => void;
 }
 
-export default function OrganizerTable({ organizers, onStatusUpdate, onSearch }: OrganizerTableProps) {
+export default function OrganizerTable({ organizers, onStatusUpdate, onSearch, onDocumentUpdate }: OrganizerTableProps) {
+  const [isUploadModalOpen, setIsUploadModalOpen] = useState(false);
+  const [isViewModalOpen, setIsViewModalOpen] = useState(false);
+  const [selectedOrganizerId, setSelectedOrganizerId] = useState<string | null>(null);
+
   const StatusUpdateConfirmation = ({ organizerId, status, onConfirm }: { organizerId: string, status: 'approved' | 'rejected', onConfirm: () => void }) => {
     return (
       <AlertDialog>
@@ -43,6 +53,23 @@ export default function OrganizerTable({ organizers, onStatusUpdate, onSearch }:
     );
   };
 
+  const handleUploadClick = (organizerId: string) => {
+    setSelectedOrganizerId(organizerId);
+    setIsUploadModalOpen(true);
+  };
+
+  const handleViewDocuments = (organizerId: string) => {
+    setSelectedOrganizerId(organizerId);
+    setIsViewModalOpen(true);
+  };
+
+  const handleUploadSuccess = (fileUrl: string) => {
+    if (selectedOrganizerId) {
+      onDocumentUpdate(selectedOrganizerId, fileUrl);
+    }
+    setIsUploadModalOpen(false);
+  };
+
   return (
     <>
       <div className="flex gap-4 mb-4">
@@ -61,6 +88,7 @@ export default function OrganizerTable({ organizers, onStatusUpdate, onSearch }:
             <th className="py-2 px-4 border-b">Tên sự kiện</th>
             <th className="py-2 px-4 border-b">Mô tả</th>
             <th className="py-2 px-4 border-b">Trạng thái</th>
+            <th className="py-2 px-4 border-b">Tài liệu</th>
             <th className="py-2 px-4 border-b">Hành động</th>
           </tr>
         </thead>
@@ -81,6 +109,18 @@ export default function OrganizerTable({ organizers, onStatusUpdate, onSearch }:
                    organizer.status === 'pending' ? 'Chờ duyệt' :
                    'Từ chối'}
                 </span>
+              </td>
+              <td className="py-2 px-4 border-b">
+                {organizer.status === 'approved' && (
+                  <div className="flex space-x-2">
+                    <Button onClick={() => handleUploadClick(organizer._id)} title="Upload tài liệu">
+                      <FaUpload />
+                    </Button>
+                    <Button onClick={() => handleViewDocuments(organizer._id)} title="Xem tài liệu">
+                      <FaEye />
+                    </Button>
+                  </div>
+                )}
               </td>
               <td className="py-2 px-4 border-b">
                 {organizer.status === 'pending' && (
@@ -104,6 +144,18 @@ export default function OrganizerTable({ organizers, onStatusUpdate, onSearch }:
           ))}
         </tbody>
       </table>
+      <UploadDocumentModal
+        isOpen={isUploadModalOpen}
+        onClose={() => setIsUploadModalOpen(false)}
+        onUploadSuccess={handleUploadSuccess}
+        organizerId={selectedOrganizerId}
+      />
+      <ViewDocumentsModal
+        isOpen={isViewModalOpen}
+        onClose={() => setIsViewModalOpen(false)}
+        organizerId={selectedOrganizerId}
+        documents={organizers.find(org => org._id === selectedOrganizerId)?.documents || []}
+      />
     </>
   );
 }
