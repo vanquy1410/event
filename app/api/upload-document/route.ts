@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
-import { writeFile } from 'fs/promises';
-import path from 'path';
+import { PutObjectCommand } from "@aws-sdk/client-s3";
+import s3Client from '@/lib/s3Client';
 
 export async function POST(req: Request) {
   const formData = await req.formData();
@@ -8,23 +8,28 @@ export async function POST(req: Request) {
   const organizerId = formData.get('organizerId') as string;
 
   if (!file) {
-    return NextResponse.json({ error: 'No file uploaded' }, { status: 400 });
+    return NextResponse.json({ error: 'Không có file được upload' }, { status: 400 });
   }
 
-  const bytes = await file.arrayBuffer();
-  const buffer = Buffer.from(bytes);
-
+  const buffer = Buffer.from(await file.arrayBuffer());
   const filename = `${Date.now()}-${file.name}`;
-  const filepath = path.join(process.cwd(), 'public', 'uploads', filename);
 
   try {
-    await writeFile(filepath, buffer);
+    await s3Client.send(new PutObjectCommand({
+      Bucket: process.env.S3_BUCKET_NAME,
+      Key: `documents/${organizerId}/${filename}`,
+      Body: buffer,
+      ContentType: file.type,
+    }));
+
+    const fileUrl = `${process.env.S3_ENDPOINT}/${process.env.S3_BUCKET_NAME}/documents/${organizerId}/${filename}`;
+
     // Ở đây bạn cần cập nhật thông tin tài liệu trong database
-    // Ví dụ: await updateOrganizerDocument(organizerId, `/uploads/${filename}`);
-    return NextResponse.json({ fileUrl: `/uploads/${filename}` });
+    // Ví dụ: await updateOrganizerDocument(organizerId, fileUrl);
+
+    return NextResponse.json({ fileUrl });
   } catch (error) {
-    console.error('Error saving file:', error);
-    return NextResponse.json({ error: 'Error saving file' }, { status: 500 });
+    console.error('Lỗi khi lưu file:', error);
+    return NextResponse.json({ error: 'Lỗi khi lưu file' }, { status: 500 });
   }
 }
-

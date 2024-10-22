@@ -82,15 +82,21 @@ export async function updateOrganizerEventStatus(organizerId: string, status: 'a
 
 export async function updateOrganizerDocument(organizerId: string, documentUrl: string) {
   try {
-    await connectToDatabase();
+    connectToDatabase();
+
     const updatedOrganizer = await Organizer.findByIdAndUpdate(
       organizerId,
       { $push: { documents: documentUrl } },
       { new: true }
     );
-    return JSON.parse(JSON.stringify(updatedOrganizer));
+
+    if (!updatedOrganizer) {
+      throw new Error('Không tìm thấy ban tổ chức');
+    }
+
+    return updatedOrganizer;
   } catch (error) {
-    handleError(error);
-    return null; // Hoặc throw error tùy thuộc vào cách bạn muốn xử lý lỗi
+    console.error('Lỗi khi cập nhật tài liệu của ban tổ chức:', error);
+    throw error;
   }
 }
