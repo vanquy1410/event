@@ -14,6 +14,7 @@ export interface IOrganizer {
   price: number;
   participantLimit: number;
   status: 'pending' | 'approved' | 'rejected' | 'cancelled';
+  documents: string[];
 }
 
 const OrganizerSchema = new Schema<IOrganizer>({
@@ -32,7 +33,8 @@ const OrganizerSchema = new Schema<IOrganizer>({
     type: String,
     enum: ['pending', 'approved', 'rejected'],
     default: 'pending'
-  }
+  },
+  documents: [{ type: String }]
 });
 
 let Organizer: Model<IOrganizer>;

@@ -1,6 +1,7 @@
 import { IOrganizer } from '@/lib/database/models/organizer.model';
 import { connectToDatabase } from '@/lib/database';
 import Organizer from '@/lib/database/models/organizer.model';
+import { handleError } from '@/lib/utils'; // Điều chỉnh đường dẫn nếu cần
 
 const API_BASE_URL = typeof window !== 'undefined' ? window.location.origin : 'http://localhost:3000';
 
@@ -76,5 +77,20 @@ export async function updateOrganizerEventStatus(organizerId: string, status: 'a
   } catch (error) {
     console.error('Lỗi khi cập nhật trạng thái ban tổ chức:', error);
     throw error;
+  }
+}
+
+export async function updateOrganizerDocument(organizerId: string, documentUrl: string) {
+  try {
+    await connectToDatabase();
+    const updatedOrganizer = await Organizer.findByIdAndUpdate(
+      organizerId,
+      { $push: { documents: documentUrl } },
+      { new: true }
+    );
+    return JSON.parse(JSON.stringify(updatedOrganizer));
+  } catch (error) {
+    handleError(error);
+    return null; // Hoặc throw error tùy thuộc vào cách bạn muốn xử lý lỗi
   }
 }

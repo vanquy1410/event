@@ -39,6 +39,14 @@ const OrganizerManagementPage: React.FC = () => {
     }
   };
 
+  const handleDocumentUpdate = (organizerId: string, newDocument: string) => {
+    setOrganizers(prevOrganizers => prevOrganizers.map(org => 
+      org._id === organizerId 
+        ? { ...org, documents: [...(org.documents || []), newDocument] }
+        : org
+    ));
+  };
+
   return (
     <>
       <section className="bg-primary-50 bg-dotted-pattern bg-cover bg-center py-5 md:py-10">
@@ -57,6 +65,7 @@ const OrganizerManagementPage: React.FC = () => {
           organizers={organizers} 
           onStatusUpdate={handleStatusUpdate} 
           onSearch={setQuery}
+          onDocumentUpdate={handleDocumentUpdate}
         />
       </section>
       {error && <p className="text-red-500">{error}</p>}
