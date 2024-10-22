@@ -12,20 +12,18 @@ export async function POST(req: Request) {
   }
 
   const buffer = Buffer.from(await file.arrayBuffer());
-  const filename = `${Date.now()}-${file.name}`;
+  const filename = file.name;
 
   try {
     await s3Client.send(new PutObjectCommand({
       Bucket: process.env.S3_BUCKET_NAME,
       Key: `documents/${organizerId}/${filename}`,
       Body: buffer,
+      ACL: 'public-read-write' as const,
       ContentType: file.type,
     }));
 
     const fileUrl = `${process.env.S3_ENDPOINT}/${process.env.S3_BUCKET_NAME}/documents/${organizerId}/${filename}`;
-
-    // Ở đây bạn cần cập nhật thông tin tài liệu trong database
-    // Ví dụ: await updateOrganizerDocument(organizerId, fileUrl);
 
     return NextResponse.json({ fileUrl });
   } catch (error) {
