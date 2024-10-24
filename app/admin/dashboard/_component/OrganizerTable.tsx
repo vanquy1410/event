@@ -63,9 +63,28 @@ export default function OrganizerTable({ organizers, onStatusUpdate, onSearch, o
     setIsViewModalOpen(true);
   };
 
-  const handleUploadSuccess = (fileUrl: string) => {
+  const handleUploadSuccess = async (fileUrl: string) => {
     if (selectedOrganizerId) {
-      onDocumentUpdate(selectedOrganizerId, fileUrl);
+      try {
+        // Gọi API để cập nhật thông tin tài liệu trong database
+        const response = await fetch('/api/update-organizer-document', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ organizerId: selectedOrganizerId, documentUrl: fileUrl }),
+        });
+
+        if (!response.ok) {
+          throw new Error('Không thể cập nhật thông tin tài liệu');
+        }
+
+        // Cập nhật state local
+        onDocumentUpdate(selectedOrganizerId, fileUrl);
+      } catch (error) {
+        console.error('Lỗi khi cập nhật thông tin tài liệu:', error);
+        // Hiển thị thông báo lỗi cho người dùng
+      }
     }
     setIsUploadModalOpen(false);
   };

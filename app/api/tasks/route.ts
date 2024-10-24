@@ -1,4 +1,4 @@
-import { NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
 import { connectToDatabase } from '@/lib/database';
 import Task from '@/lib/database/models/task.model';
 
@@ -13,13 +13,26 @@ export async function POST(req: Request) {
   }
 }
 
-export async function GET() {
+export async function GET(request: NextRequest) {
   try {
     await connectToDatabase();
-    const tasks = await Task.find();
+    const { searchParams } = new URL(request.url);
+    const assignedTo = searchParams.get('assignedTo');
+
+    console.log('API: Fetching tasks for assignedTo:', assignedTo);
+
+    let query = {};
+    if (assignedTo) {
+      query = { assignedTo: assignedTo };
+    }
+
+    const tasks = await Task.find(query).sort({ createdAt: 'desc' });
+    console.log('API: Tasks found:', tasks);
+
     return NextResponse.json(tasks);
   } catch (error) {
-    return NextResponse.json({ error: 'Lỗi khi lấy danh sách công việc' }, { status: 500 });
+    console.error('Lỗi khi lấy danh sách công việc:', error);
+    return NextResponse.json({ message: 'Lỗi server khi lấy danh sách công việc' }, { status: 500 });
   }
 }
 

@@ -41,7 +41,7 @@ export default function ViewDocumentsModal({ isOpen, onClose, organizerId, docum
                     rel="noopener noreferrer"
                     className="text-blue-600 hover:underline flex-grow font-medium"
                   >
-                    Tài liệu {index + 1}
+                    {doc.split('/').pop()} 
                   </a>
                 </li>
               ))}

@@ -52,7 +52,7 @@ export default function UploadDocumentModal({ isOpen, onClose, onUploadSuccess, 
         onUploadSuccess(data.fileUrl);
       } catch (error) {
         console.error('Lỗi khi upload tài liệu:', error);
-        // You might want to set an error state here and display it to the user
+        // Bạn có thể muốn đặt một trạng thái lỗi ở đây và hiển thị nó cho người dùng
         // setError(error.message);
       } finally {
         setIsUploading(false);
@@ -110,4 +110,3 @@ export default function UploadDocumentModal({ isOpen, onClose, onUploadSuccess, 
     </Dialog>
   );
 }
-

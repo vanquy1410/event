@@ -23,6 +23,10 @@ export const headerLinks = [
     label: 'Dashboard',
     route: '/admin/dashboard',
   },
+  {
+    label: 'Nhân viên',
+    route: '/employee',
+  },
 ]
 
 export const eventDefaultValues = {

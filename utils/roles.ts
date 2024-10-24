@@ -1,5 +1,6 @@
-import { Roles } from "@/types/globals"
 import { auth } from "@clerk/nextjs/server"
+
+export type Roles = 'admin' | 'organizer' | 'employee' | 'user';
 
 export const checkRole = (roles: Roles | Roles[]) => {
   const { sessionClaims } = auth()
@@ -15,5 +16,10 @@ export const isOrganizer = () => {
 
 export const getRole = (): Roles | undefined => {
   const { sessionClaims } = auth()
-  return sessionClaims?.metadata.role as Roles
-}
+  return sessionClaims?.metadata.role as Roles | undefined;
+};
+
+export const isEmployee = (): boolean => {
+  const role = getRole();
+  return role === 'employee';
+};
