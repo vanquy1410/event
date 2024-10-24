@@ -303,9 +303,9 @@ export default function TaskManagementPage() {
               <SelectValue placeholder="Chọn người được giao" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="default" disabled>Chọn nguời được giao</SelectItem>
+              <SelectItem value="default" disabled>Chọn người được giao</SelectItem>
               {users.map((user) => (
-                <SelectItem key={user.id} value={user.id}>
+                <SelectItem key={user.id} value={user.username}>
                   {user.username}
                 </SelectItem>
               ))}
@@ -360,7 +360,7 @@ export default function TaskManagementPage() {
                     )}
                   </div>
                   <p>{task.description}</p>
-                  <p>Người được giao: {users.find(user => user.id === task.assignedTo)?.username || 'Chưa xác định'}</p>
+                  <p>Người được giao: {task.assignedTo || 'Chưa xác định'}</p>
                   <p>Bắt đầu: {new Date(task.startDate).toLocaleDateString()}</p>
                   <p>Kết thúc: {new Date(task.endDate).toLocaleDateString()}</p>
                   <div className="mt-2 flex justify-between items-center">
