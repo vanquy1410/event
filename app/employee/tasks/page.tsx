@@ -17,6 +17,12 @@ import {
 } from "@/components/ui/alert-dialog";
 import { FaTrash } from 'react-icons/fa';
 import { toast } from 'react-hot-toast';
+import { Calendar, momentLocalizer } from 'react-big-calendar';
+import moment from 'moment';
+import 'react-big-calendar/lib/css/react-big-calendar.css';
+import { Textarea } from '@/components/ui/textarea';
+
+moment.locale('vi');
 
 interface Task {
   _id: string;
@@ -28,14 +34,40 @@ interface Task {
   status: 'pending' | 'in-progress' | 'completed';
 }
 
+const localizer = momentLocalizer(moment);
+
+const messages = {
+  allDay: 'Cả ngày',
+  previous: 'Trước',
+  next: 'Sau',
+  today: 'Hôm nay',
+  month: 'Tháng',
+  week: 'Tuần',
+  day: 'Ngày',
+  agenda: 'Lịch công việc',
+  date: 'Ngày',
+  time: 'Thời gian',
+  event: 'Sự kiện',
+  noEventsInRange: 'Không có sự kiện nào trong khoảng thời gian này.',
+  showMore: (total: number) => `+ Xem thêm (${total})`,
+  sunday: 'Chủ Nhật',
+  monday: 'Thứ Hai',
+  tuesday: 'Thứ Ba',
+  wednesday: 'Thứ Tư',
+  thursday: 'Thứ Năm',
+  friday: 'Thứ Sáu',
+  saturday: 'Thứ Bảy',
+};
+
 export default function EmployeeTasksPage() {
   const { user, isLoaded } = useUser();
   const [tasks, setTasks] = useState<Task[]>([]);
+  const [notes, setNotes] = useState('');
 
   useEffect(() => {
-    console.log("User data:", user);
     if (isLoaded && user) {
       fetchTasks();
+      fetchNotes();
     }
   }, [user, isLoaded]);
 
@@ -58,6 +90,16 @@ export default function EmployeeTasksPage() {
     } catch (error) {
       console.error('Lỗi khi tải danh sách công việc:', error);
       setTasks([]);
+    }
+  };
+
+  const fetchNotes = async () => {
+    try {
+      const response = await fetch('/api/notes');
+      const data = await response.json();
+      setNotes(data.notes || '');
+    } catch (error) {
+      console.error('Lỗi khi tải ghi chú:', error);
     }
   };
 
@@ -85,6 +127,33 @@ export default function EmployeeTasksPage() {
       toast.error('Đã xảy ra lỗi khi cập nhật trạng thái công việc');
     }
   };
+
+  const handleSaveNotes = async () => {
+    try {
+      // Gọi API để lưu ghi chú
+      const response = await fetch('/api/notes', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ notes }),
+      });
+
+      if (response.ok) {
+        toast.success('Ghi chú đã được lưu thành công');
+      } else {
+        toast.error('Có lỗi xảy ra khi lưu ghi chú');
+      }
+    } catch (error) {
+      console.error('Lỗi khi lưu ghi chú:', error);
+      toast.error('Có lỗi xảy ra khi lưu ghi chú');
+    }
+  };
+
+  const calendarEvents = tasks.map(task => ({
+    title: task.title,
+    start: new Date(task.startDate),
+    end: new Date(task.endDate),
+    allDay: false,
+  }));
 
   return (
     <div className="p-4">
@@ -128,6 +197,38 @@ export default function EmployeeTasksPage() {
               ))}
           </div>
         ))}
+      </div>
+
+      <div className="mb-8">
+        <h2 className="text-xl font-semibold mb-4">Lịch công việc</h2>
+        <Calendar
+          localizer={localizer}
+          events={calendarEvents}
+          startAccessor="start"
+          endAccessor="end"
+          style={{ height: 500 }}
+          messages={messages}
+          formats={{
+            monthHeaderFormat: (date: Date) => moment(date).format('MMMM YYYY'),
+            dayFormat: (date: Date, culture: string, localizer: any) =>
+              localizer.format(date, 'dddd', culture),
+            dayHeaderFormat: (date: Date) => moment(date).format('dddd DD/MM'),
+            dayRangeHeaderFormat: ({ start, end }: { start: Date; end: Date }) =>
+              `${moment(start).format('D MMMM')} - ${moment(end).format('D MMMM YYYY')}`,
+          }}
+          views={['month', 'week', 'day', 'agenda']}
+        />
+      </div>
+
+      <div className="mb-8">
+        <h2 className="text-xl font-semibold mb-4">Ghi chú công việc</h2>
+        <Textarea
+          value={notes}
+          onChange={(e) => setNotes(e.target.value)}
+          placeholder="Nhập ghi chú của bạn ở đây..."
+          className="w-full h-32"
+        />
+        <Button onClick={handleSaveNotes} className="mt-2">Lưu ghi chú</Button>
       </div>
     </div>
   );
