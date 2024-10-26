@@ -2,12 +2,13 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { FaHome, FaCalendarAlt, FaClipboardList } from 'react-icons/fa';
+import { FaHome, FaCalendarAlt, FaClipboardList, FaBell } from 'react-icons/fa';
 
 const navItems = [
-  { href: '/employee', label: 'Trang chủ', icon: FaHome },
+  { href: '/employee', label: 'Trang nhân viên', icon: FaHome },
   { href: '/employee/events', label: 'Quản lý sự kiện', icon: FaCalendarAlt },
   { href: '/employee/tasks', label: 'Công việc', icon: FaClipboardList },
+  { href: "/employee/notifications", label: "Thông báo", icon: FaBell },
 ];
 
 const Sidebar = () => {
@@ -26,7 +27,7 @@ const Sidebar = () => {
                 : 'text-gray-300 hover:bg-gray-700'
             }`}
           >
-            <item.icon className="w-5 h-5" />
+            {item.icon && <item.icon className="w-5 h-5" />}
             <span>{item.label}</span>
           </Link>
         ))}
