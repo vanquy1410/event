@@ -34,11 +34,17 @@ interface Task {
   status: 'pending' | 'in-progress' | 'completed';
 }
 
+interface Note {
+  id: string;
+  content: string;
+  date: Date | string;
+}
+
 const localizer = momentLocalizer(moment);
 
 const messages = {
   allDay: 'Cả ngày',
-  previous: 'Trước',
+  previous: 'Trc',
   next: 'Sau',
   today: 'Hôm nay',
   month: 'Tháng',
@@ -47,7 +53,7 @@ const messages = {
   agenda: 'Lịch công việc',
   date: 'Ngày',
   time: 'Thời gian',
-  event: 'Sự kiện',
+  event: 'S kiện',
   noEventsInRange: 'Không có sự kiện nào trong khoảng thời gian này.',
   showMore: (total: number) => `+ Xem thêm (${total})`,
   sunday: 'Chủ Nhật',
@@ -59,10 +65,23 @@ const messages = {
   saturday: 'Thứ Bảy',
 };
 
+const eventStyleGetter = (event: any) => {
+  let style = {
+    backgroundColor: event.resource === 'task' ? '#3174ad' : '#4caf50',
+    borderRadius: '5px',
+    opacity: 0.8,
+    color: 'white',
+    border: '0px',
+    display: 'block'
+  };
+  return { style };
+};
+
 export default function EmployeeTasksPage() {
   const { user, isLoaded } = useUser();
   const [tasks, setTasks] = useState<Task[]>([]);
-  const [notes, setNotes] = useState('');
+  const [notes, setNotes] = useState<Note[]>([]);
+  const [newNote, setNewNote] = useState('');
 
   useEffect(() => {
     if (isLoaded && user) {
@@ -96,11 +115,23 @@ export default function EmployeeTasksPage() {
   const fetchNotes = async () => {
     try {
       const response = await fetch('/api/notes');
+      if (!response.ok) {
+        throw new Error('Lỗi khi tải ghi chú');
+      }
       const data = await response.json();
-      setNotes(data.notes || '');
+      const formattedNotes = data.notes.map((note: any) => ({
+        ...note,
+        date: new Date(note.date)
+      }));
+      setNotes(formattedNotes);
     } catch (error) {
       console.error('Lỗi khi tải ghi chú:', error);
+      toast.error('Không thể tải ghi chú');
     }
+  };
+
+  const handleNotesChange = (event: React.ChangeEvent<HTMLTextAreaElement>) => {
+    setNewNote(event.target.value);
   };
 
   const handleStatusChange = async (taskId: string, newStatus: 'pending' | 'in-progress' | 'completed') => {
@@ -130,30 +161,58 @@ export default function EmployeeTasksPage() {
 
   const handleSaveNotes = async () => {
     try {
-      // Gọi API để lưu ghi chú
+      const newNoteObject = {
+        content: newNote,
+        date: new Date().toISOString(),
+      };
+
       const response = await fetch('/api/notes', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ notes }),
+        body: JSON.stringify({ note: newNoteObject }),
       });
 
-      if (response.ok) {
-        toast.success('Ghi chú đã được lưu thành công');
-      } else {
-        toast.error('Có lỗi xảy ra khi lưu ghi chú');
+      if (!response.ok) {
+        throw new Error('Lỗi khi lưu ghi chú');
       }
+
+      const result = await response.json();
+      
+      // Cập nhật ID của ghi chú từ server và chuyển đổi date thành đối tượng Date
+      const savedNote: Note = {
+        ...newNoteObject,
+        id: result.noteId,
+        date: new Date(newNoteObject.date),
+      };
+
+      setNotes([...notes, savedNote]);
+      setNewNote('');
+      toast.success('Ghi chú đã được lưu thành công');
+      
+      // Gọi lại fetchNotes để cập nhật danh sách ghi chú từ server
+      await fetchNotes();
     } catch (error) {
       console.error('Lỗi khi lưu ghi chú:', error);
       toast.error('Có lỗi xảy ra khi lưu ghi chú');
     }
   };
 
-  const calendarEvents = tasks.map(task => ({
-    title: task.title,
-    start: new Date(task.startDate),
-    end: new Date(task.endDate),
-    allDay: false,
-  }));
+  const calendarEvents = [
+    ...tasks.map(task => ({
+      title: task.title,
+      start: new Date(task.startDate),
+      end: new Date(task.endDate),
+      allDay: false,
+      resource: 'task',
+    })),
+    ...notes.map(note => ({
+      title: note.content,
+      start: new Date(note.date),
+      end: new Date(note.date),
+      allDay: true,
+      resource: 'note',
+    }))
+  ];
 
   return (
     <div className="p-4">
@@ -217,18 +276,38 @@ export default function EmployeeTasksPage() {
               `${moment(start).format('D MMMM')} - ${moment(end).format('D MMMM YYYY')}`,
           }}
           views={['month', 'week', 'day', 'agenda']}
+          eventPropGetter={eventStyleGetter}
         />
+        <div className="mt-4 flex items-center justify-start space-x-4">
+          <div className="flex items-center">
+            <div className="w-4 h-4 bg-[#3174ad] mr-2"></div>
+            <span>Công việc</span>
+          </div>
+          <div className="flex items-center">
+            <div className="w-4 h-4 bg-[#4caf50] mr-2"></div>
+            <span>Ghi chú</span>
+          </div>
+        </div>
       </div>
 
       <div className="mb-8">
-        <h2 className="text-xl font-semibold mb-4">Ghi chú công việc</h2>
+        <h2 className="text-xl font-semibold mb-4">Ghi chú</h2>
         <Textarea
-          value={notes}
-          onChange={(e) => setNotes(e.target.value)}
-          placeholder="Nhập ghi chú của bạn ở đây..."
-          className="w-full h-32"
+          value={newNote}
+          onChange={handleNotesChange}
+          rows={5}
+          placeholder="Nhập ghi chú mới của bạn ở đây..."
+          className="w-full mb-2"
         />
-        <Button onClick={handleSaveNotes} className="mt-2">Lưu ghi chú</Button>
+        <Button onClick={handleSaveNotes} className="mb-4">Lưu ghi chú</Button>
+        
+        <h3 className="text-lg font-semibold mb-2">Danh sách ghi chú:</h3>
+        {notes.map((note) => (
+          <div key={note.id} className="bg-gray-100 p-2 mb-2 rounded">
+            <p>{note.content}</p>
+            <small>{new Date(note.date).toLocaleString()}</small>
+          </div>
+        ))}
       </div>
     </div>
   );
