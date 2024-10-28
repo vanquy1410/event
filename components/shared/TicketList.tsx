@@ -60,7 +60,7 @@ const TicketList = ({ userId, orders, page, totalPages }: TicketListProps) => {
     const qrData = JSON.stringify({
       orderId: order._id,
       eventTitle: order.event.title,
-      buyerName: order.buyerName, // Giả sử bạn có thông tin này trong order
+      buyer: order.buyer,
     });
     const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?data=${encodeURIComponent(qrData)}&size=900x900`;
     window.open(qrUrl, '_blank');

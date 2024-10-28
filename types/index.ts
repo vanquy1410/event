@@ -13,6 +13,7 @@ export interface IEvent {
 }
 
 export interface IOrder extends Document {
+  buyerName: string;
   selectedSeat: number;
   _id: string;
   createdAt: Date;
