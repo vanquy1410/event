@@ -89,7 +89,7 @@ const EventDetails = async ({ params, searchParams }: SearchParamProps) => {
             <div className="p-regular-20 flex items-center gap-3">
               <Image src="/assets/icons/participant.svg" alt="participants" width={32} height={32} />
               <p className="p-medium-16 lg:p-regular-20">
-                {event.currentParticipants} / {event.participantLimit} participants
+                {event.currentParticipants} / {event.participantLimit} người tham dự
               </p>
             </div>
           </div>

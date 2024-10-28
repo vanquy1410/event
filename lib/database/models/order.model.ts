@@ -16,6 +16,7 @@ export interface IOrder extends Document {
   }
   eventTitle: string
   buyerName: string
+  seats: boolean[];
 }
 
 export type IOrderItem = {
@@ -26,6 +27,7 @@ export type IOrderItem = {
   eventId: string
   buyer: string
   buyerName: string
+  seats: boolean[];
 }
 
 const OrderSchema = new Schema({
@@ -33,7 +35,7 @@ const OrderSchema = new Schema({
     type: Date,
     default: Date.now,
   },
-  stripeId: {
+  stripeId: {       
     type: String,
     required: true,
     unique: true,
@@ -60,7 +62,8 @@ const OrderSchema = new Schema({
   username: {
     type: String,
     required: true,
-  }
+  },
+  seats: { type: [Boolean], default: [] },
 })
 
 const Order = models.Order || model('Order', OrderSchema)

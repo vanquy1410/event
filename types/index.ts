@@ -1,6 +1,7 @@
 import { Document } from 'mongoose';
 
 export interface IEvent {
+  seats: any;
   _id: string;
   title: string;
   description: string;
@@ -12,14 +13,27 @@ export interface IEvent {
 }
 
 export interface IOrder extends Document {
+  selectedSeat: number;
   _id: string;
   createdAt: Date;
   stripeId: string;
   totalAmount: string;
   event: IEvent;
   buyer: string;
-  // Add other fields as needed
+  seats?: boolean[]
 }
+
+// Thêm type Order
+export type Order = {
+  _id: string;
+  createdAt: Date;
+  stripeId: string;
+  totalAmount: string;
+  event: IEvent; // Sự kiện liên quan đến đơn hàng
+  buyer: string; // ID của người mua
+  selectedSeat: number; // Ghế đã chọn
+  seats?: boolean[]; // Danh sách ghế
+};
 
 // ====== USER PARAMS
 export type CreateUserParams = {
@@ -137,9 +151,11 @@ export type CheckoutOrderParams = {
   price: string
   isFree: boolean
   buyerId: string
+  selectedSeat: any;
 }
 
 export type CreateOrderParams = {
+  selectedSeat: any;
   stripeId: string
   eventId: string
   buyerId: string

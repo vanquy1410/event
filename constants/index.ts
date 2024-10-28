@@ -40,5 +40,5 @@ export const eventDefaultValues = {
   price: '',
   isFree: false,
   url: '',
-  participantLimit: 1, // Add this line
+  participantLimit: 1,
 }

@@ -32,28 +32,32 @@ const populateEvent = (query: any) => {
 // CREATE
 export async function createEvent({ event, userId, path }: CreateEventParams) {
   try {
-    await connectToDatabase()
+    await connectToDatabase();
 
-    const organizer = await User.findById(userId)
-    if (!organizer) throw new Error('Organizer not found')
+    const organizer = await User.findById(userId);
+    if (!organizer) throw new Error('Organizer not found');
+
+    // Khởi tạo seats với số lượng ghế dựa trên participantLimit
+    const seats = new Array(event.participantLimit).fill(false); // Tất cả ghế đều trống
 
     const newEvent = await Event.create({
       ...event,
       category: event.categoryId,
-      organizer: userId
-    })
+      organizer: userId,
+      seats: seats, // Thêm trường seats vào sự kiện
+    });
 
     // Tạo thông báo mới
     await Notification.create({
       message: `Sự kiện mới "${newEvent.title}" đã được tạo`,
-      eventId: newEvent._id
+      eventId: newEvent._id,
     });
 
-    revalidatePath(path)
+    revalidatePath(path);
 
-    return JSON.parse(JSON.stringify(newEvent))
+    return JSON.parse(JSON.stringify(newEvent));
   } catch (error) {
-    handleError(error)
+    handleError(error);
   }
 }
 
@@ -269,4 +273,3 @@ export async function getUpcomingEvents(limit: number = 5) {
     throw error;
   }
 }
-

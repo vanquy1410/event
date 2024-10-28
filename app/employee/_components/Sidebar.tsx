@@ -2,13 +2,15 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { FaHome, FaCalendarAlt, FaClipboardList, FaBell } from 'react-icons/fa';
+import { FaHome, FaCalendarAlt, FaClipboardList, FaBell, FaFolder } from 'react-icons/fa';
 
 const navItems = [
   { href: '/employee', label: 'Trang nhân viên', icon: FaHome },
   { href: '/employee/events', label: 'Quản lý sự kiện', icon: FaCalendarAlt },
   { href: '/employee/tasks', label: 'Công việc', icon: FaClipboardList },
   { href: "/employee/notifications", label: "Thông báo", icon: FaBell },
+  { href: '/employee/orders', label: 'Quản lý đơn hàng', icon: FaClipboardList },
+  { href: '/employee/resources', label: 'Quản lý tài nguyên', icon: FaFolder },
 ];
 
 const Sidebar = () => {

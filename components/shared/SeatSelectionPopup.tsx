@@ -21,7 +21,9 @@ const SeatSelectionPopup: React.FC<SeatSelectionPopupProps> = ({
   if (!isOpen) return null;
 
   const handleSeatClick = (index: number) => {
-    setSelectedSeat(index);
+    if (!seats[index]) { // Chỉ cho phép chọn ghế chưa có người
+      setSelectedSeat(index);
+    }
   };
 
   const handleConfirm = () => {
@@ -41,13 +43,13 @@ const SeatSelectionPopup: React.FC<SeatSelectionPopupProps> = ({
               key={index}
               className={`w-8 h-8 ${
                 seats[index]
-                  ? 'bg-red-500'
+                  ? 'bg-red-500' // Ghế đã có người
                   : selectedSeat === index
-                  ? 'bg-blue-500'
-                  : 'bg-green-500'
+                  ? 'bg-blue-500' // Ghế đang được chọn
+                  : 'bg-green-500' // Ghế chưa có người
               }`}
               onClick={() => handleSeatClick(index)}
-              disabled={seats[index]}
+              disabled={seats[index]} // Không cho phép chọn ghế đã có người
             >
               {index + 1}
             </Button>

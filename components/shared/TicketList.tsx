@@ -15,7 +15,7 @@ import {
 } from "@/components/ui/dialog"
 import { IOrder } from '@/types'
 import Pagination from './Pagination'
-import { deleteOrderClient } from '@/lib/actions/order.actions';
+import { cancelOrder } from '@/lib/actions/order.actions';
 import Link from 'next/link';
 
 interface TicketListProps {
@@ -28,16 +28,16 @@ interface TicketListProps {
 const TicketList = ({ userId, orders, page, totalPages }: TicketListProps) => {
   const [orderList, setOrderList] = useState(orders);
   const [selectedOrderId, setSelectedOrderId] = useState<string | null>(null);
-  const [isConfirming, setIsConfirming] = useState(false); // Thêm state để kiểm soát xác nhận
+  const [isConfirming, setIsConfirming] = useState(false);
 
   const handleCancelOrder = async () => {
     if (!selectedOrderId) return;
 
     try {
-      await deleteOrderClient(selectedOrderId);
+      await cancelOrder({ orderId: selectedOrderId });
       setOrderList(orderList.filter(order => order._id !== selectedOrderId));
       setSelectedOrderId(null);
-      setIsConfirming(false); // Đặt lại trạng thái xác nhận
+      setIsConfirming(false);
     } catch (error) {
       console.error('Lỗi khi hủy đơn hàng:', error);
       alert('Có lỗi xảy ra khi hủy đơn hàng. Vui lòng thử lại.');
@@ -50,15 +50,25 @@ const TicketList = ({ userId, orders, page, totalPages }: TicketListProps) => {
       if (confirmCancel) {
         handleCancelOrder();
       } else {
-        setSelectedOrderId(null); // Reset ID nếu không xác nhận
-        setIsConfirming(false); // Đặt lại trạng thái xác nhận
+        setSelectedOrderId(null);
+        setIsConfirming(false);
       }
     }
   }, [isConfirming]);
 
+  const openQRCodeTab = (order: IOrder) => {
+    const qrData = JSON.stringify({
+      orderId: order._id,
+      eventTitle: order.event.title,
+      buyerName: order.buyerName, // Giả sử bạn có thông tin này trong order
+    });
+    const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?data=${encodeURIComponent(qrData)}&size=900x900`;
+    window.open(qrUrl, '_blank');
+  };
+
   return (
     <div className="overflow-x-auto">
-      <table className="min-w-full divide-y divide-gray-200 w-full"> {/* Thêm w-full để bảng chiếm toàn bộ chiều rộng */}
+      <table className="min-w-full divide-y divide-gray-200 w-full">
         <thead className="bg-primary-50">
           <tr>
             <th scope="col" className="px-6 py-3 text-left text-sm font-bold text-black uppercase tracking-wider">STT</th>
@@ -70,6 +80,7 @@ const TicketList = ({ userId, orders, page, totalPages }: TicketListProps) => {
             <th scope="col" className="px-6 py-3 text-left text-sm font-bold text-black uppercase tracking-wider">Ngày kết thúc</th>
             <th scope="col" className="px-6 py-3 text-left text-sm font-bold text-black uppercase tracking-wider">Chi tiết</th>
             <th scope="col" className="px-6 py-3 text-left text-sm font-bold text-black uppercase tracking-wider">Tài liệu</th>
+            <th scope="col" className="px-6 py-3 text-left text-sm font-bold text-black uppercase tracking-wider">QR</th>
           </tr>
         </thead>
         <tbody className="bg-white divide-y divide-gray-200">
@@ -127,22 +138,26 @@ const TicketList = ({ userId, orders, page, totalPages }: TicketListProps) => {
                       </DialogClose>
                       <Button variant="destructive" className="mt-4" onClick={() => {
                         setSelectedOrderId(order._id);
-                        setIsConfirming(true); // Đặt trạng thái xác nhận
+                        setIsConfirming(true);
                       }}>Hủy vé</Button>
                     </DialogFooter>
                   </DialogContent>
                 </Dialog>
               </td>
               <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                        {/* Thêm nút "Xem tài liệu" ở đây */}
-                        <Button variant="outline" className="text-primary-500 hover:text-primary-600 hover:bg-primary-50 transition-colors">
-                        <Link href={order.event.url || '#'} target="_blank">
-                        Tải tài liệu
-                        </Link>
-                      </Button>
+                <Button variant="outline" className="text-primary-500 hover:text-primary-600 hover:bg-primary-50 transition-colors">
+                  <Link href={order.event.url || '#'} target="_blank">
+                    Tải tài liệu
+                  </Link>
+                </Button>
+              </td>
+              <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                <Button variant="outline" className="text-primary-500 hover:text-primary-600 hover:bg-primary-50 transition-colors" onClick={() => openQRCodeTab(order)}>
+                  Hiển thị QR
+                </Button>
               </td>
             </tr>
-          ))} 
+          ))}
         </tbody>
       </table>
       {totalPages > 1 && (
