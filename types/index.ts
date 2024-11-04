@@ -197,3 +197,12 @@ type Organizer = {
   status: "pending" | "approved" | "rejected" | "cancelled";
 };
 
+export interface Blog {
+  _id: string
+  title: string
+  description: string
+  content: string
+  imageUrl: string
+  createdAt: string
+}
+

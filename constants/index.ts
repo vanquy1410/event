@@ -20,6 +20,10 @@ export const headerLinks = [
     route: '/organizer',
   },
   {
+    label: 'Blog',
+    route: '/blog',
+  },
+  {
     label: 'Dashboard',
     route: '/admin/dashboard',
   },
