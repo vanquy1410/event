@@ -196,3 +196,4 @@ type Organizer = {
   // ... other properties
   status: "pending" | "approved" | "rejected" | "cancelled";
 };
+
