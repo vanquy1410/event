@@ -1,15 +1,22 @@
 "use server"
 
 import Stripe from 'stripe';
-import { CheckoutOrderParams, CreateOrderParams, GetOrdersByEventParams, GetOrdersByUserParams } from "@/types"
+import { 
+  CheckoutOrderParams, 
+  CreateOrderParams, 
+  GetOrdersByEventParams, 
+  GetOrdersByUserParams, 
+  Order
+} from "@/types";
 import { redirect } from 'next/navigation';
 import { handleError } from '../utils';
 import { connectToDatabase } from '../database';
-import Order from '../database/models/order.model';
+import OrderModel from '../database/models/order.model';
 import Event from '../database/models/event.model';
-import {ObjectId} from 'mongodb';
+import { ObjectId } from 'mongodb';
 import User from '../database/models/user.model';
 import { revalidatePath } from 'next/cache';
+import { updateEvent } from './event.actions';
 
 export const checkoutOrder = async (order: CheckoutOrderParams) => {
   const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!);
@@ -33,19 +40,20 @@ export const checkoutOrder = async (order: CheckoutOrderParams) => {
       metadata: {
         eventId: order.eventId,
         buyerId: order.buyerId,
+        selectedSeat: order.selectedSeat,
       },
       mode: 'payment',
       success_url: `${process.env.NEXT_PUBLIC_SERVER_URL}/profile`,
       cancel_url: `${process.env.NEXT_PUBLIC_SERVER_URL}/`,
     });
 
-    redirect(session.url!)
+    redirect(session.url!);
   } catch (error) {
     throw error;
   }
 }
 
-export const createOrder = async (order: CreateOrderParams) => {
+export const createOrder = async (order: CreateOrderParams): Promise<Order | null> => {
   try {
     await connectToDatabase();
     
@@ -56,18 +64,38 @@ export const createOrder = async (order: CreateOrderParams) => {
       throw new Error('Event or Buyer not found');
     }
     
-    const newOrder = await Order.create({
+    // Cập nhật ghế đã chọn
+    const updatedSeats = [...(event.seats || [])];
+    if (order.selectedSeat !== undefined) {
+      updatedSeats[order.selectedSeat] = true; // Đánh dấu ghế đã chọn
+    }
+
+    // Tạo đơn hàng
+    const newOrder = await OrderModel.create({
       ...order,
       event: order.eventId,
       buyer: order.buyerId,
       eventTitle: event.title,
       buyerName: `${buyer.firstName} ${buyer.lastName}`,
       username: buyer.username,
+      selectedSeat: order.selectedSeat, // Lưu ghế đã chọn
+    });
+
+    // Cập nhật sự kiện với ghế đã chọn
+    await updateEvent({
+      userId: buyer._id, // Sử dụng ID của người mua
+      event: {
+        _id: event._id,
+        currentParticipants: (event.currentParticipants || 0) + 1, // Tăng số lượng người tham gia
+        seats: updatedSeats,
+      },
+      path: `/events/${event._id}`
     });
 
     return JSON.parse(JSON.stringify(newOrder));
   } catch (error) {
     handleError(error);
+    return null; // Trả về null nếu có lỗi
   }
 }
 
@@ -79,7 +107,7 @@ export async function getOrdersByEvent({ searchString, eventId }: GetOrdersByEve
     if (!eventId) throw new Error('Event ID is required')
     const eventObjectId = new ObjectId(eventId)
 
-    const orders = await Order.aggregate([
+    const orders = await OrderModel.aggregate([
       {
         $lookup: {
           from: 'users',
@@ -144,7 +172,7 @@ export async function getOrdersByUser({
 
     const conditions = { buyer: userId }
 
-    const orders = await Order.find(conditions)
+    const orders = await OrderModel.find(conditions)
       .sort({ createdAt: 'desc' })
       .skip(skipAmount)
       .limit(limit)
@@ -158,7 +186,7 @@ export async function getOrdersByUser({
         },
       })
 
-    const ordersCount = await Order.countDocuments(conditions)
+    const ordersCount = await OrderModel.countDocuments(conditions)
 
     return {
       data: JSON.parse(JSON.stringify(orders)),
@@ -193,12 +221,12 @@ export async function getAllOrders({
         }
       : {};
 
-    const orders = await Order.find(conditions)
+    const orders = await OrderModel.find(conditions)
       .sort({ createdAt: 'desc' })
       .skip(skipAmount)
       .limit(limit);
 
-    const ordersCount = await Order.countDocuments(conditions);
+    const ordersCount = await OrderModel.countDocuments(conditions);
 
     return {
       data: JSON.parse(JSON.stringify(orders)),
@@ -213,7 +241,7 @@ export async function deleteOrder({ orderId, path }: { orderId: string; path: st
   try {
     await connectToDatabase();
 
-    const deletedOrder = await Order.findByIdAndDelete(orderId);
+    const deletedOrder = await OrderModel.findByIdAndDelete(orderId);
 
     if (deletedOrder) revalidatePath(path);
   } catch (error) {
@@ -225,9 +253,45 @@ export async function deleteOrderClient(orderId: string) {
   try {
     await connectToDatabase();
 
-    const deletedOrder = await Order.findByIdAndDelete(orderId);
+    const deletedOrder = await OrderModel.findByIdAndDelete(orderId);
 
     return deletedOrder; // Trả về đơn hàng đã xóa
+  } catch (error) {
+    handleError(error);
+  }
+}
+
+export async function cancelOrder({ orderId }: { orderId: string }) {
+  try {
+    await connectToDatabase();
+
+    const order = await OrderModel.findById(orderId);
+    if (!order) {
+      throw new Error('Order not found');
+    }
+
+    const event = await Event.findById(order.event);
+    if (!event) {
+      throw new Error('Event not found');
+    }
+
+    // Cập nhật ghế đã hủy
+    const updatedSeats = [...(event.seats || [])];
+    if (order.selectedSeat !== undefined) {
+      updatedSeats[order.selectedSeat] = false; // Đánh dấu ghế đã hủy
+    }
+    
+    await updateEvent({
+      userId: order.buyer, // Sử dụng buyerId từ đơn hàng
+      event: {
+        _id: event._id,
+        currentParticipants: (event.currentParticipants || 0) - 1,
+        seats: updatedSeats,
+      },
+      path: `/events/${event._id}`
+    });
+    
+    await OrderModel.findByIdAndDelete(orderId);
   } catch (error) {
     handleError(error);
   }

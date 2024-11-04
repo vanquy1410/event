@@ -27,15 +27,15 @@ const Checkout = ({ event, userId, selectedSeat }: { event: IEvent; userId: stri
       eventId: event._id,
       price: event.price,
       isFree: event.isFree,
-      buyerId: userId
-    }
+      buyerId: userId,
+      selectedSeat: selectedSeat 
+    };
 
     await checkoutOrder(order);
 
     // After successful checkout
     const updatedSeats = [...(event.seats || [])];
     updatedSeats[selectedSeat] = true;
-
     await updateEvent({
       userId,
       event: {
@@ -44,7 +44,7 @@ const Checkout = ({ event, userId, selectedSeat }: { event: IEvent; userId: stri
         seats: updatedSeats,
       },
       path: `/events/${event._id}`
-    })
+    });
   }
 
   return (

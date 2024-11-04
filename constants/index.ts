@@ -20,6 +20,10 @@ export const headerLinks = [
     route: '/organizer',
   },
   {
+    label: 'Blog',
+    route: '/blog',
+  },
+  {
     label: 'Dashboard',
     route: '/admin/dashboard',
   },
@@ -40,5 +44,5 @@ export const eventDefaultValues = {
   price: '',
   isFree: false,
   url: '',
-  participantLimit: 1, // Add this line
+  participantLimit: 1,
 }
