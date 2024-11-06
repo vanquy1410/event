@@ -46,3 +46,12 @@ export const eventDefaultValues = {
   url: '',
   participantLimit: 1,
 }
+
+export const BLOG_TAGS = [
+  "Du lịch",
+  "Công nghệ", 
+  "Thời trang",
+  "Ẩm thực",
+  "Văn hóa",
+  "Giải trí"
+] as const;

@@ -8,13 +8,8 @@ import { Textarea } from '@/components/ui/textarea';
 import { updateBlog, getBlogById } from '@/lib/actions/blog.actions';
 import { toast } from 'react-hot-toast';
 import Image from 'next/image';
-
-interface BlogFormData {
-  title: string;
-  description: string;
-  content: string;
-  imageUrl: string;
-}
+import { BLOG_TAGS } from '@/constants';
+import { BlogFormData } from '@/types';
 
 const UpdateBlogPage = ({ params }: { params: { id: string } }) => {
   const router = useRouter();
@@ -23,40 +18,48 @@ const UpdateBlogPage = ({ params }: { params: { id: string } }) => {
     title: '',
     description: '',
     content: '',
-    imageUrl: ''
+    imageUrl: '',
+    tags: []
   });
   const [files, setFiles] = useState<File[]>([]);
   const [previewUrl, setPreviewUrl] = useState<string>('');
-  const [errors, setErrors] = useState<Record<string, string>>({});
+  const [tags, setTags] = useState<string[]>([]);
+  const [currentTag, setCurrentTag] = useState('');
 
   useEffect(() => {
     const fetchBlog = async () => {
       try {
-        const blog = await getBlogById(params.id);
-        if (blog) {
-          setBlogData({
-            title: blog.title,
-            description: blog.description,
-            content: blog.content,
-            imageUrl: blog.imageUrl
-          });
-          setPreviewUrl(blog.imageUrl);
+        const fetchedBlog = await getBlogById(params.id);
+        
+        if (!fetchedBlog) {
+          toast.error('Blog không tồn tại');
+          router.push('/admin/dashboard/blog-management');
+          return;
         }
+
+        setBlogData({
+          title: fetchedBlog.title,
+          description: fetchedBlog.description,
+          content: fetchedBlog.content,
+          imageUrl: fetchedBlog.imageUrl,
+          tags: fetchedBlog.tags || []
+        });
+        setTags(fetchedBlog.tags || []);
+        setPreviewUrl(fetchedBlog.imageUrl);
       } catch (error) {
-        console.error('Lỗi khi tải thông tin blog:', error);
-        toast.error('Không thể tải thông tin blog');
+        console.error('Error fetching blog:', error);
+        toast.error('Có lỗi xảy ra khi tải thông tin blog');
+        router.push('/admin/dashboard/blog-management');
       }
     };
+
     fetchBlog();
-  }, [params.id]);
+  }, [params.id, router]);
 
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
   ) => {
     setBlogData({ ...blogData, [e.target.name]: e.target.value });
-    if (errors[e.target.name]) {
-      setErrors({ ...errors, [e.target.name]: '' });
-    }
   };
 
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -69,6 +72,21 @@ const UpdateBlogPage = ({ params }: { params: { id: string } }) => {
       };
       reader.readAsDataURL(file);
     }
+  };
+
+  const handleAddTag = () => {
+    if (currentTag.trim() && !tags.includes(currentTag.trim())) {
+      const newTags = [...tags, currentTag.trim()];
+      setTags(newTags);
+      setBlogData({ ...blogData, tags: newTags });
+      setCurrentTag('');
+    }
+  };
+
+  const handleRemoveTag = (tagToRemove: string) => {
+    const newTags = tags.filter(tag => tag !== tagToRemove);
+    setTags(newTags);
+    setBlogData({ ...blogData, tags: newTags });
   };
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
@@ -95,16 +113,17 @@ const UpdateBlogPage = ({ params }: { params: { id: string } }) => {
 
         const uploadData = await uploadResponse.json();
         imageUrl = uploadData.url || uploadData.fileUrl;
-
-        if (!imageUrl) {
-          throw new Error('Không nhận được URL ảnh từ server');
-        }
       }
 
       const updatedBlog = {
-        ...blogData,
-        imageUrl
+        title: blogData.title,
+        description: blogData.description,
+        content: blogData.content,
+        imageUrl,
+        tags: tags
       };
+
+      console.log('Updating blog with data:', updatedBlog);
 
       const result = await updateBlog({
         blogId: params.id,
@@ -124,6 +143,18 @@ const UpdateBlogPage = ({ params }: { params: { id: string } }) => {
     } finally {
       setIsSubmitting(false);
     }
+  };
+
+  const handleTagClick = (tag: string) => {
+    const newTags = tags.includes(tag)
+      ? tags.filter(t => t !== tag)
+      : [...tags, tag];
+    
+    setTags(newTags);
+    setBlogData(prev => ({
+      ...prev,
+      tags: newTags
+    }));
   };
 
   return (
@@ -195,6 +226,28 @@ const UpdateBlogPage = ({ params }: { params: { id: string } }) => {
               />
             </div>
           )}
+        </div>
+
+        <div>
+          <label className="block text-sm font-medium mb-1">
+            Tags
+          </label>
+          <div className="flex flex-wrap gap-2 mb-2">
+            {BLOG_TAGS.map((tag) => (
+              <button
+                key={tag}
+                type="button"
+                onClick={() => handleTagClick(tag)}
+                className={`px-3 py-1 rounded-full text-sm transition-colors ${
+                  tags.includes(tag) 
+                    ? 'bg-primary-500 text-white' 
+                    : 'bg-gray-100 hover:bg-gray-200'
+                }`}
+              >
+                {tag}
+              </button>
+            ))}
+          </div>
         </div>
 
         <Button type="submit" disabled={isSubmitting}>

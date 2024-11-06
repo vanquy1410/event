@@ -5,6 +5,7 @@ const BlogSchema = new Schema({
   description: { type: String, required: true },
   content: { type: String, required: true },
   imageUrl: { type: String, required: true },
+  tags: [{ type: String }],
   createdAt: { type: Date, default: Date.now }
 })
 

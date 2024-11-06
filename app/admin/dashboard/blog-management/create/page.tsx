@@ -8,13 +8,8 @@ import { Textarea } from '@/components/ui/textarea';
 import { createBlog } from '@/lib/actions/blog.actions';
 import { toast } from 'react-hot-toast';
 import Image from 'next/image';
-
-interface BlogFormData {
-  title: string;
-  description: string;
-  content: string;
-  imageUrl: string;
-}
+import { BLOG_TAGS } from '@/constants';
+import { BlogFormData } from '@/types';
 
 const CreateBlogPage = () => {
   const router = useRouter();
@@ -23,11 +18,14 @@ const CreateBlogPage = () => {
     title: '',
     description: '',
     content: '',
-    imageUrl: ''
+    imageUrl: '',
+    tags: []
   });
   const [files, setFiles] = useState<File[]>([]);
   const [previewUrl, setPreviewUrl] = useState<string>('');
   const [errors, setErrors] = useState<Record<string, string>>({});
+  const [tags, setTags] = useState<string[]>([]);
+  const [currentTag, setCurrentTag] = useState('');
 
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
@@ -50,6 +48,29 @@ const CreateBlogPage = () => {
     }
   };
 
+  const handleAddTag = () => {
+    if (currentTag.trim() && !tags.includes(currentTag.trim())) {
+      setTags([...tags, currentTag.trim()]);
+      setCurrentTag('');
+    }
+  };
+
+  const handleRemoveTag = (tagToRemove: string) => {
+    setTags(tags.filter(tag => tag !== tagToRemove));
+  };
+
+  const handleTagClick = (tag: string) => {
+    const newTags = tags.includes(tag)
+      ? tags.filter(t => t !== tag)
+      : [...tags, tag];
+    
+    setTags(newTags);
+    setBlogData(prev => ({
+      ...prev,
+      tags: newTags
+    }));
+  };
+
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     try {
@@ -61,7 +82,6 @@ const CreateBlogPage = () => {
         return;
       }
 
-      // Upload image first
       const formData = new FormData();
       formData.append('file', files[0]);
       formData.append('type', 'blog');
@@ -77,37 +97,34 @@ const CreateBlogPage = () => {
       }
 
       const uploadData = await uploadResponse.json();
-      console.log('Upload response:', uploadData); // Debug log
-
-      // Check for both possible response formats
       const imageUrl = uploadData.url || uploadData.fileUrl;
-      
-      if (!imageUrl) {
-        throw new Error('Không nhận được URL ảnh từ server');
-      }
 
-      // Create blog with image URL
-      const blogWithImage = {
+      const newBlog = {
         title: blogData.title,
         description: blogData.description,
         content: blogData.content,
-        imageUrl: imageUrl
+        imageUrl,
+        tags: blogData.tags
       };
 
+      console.log('Sending blog data:', newBlog);
+
       const result = await createBlog({
-        blog: blogWithImage,
+        blog: newBlog,
         path: '/admin/dashboard/blog-management'
       });
 
-      if (result.error) {
+      console.log('Create blog result:', result);
+
+      if (result?.error) {
         throw new Error(result.error);
       }
 
       toast.success('Tạo blog thành công!');
       router.push('/admin/dashboard/blog-management');
     } catch (error) {
-      console.error('Lỗi khi tạo blog:', error);
-      toast.error('Có lỗi xảy ra khi tạo blog');
+      console.error('Error in handleSubmit:', error);
+      toast.error(error instanceof Error ? error.message : 'Có lỗi xảy ra khi tạo blog');
     } finally {
       setIsSubmitting(false);
     }
@@ -186,6 +203,28 @@ const CreateBlogPage = () => {
               />
             </div>
           )}
+        </div>
+
+        <div>
+          <label className="block text-sm font-medium mb-1">
+            Tags
+          </label>
+          <div className="flex flex-wrap gap-2 mb-2">
+            {BLOG_TAGS.map((tag) => (
+              <button
+                key={tag}
+                type="button"
+                onClick={() => handleTagClick(tag)}
+                className={`px-3 py-1 rounded-full text-sm transition-colors ${
+                  tags.includes(tag) 
+                    ? 'bg-primary-500 text-white' 
+                    : 'bg-gray-100 hover:bg-gray-200'
+                }`}
+              >
+                {tag}
+              </button>
+            ))}
+          </div>
         </div>
 
         <Button type="submit" disabled={isSubmitting}>
