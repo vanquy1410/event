@@ -204,5 +204,14 @@ export interface Blog {
   content: string
   imageUrl: string
   createdAt: string
+  tags: string[]
+}
+
+export interface BlogFormData {
+  title: string;
+  description: string;
+  content: string;
+  imageUrl: string;
+  tags: string[];
 }
 

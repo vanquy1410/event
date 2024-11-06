@@ -4,39 +4,50 @@ import { connectToDatabase } from '@/lib/database'
 import Blog from '@/lib/database/models/blog.model'
 import { handleError } from '@/lib/utils'
 import { revalidatePath } from 'next/cache'
+import { BlogFormData } from '@/types'
 
 export async function getAllBlogs({
   query,
-  limit = 10,
+  tag,
+  limit = 6,
   page = 1,
 }: {
-  query?: string
-  limit?: number
-  page: number
+  query?: string | null;
+  tag?: string | null;
+  limit?: number;
+  page: number;
 }) {
   try {
-    await connectToDatabase()
+    await connectToDatabase();
 
-    const conditions = query ? {
-      $or: [
-        { title: { $regex: query, $options: 'i' } },
-        { description: { $regex: query, $options: 'i' } }
-      ]
-    } : {}
+    let conditions = {};
+
+    if (query) {
+      conditions = {
+        $or: [
+          { title: { $regex: query, $options: 'i' } },
+          { description: { $regex: query, $options: 'i' } },
+        ],
+      };
+    }
+
+    if (tag) {
+      conditions = { ...conditions, tags: tag };
+    }
 
     const blogs = await Blog.find(conditions)
-      .sort({ createdAt: 'desc' })
+      .sort({ createdAt: -1 })
       .skip((page - 1) * limit)
-      .limit(limit)
+      .limit(limit);
 
-    const blogsCount = await Blog.countDocuments(conditions)
+    const blogsCount = await Blog.countDocuments(conditions);
 
     return {
-      data: blogs,
-      totalPages: Math.ceil(blogsCount / limit)
-    }
+      data: JSON.parse(JSON.stringify(blogs)),
+      totalPages: Math.ceil(blogsCount / limit),
+    };
   } catch (error) {
-    handleError(error)
+    handleError(error);
   }
 }
 
@@ -44,15 +55,31 @@ export async function createBlog({
   blog,
   path
 }: {
-  blog: any;
+  blog: BlogFormData;
   path: string;
 }) {
   try {
     await connectToDatabase();
-    const newBlog = await Blog.create(blog);
+    
+    console.log('Creating blog with data:', blog);
+    console.log('Tags:', blog.tags);
+    
+    const blogData = {
+      title: blog.title,
+      description: blog.description,
+      content: blog.content,
+      imageUrl: blog.imageUrl,
+      tags: blog.tags || []
+    };
+
+    const newBlog = await Blog.create(blogData);
+    
+    console.log('Created blog document:', newBlog);
+    
     revalidatePath(path);
-    return newBlog;
+    return JSON.parse(JSON.stringify(newBlog));
   } catch (error) {
+    console.error('Error creating blog:', error);
     handleError(error);
   }
 }
@@ -60,11 +87,22 @@ export async function createBlog({
 export async function getBlogById(blogId: string) {
   try {
     await connectToDatabase();
+    
+    console.log('Getting blog with ID:', blogId);
+    
     const blog = await Blog.findById(blogId);
-    if (!blog) throw new Error('Blog không tồn tại');
-    return blog;
+    
+    console.log('Found blog:', blog);
+    
+    if (!blog) {
+      console.log('Blog not found');
+      return null;
+    }
+    
+    return JSON.parse(JSON.stringify(blog));
   } catch (error) {
-    handleError(error);
+    console.error('Error in getBlogById:', error);
+    return null;
   }
 }
 
@@ -74,17 +112,23 @@ export async function updateBlog({
   path
 }: {
   blogId: string;
-  blog: any;
+  blog: BlogFormData;
   path: string;
 }) {
   try {
     await connectToDatabase();
+    console.log('Blog data before update:', blog);
+    
     const updatedBlog = await Blog.findByIdAndUpdate(
       blogId,
-      { ...blog },
+      { 
+        $set: blog
+      },
       { new: true }
     );
+    
     if (!updatedBlog) throw new Error('Blog không tồn tại');
+    console.log('Updated blog:', updatedBlog);
     revalidatePath(path);
     return updatedBlog;
   } catch (error) {

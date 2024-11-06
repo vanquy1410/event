@@ -25,6 +25,18 @@ const BlogDetails = ({ blog }: BlogDetailsProps) => {
       <div className="w-full space-y-8 mb-8">
         <h1 className="h1-bold text-center">{blog.title}</h1>
         
+        <div className="flex flex-wrap gap-2 justify-center">
+          {blog.tags?.map((tag: string) => (
+            <Link 
+              key={tag}
+              href={`/blog?tag=${tag}`}
+              className="px-3 py-1 bg-gray-100 hover:bg-gray-200 rounded-full text-sm transition-colors"
+            >
+              {tag}
+            </Link>
+          ))}
+        </div>
+
         <div className="flex justify-center text-gray-500">
           <p>{new Date(blog.createdAt).toLocaleDateString('vi-VN')}</p>
         </div>
@@ -38,13 +50,13 @@ const BlogDetails = ({ blog }: BlogDetailsProps) => {
       </div>
 
       {/* Ảnh */}
-      <div className="w-full max-w-2xl">
+      <div className="w-full">
         <Image
           src={blog.imageUrl}
           alt={blog.title}
-          width={600}
-          height={300}
-          className="w-full h-[250px] object-cover rounded-lg"
+          width={1200}
+          height={600}
+          className="w-full h-[500px] object-cover rounded-lg"
           priority
         />
       </div>
