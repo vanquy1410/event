@@ -65,7 +65,7 @@ const UserManagementPage: React.FC = () => {
                   <th className="py-4 px-6 text-left">Tên</th>
                   <th className="py-4 px-6 text-left">Họ</th>
                   <th className="py-4 px-6 text-left">Email</th>
-                  <th className="py-4 px-6 text-center">Hành động</th>
+                  {/* <th className="py-4 px-6 text-center">Hành động</th> */}
                 </tr>
               </thead>
               <tbody>
@@ -78,11 +78,11 @@ const UserManagementPage: React.FC = () => {
                     <td className="py-4 px-6">{user.firstName}</td>
                     <td className="py-4 px-6">{user.lastName}</td>
                     <td className="py-4 px-6">{user.email}</td>
-                    <td className="py-4 px-6 text-center">
+                    {/* <td className="py-4 px-6 text-center">
                       <Link href={`/users/${user.clerkId}/update`} className="text-blue-600 hover:text-blue-800">
                         <Image src="/assets/icons/edit.svg" alt="edit" width={20} height={20} className="inline-block" />
                       </Link>
-                    </td>
+                    </td> */}
                   </tr>
                 ))}
               </tbody>
