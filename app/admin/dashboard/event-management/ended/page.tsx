@@ -5,6 +5,8 @@ import { getAllEvents } from '@/lib/actions/event.actions';
 
 export default function EndedEventsPage() {
   const [events, setEvents] = useState([]);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
 
   useEffect(() => {
     const fetchEvents = async () => {
@@ -13,17 +15,22 @@ export default function EndedEventsPage() {
         query: '',
         category: '',
         limit: 10,
-        page: 1,
+        page: currentPage,
         endDate: now,
         minPrice: undefined,
         maxPrice: undefined,
         isFree: undefined
       });
       setEvents(fetchedEvents?.data || []);
+      setTotalPages(fetchedEvents?.totalPages || 1);
     };
 
     fetchEvents();
-  }, []);
+  }, [currentPage]);
+
+  const handlePageChange = (newPage: number) => {
+    setCurrentPage(newPage);
+  };
 
   return (
     <div>
@@ -34,6 +41,9 @@ export default function EndedEventsPage() {
         onSearch={() => {}} 
         onCategoryChange={() => {}}
         filterType="ended"
+        currentPage={currentPage}
+        totalPages={totalPages}
+        onPageChange={handlePageChange}
       />
     </div>
   );
