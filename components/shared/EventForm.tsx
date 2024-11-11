@@ -336,6 +336,7 @@ const EventForm = ({ userId, type, event, eventId }: EventFormProps) => {
                 </FormItem>
               )}
             />
+            
         </div>
 
         <div className="flex flex-col gap-5 md:flex-row">

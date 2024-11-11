@@ -16,6 +16,7 @@ interface Event {
   startDateTime: string;
   endDateTime: string;
   imageUrl: string;
+  url2: string;
   category: {
     name: string;
   };

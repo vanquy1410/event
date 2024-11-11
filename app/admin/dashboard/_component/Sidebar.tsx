@@ -2,29 +2,32 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { FaHome } from "react-icons/fa"; // Thêm import này
+import { FaHome, FaChartBar, FaUsers, FaCalendarAlt, FaShoppingCart, 
+         FaUserTie, FaAddressBook, FaSitemap, FaBox, FaBlog, 
+         FaBell, FaTasks } from "react-icons/fa";
 
 const navItems = [
-  { href: "/", label: "Trang chủ", icon: FaHome }, // Thêm mục này
-  { href: "/admin/dashboard", label: "Tổng quan" },
-  { href: "/admin/dashboard/statistics", label: "Thống kê" },
-  { href: "/admin/dashboard/user-management", label: "Quản lý người dùng" },
+  { href: "/", label: "Trang chủ", icon: FaHome },
+  { href: "/admin/dashboard", label: "Tổng quan", icon: FaChartBar },
+  { href: "/admin/dashboard/statistics", label: "Thống kê", icon: FaChartBar },
+  { href: "/admin/dashboard/user-management", label: "Quản lý người dùng", icon: FaUsers },
   { 
     href: "/admin/dashboard/event-management", 
     label: "Quản lý sự kiện",
+    icon: FaCalendarAlt,
     subItems: [
-      { href: "/admin/dashboard/event-management/ending-soon", label: "Sự kiện sắp kết thúc" },
-      { href: "/admin/dashboard/event-management/ended", label: "Sự kiện đã kết thúc" }
+      { href: "/admin/dashboard/event-management/ending-soon", label: "Sự kiện sắp kết thúc", icon: FaCalendarAlt },
+      { href: "/admin/dashboard/event-management/ended", label: "Sự kiện đã kết thúc", icon: FaCalendarAlt }
     ]
   },
-  { href: "/admin/dashboard/order-management", label: "Quản lý đơn hàng" },
-  { href: "/admin/dashboard/employee-management", label: "Quản lý nhân viên" },
-  { href: "/admin/dashboard/contact-form-management", label: "Quản lý form liên hệ" },
-  { href: "/admin/dashboard/organizer-management", label: "Quản lý ban tổ chức" },
-  { href: "/admin/dashboard/resource-management", label: "Quản lý tài nguyên" },
-  { href: "/admin/dashboard/blog-management", label: "Quản lý Blog" },
-  { href: "/admin/dashboard/notifications", label: "Thông báo" },
-  { href: "/admin/dashboard/task-management", label: "Quản lý công việc" },
+  { href: "/admin/dashboard/order-management", label: "Quản lý đơn hàng", icon: FaShoppingCart },
+  { href: "/admin/dashboard/employee-management", label: "Quản lý nhân viên", icon: FaUserTie },
+  { href: "/admin/dashboard/contact-form-management", label: "Quản lý form liên hệ", icon: FaAddressBook },
+  { href: "/admin/dashboard/organizer-management", label: "Quản lý ban tổ chức", icon: FaSitemap },
+  { href: "/admin/dashboard/resource-management", label: "Quản lý tài nguyên", icon: FaBox },
+  { href: "/admin/dashboard/blog-management", label: "Quản lý Blog", icon: FaBlog },
+  { href: "/admin/dashboard/notifications", label: "Thông báo", icon: FaBell },
+  { href: "/admin/dashboard/task-management", label: "Quản lý công việc", icon: FaTasks },
 ];
 
 export default function Sidebar() {
@@ -43,7 +46,7 @@ export default function Sidebar() {
                   pathname === item.href ? "bg-gray-700" : "hover:bg-gray-700"
                 }`}
               >
-                {item.icon && <item.icon className="mr-2" />}
+                {item.icon && <item.icon className="mr-2 text-lg" />}
                 {item.label}
               </Link>
               {item.subItems && (
@@ -52,10 +55,11 @@ export default function Sidebar() {
                     <li key={subItem.href}>
                       <Link
                         href={subItem.href}
-                        className={`block p-2 rounded ${
+                        className={`block p-2 rounded flex items-center ${
                           pathname === subItem.href ? "bg-gray-700" : "hover:bg-gray-700"
                         }`}
                       >
+                        {subItem.icon && <subItem.icon className="mr-2 text-sm" />}
                         {subItem.label}
                       </Link>
                     </li>

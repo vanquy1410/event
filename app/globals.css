@@ -4,6 +4,14 @@
 
 @layer base {
   :root {
+    --dark-bg: #1a1a1a;
+    --dark-text: #ffffff;
+    --light-bg: #ffffff;
+    --light-text: #000000;
+    --primary-500: #624CF5;
+    --primary-50: #F6F8FD;
+    --secondary-500: #FFB620;
+    
     --background: 0 0% 100%;
     --foreground: 222.2 84% 4.9%;
 
@@ -63,6 +71,16 @@
     --border: 217.2 32.6% 17.5%;
     --input: 217.2 32.6% 17.5%;
     --ring: 212.7 26.8% 83.9%;
+  }
+}
+
+@layer utilities {
+  .dark {
+    @apply bg-dark-bg text-dark-text transition-colors duration-200;
+  }
+
+  .light {
+    @apply bg-light-bg text-light-text transition-colors duration-200;
   }
 }
 
@@ -356,4 +374,3 @@ body {
 .react-datepicker__time-list-item--selected {
   background-color: #624cf5 !important;
 }
-
