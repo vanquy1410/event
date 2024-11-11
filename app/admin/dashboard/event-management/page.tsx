@@ -10,6 +10,8 @@ const EventManagementPage: React.FC = () => {
   const [events, setEvents] = useState([]);
   const [query, setQuery] = useState('');
   const [category, setCategory] = useState('');
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
@@ -19,21 +21,26 @@ const EventManagementPage: React.FC = () => {
           query: query,
           category: category,
           limit: 10,
-          page: 1
+          page: currentPage
         });
         setEvents(fetchedEvents?.data || []);
+        setTotalPages(fetchedEvents?.totalPages || 1);
       } catch (err) {
         console.error('Error fetching events:', err);
-        setError('Failed to load events. Please try again later.');
+        setError('Không thể tải danh sách sự kiện. Vui lòng thử lại sau.');
       }
     };
 
     fetchEvents();
-  }, [query, category]);
+  }, [query, category, currentPage]);
 
   const handleDelete = async (eventId: string) => {
     await deleteEvent({ eventId, path: '/admin/dashboard/event-management' });
     setEvents(events.filter((event: any) => event._id !== eventId));
+  };
+
+  const handlePageChange = (newPage: number) => {
+    setCurrentPage(newPage);
   };
 
   return (
@@ -56,6 +63,9 @@ const EventManagementPage: React.FC = () => {
           onSearch={setQuery}
           onCategoryChange={setCategory}
           filterType="all"
+          currentPage={currentPage}
+          totalPages={totalPages}
+          onPageChange={handlePageChange}
         />
       </section>
       {error && <p className="text-red-500">{error}</p>}

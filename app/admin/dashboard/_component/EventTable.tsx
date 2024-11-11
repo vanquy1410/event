@@ -23,14 +23,26 @@ interface Event {
 }
 
 interface EventTableProps {
-  events: Event[];
+  events: any[];
   onDelete: (id: string) => void;
   onSearch: (query: string) => void;
   onCategoryChange: (category: string) => void;
-  filterType: 'all' | 'ending-soon' | 'ended';
+  filterType: string;
+  currentPage: number;
+  totalPages: number;
+  onPageChange: (page: number) => void;
 }
 
-export default function EventTable({ events, onDelete, onSearch, onCategoryChange, filterType }: EventTableProps) {
+export default function EventTable({ 
+  events, 
+  onDelete, 
+  onSearch, 
+  onCategoryChange, 
+  filterType,
+  currentPage,
+  totalPages,
+  onPageChange 
+}: EventTableProps) {
   const [categories, setCategories] = useState<{_id: string, name: string}[]>([]);
 
   useEffect(() => {
@@ -141,6 +153,44 @@ export default function EventTable({ events, onDelete, onSearch, onCategoryChang
           ))}
         </tbody>
       </table>
+      <div className="mt-4 flex items-center justify-between">
+        <div className="text-sm text-gray-700">
+          Trang {currentPage} / {totalPages}
+        </div>
+        
+        <div className="flex gap-2">
+          <Button
+            onClick={() => onPageChange(currentPage - 1)}
+            disabled={currentPage <= 1}
+            variant="outline"
+          >
+            Trang trước
+          </Button>
+          
+          <div className="flex gap-1">
+            {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
+              <Button
+                key={page}
+                onClick={() => onPageChange(page)}
+                variant={currentPage === page ? "default" : "outline"}
+                className={`w-10 h-10 ${
+                  currentPage === page ? "bg-primary-500 text-white" : ""
+                }`}
+              >
+                {page}
+              </Button>
+            ))}
+          </div>
+
+          <Button
+            onClick={() => onPageChange(currentPage + 1)}
+            disabled={currentPage >= totalPages}
+            variant="outline"
+          >
+            Trang sau
+          </Button>
+        </div>
+      </div>
     </>
   );
 }
