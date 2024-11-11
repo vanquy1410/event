@@ -8,6 +8,7 @@ import Link from 'next/link'
 import AdvancedSearch from '@/components/shared/AdvancedSearch';
 import UpcomingEvents from '@/components/shared/UpcomingEvents';
 import { getUpcomingEvents } from '@/lib/actions/event.actions';
+import HomeSlider from '@/components/shared/HomeSlider';
 
 export default async function Home({ searchParams }: SearchParamProps) {
   const page = Number(searchParams?.page) || 1;
@@ -75,6 +76,11 @@ export default async function Home({ searchParams }: SearchParamProps) {
         </div>
       </section> 
       
+
+      <section className="wrapper my-8">
+        <h2 className="h2-bold mb-4">Các chủ đề sự kiện phổ biến</h2>
+        <HomeSlider />
+      </section>
 
       <section className="wrapper my-8">
         <h2 className="h2-bold mb-4">Từ khóa tìm kiếm phổ biến</h2>
