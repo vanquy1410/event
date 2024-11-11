@@ -2,7 +2,33 @@
 @tailwind components;
 @tailwind utilities;
 
+:root {
+  --primary-500: #624CF5;
+  --primary-50: #F6F8FD;
+  --secondary-500: #FFB620;
+  
+  /* Light theme */
+  --light-bg: #ffffff;
+  --light-text: #000000;
+  
+  /* Dark theme */
+  --dark-bg: #1a1a1a;
+  --dark-text: #ffffff;
+}
+
 @layer base {
+  body {
+    @apply transition-colors duration-200;
+  }
+  
+  .dark {
+    @apply bg-dark text-dark;
+  }
+  
+  .light {
+    @apply bg-light text-light;
+  }
+
   :root {
     --background: 0 0% 100%;
     --foreground: 222.2 84% 4.9%;
@@ -63,6 +89,9 @@
     --border: 217.2 32.6% 17.5%;
     --input: 217.2 32.6% 17.5%;
     --ring: 212.7 26.8% 83.9%;
+
+    background-color: var(--dark-bg);
+    color: var(--dark-text);
   }
 }
 
@@ -356,4 +385,3 @@ body {
 .react-datepicker__time-list-item--selected {
   background-color: #624cf5 !important;
 }
-
