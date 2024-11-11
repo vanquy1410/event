@@ -9,6 +9,7 @@ import AdvancedSearch from '@/components/shared/AdvancedSearch';
 import UpcomingEvents from '@/components/shared/UpcomingEvents';
 import { getUpcomingEvents } from '@/lib/actions/event.actions';
 import HomeSlider from '@/components/shared/HomeSlider';
+import RoadTree from '@/components/shared/RoadTree';
 
 export default async function Home({ searchParams }: SearchParamProps) {
   const page = Number(searchParams?.page) || 1;
@@ -109,6 +110,11 @@ export default async function Home({ searchParams }: SearchParamProps) {
         <div className="w-full md:w-1/3">
           <UpcomingEvents events={upcomingEvents} />
         </div>
+      </section>
+      
+      <section className="wrapper my-12">
+        <h2 className="h2-bold mb-4">Khám Phá Evently</h2>
+        <RoadTree />
       </section>
     </>
   )
