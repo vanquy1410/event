@@ -14,7 +14,9 @@ export default function AdminDashboardLayout({
           <strong className="font-bold">Không có quyền truy cập!<br/></strong>
           <span className="block sm:inline text-center">Bạn cần quyền admin hoặc organizer để xem trang này.</span>
           <div className="mt-4">
-            <Link href="/" className="inline-block bg-purple-500 text-white py-1 px-2 rounded hover:bg-purple-600 transition-colors duration-200 ease-in-out transform hover:-translate-y-1 hover:scale-110">Quay về Trang chủ</Link>
+            <Link href="/" className="inline-block bg-purple-500 text-white py-1 px-2 rounded hover:bg-purple-600">
+              Quay về Trang chủ
+            </Link>
           </div>
         </div>
       </div>
@@ -22,9 +24,11 @@ export default function AdminDashboardLayout({
   }
 
   return (
-    <div className="flex h-screen">
+    <div className="flex h-screen bg-[hsl(192.9,82.3%,31%)]">
       <Sidebar />
-      <main className="flex-1 p-8 overflow-auto">{children}</main>
+      <main className="flex-1 p-8 overflow-auto bg-white m-4 rounded-xl shadow-lg">
+        {children}
+      </main>
     </div>
   );
 }
