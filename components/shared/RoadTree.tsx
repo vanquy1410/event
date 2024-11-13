@@ -30,6 +30,13 @@ const RoadTree = () => {
       description: "Cập nhật thông tin mới nhất về sự kiện",
       link: "/blog",
       color: "bg-orange-50"
+    },
+    {
+      icon: "/assets/icons/info.svg",
+      title: "Về Chúng Tôi",
+      description: "Tìm hiểu thêm về Evently",
+      link: "/about",
+      color: "bg-yellow-50"
     }
   ];
 
