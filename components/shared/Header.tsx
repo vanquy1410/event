@@ -5,7 +5,7 @@ import { Button } from "../ui/button"
 import NavItems from "./NavItems"
 import MobileNav from "./MobileNav"
 import NotificationDropdown from "./NotificationDropdown"
-import { ThemeToggle } from "./ThemeToggle"
+
 
 const Header = () => {
   return (
@@ -21,7 +21,6 @@ const Header = () => {
 
           <SignedIn>
             <nav className="hidden md:flex items-center gap-4">
-              <ThemeToggle />
               <NotificationDropdown />
               <NavItems />
             </nav>
