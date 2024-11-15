@@ -2,9 +2,10 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { useState } from "react";
 import { FaHome, FaChartBar, FaUsers, FaCalendarAlt, FaShoppingCart, 
          FaUserTie, FaAddressBook, FaSitemap, FaBox, FaBlog, 
-         FaBell, FaTasks } from "react-icons/fa";
+         FaBell, FaTasks, FaChevronLeft, FaChevronRight } from "react-icons/fa";
 
 const navItems = [
   { href: "/", label: "Trang chủ", icon: FaHome },
@@ -32,11 +33,20 @@ const navItems = [
 
 export default function Sidebar() {
   const pathname = usePathname();
+  const [isCollapsed, setIsCollapsed] = useState(false);
 
   return (
-    <nav className="w-64 bg-gray-800 text-white h-full overflow-y-auto">
+    <nav className={`bg-gray-800 text-white h-full transition-all duration-300 ${isCollapsed ? 'w-16' : 'w-64'}`}>
       <div className="p-4">
-        <h2 className="text-2xl font-bold mb-4">Admin Dashboard</h2>
+        <div className="flex items-center justify-between mb-4">
+          {!isCollapsed && <h2 className="text-2xl font-bold">Dashboard</h2>}
+          <button
+            onClick={() => setIsCollapsed(!isCollapsed)}
+            className="p-2 rounded hover:bg-gray-700"
+          >
+            {isCollapsed ? <FaChevronRight /> : <FaChevronLeft />}
+          </button>
+        </div>
         <ul>
           {navItems.map((item) => (
             <li key={item.href} className="mb-2">
@@ -45,11 +55,12 @@ export default function Sidebar() {
                 className={`block p-2 rounded flex items-center ${
                   pathname === item.href ? "bg-gray-700" : "hover:bg-gray-700"
                 }`}
+                title={isCollapsed ? item.label : ""}
               >
-                {item.icon && <item.icon className="mr-2 text-lg" />}
-                {item.label}
+                <item.icon className={`text-lg ${isCollapsed ? 'mx-auto' : 'mr-2'}`} />
+                {!isCollapsed && <span>{item.label}</span>}
               </Link>
-              {item.subItems && (
+              {!isCollapsed && item.subItems && (
                 <ul className="ml-4 mt-2">
                   {item.subItems.map((subItem) => (
                     <li key={subItem.href}>
