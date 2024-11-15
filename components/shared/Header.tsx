@@ -6,7 +6,6 @@ import NavItems from "./NavItems"
 import MobileNav from "./MobileNav"
 import NotificationDropdown from "./NotificationDropdown"
 
-
 const Header = () => {
   return (
     <header className="w-full border-b">

@@ -24,10 +24,12 @@ export default function AdminDashboardLayout({
   }
 
   return (
-    <div className="flex h-screen bg-[hsl(192.9,82.3%,31%)]">
+    <div className="flex h-screen overflow-hidden">
       <Sidebar />
-      <main className="flex-1 p-8 overflow-auto bg-white m-4 rounded-xl shadow-lg">
-        {children}
+      <main className="flex-1 overflow-auto bg-white">
+        <div className="p-8">
+          {children}
+        </div>
       </main>
     </div>
   );

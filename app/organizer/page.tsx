@@ -10,6 +10,8 @@ import EditOrganizerForm from '@/components/shared/EditOrganizerForm';
 import { updateOrganizerEvent } from '@/lib/actions/organizer.actions';
 import { useRouter } from 'next/navigation';
 import { useUser } from '@clerk/nextjs';
+import Link from 'next/link';
+import { FaHome } from 'react-icons/fa';
 
 const OrganizerPage = () => {
   const [showForm, setShowForm] = useState(false);
@@ -156,7 +158,14 @@ const OrganizerPage = () => {
 
   return (
     <div className="container mx-auto py-10">
-      <h1 className="text-2xl font-bold mb-5">Đăng ký ban tổ chức sự kiện</h1>
+      <div className="flex justify-between items-center mb-5">
+        <h1 className="text-2xl font-bold">Đăng ký ban tổ chức sự kiện</h1>
+        <Button asChild variant="outline">
+          <Link href="/" className="flex items-center gap-2">
+            <FaHome /> Quay về trang chủ
+          </Link>
+        </Button>
+      </div>
       <Button onClick={() => setShowForm(!showForm)}>
         {showForm ? 'Ẩn form' : 'Tạo sự kiện ban tổ chức'}
       </Button>
