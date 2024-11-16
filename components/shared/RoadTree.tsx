@@ -41,7 +41,7 @@ const RoadTree = () => {
     {
       icon: "/assets/icons/chart.svg",
       title: "Thống Kê & Phân Tích",
-      description: "Xem phân tích chi tiết về sự kiện",
+      description: "Xem thống kê và phân tích",
       link: "/analytics",
       color: "bg-cyan-50"
     },
