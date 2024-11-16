@@ -14,11 +14,10 @@ interface FileUploaderProps {
   eventId: string;
 }
 
-export function FileUploader({ imageUrl, documentUrl, onImageChange, onDocumentChange }: FileUploaderProps) {
+export function FileUploader({ imageUrl, documentUrl, onImageChange, onDocumentChange, setFiles }: FileUploaderProps) {
   const [isUploadingImage, setIsUploadingImage] = useState(false)
   const [isUploadingDocument, setIsUploadingDocument] = useState(false)
   const [uploadedDocument, setUploadedDocument] = useState<{ name: string, url: string } | null>(null);
-  const [uploadedDiagram, setUploadedDiagram] = useState<{ name: string, url: string } | null>(null);
 
   const getFileIcon = (fileName: string) => {
     const extension = fileName.split('.').pop()?.toLowerCase();
@@ -37,6 +36,8 @@ export function FileUploader({ imageUrl, documentUrl, onImageChange, onDocumentC
     if (acceptedFiles.length > 0) {
       setIsUploadingImage(true)
       const file = acceptedFiles[0]
+      setFiles([file])
+      
       const formData = new FormData()
       formData.append('file', file)
       formData.append('fileType', 'image')
@@ -59,7 +60,7 @@ export function FileUploader({ imageUrl, documentUrl, onImageChange, onDocumentC
         setIsUploadingImage(false)
       }
     }
-  }, [onImageChange])
+  }, [onImageChange, setFiles])
 
   const onDropDocument = useCallback(async (acceptedFiles: File[]) => {
     if (acceptedFiles.length > 0) {
@@ -90,34 +91,6 @@ export function FileUploader({ imageUrl, documentUrl, onImageChange, onDocumentC
     }
   }, [onDocumentChange])
 
-  const onDropDiagram = useCallback(async (acceptedFiles: File[]) => {
-    if (acceptedFiles.length > 0) {
-      setIsUploadingDocument(true);
-      const file = acceptedFiles[0];
-      const formData = new FormData();
-      formData.append('file', file);
-      formData.append('fileType', 'diagram');
-
-      try {
-        const response = await fetch('/api/s3-storage', {
-          method: 'POST',
-          body: formData,
-        });
-
-        if (!response.ok) {
-          throw new Error('Upload sơ đồ ghế thất bại');
-        }
-
-        const data = await response.json();
-        onDocumentChange(data.url2);
-      } catch (error) {
-        console.error('Lỗi khi upload sơ đồ ghế:', error);
-      } finally {
-        setIsUploadingDocument(false);
-      }
-    }
-  }, [onDocumentChange]);
-
   const { getRootProps: getImageRootProps, getInputProps: getImageInputProps } = useDropzone({
     onDrop: onDropImage,
     accept: {
@@ -132,15 +105,6 @@ export function FileUploader({ imageUrl, documentUrl, onImageChange, onDocumentC
       'application/pdf': ['.pdf'],
       'application/msword': ['.doc'],
       'application/vnd.openxmlformats-officedocument.wordprocessingml.document': ['.docx']
-    },
-    multiple: false
-  })
-
-  const { getRootProps: getDiagramRootProps, getInputProps: getDiagramInputProps } = useDropzone({
-    onDrop: onDropDiagram,
-    accept: {
-      'image/png': ['.png'],
-      'image/jpg': ['.jpg']
     },
     multiple: false
   })
@@ -174,8 +138,6 @@ export function FileUploader({ imageUrl, documentUrl, onImageChange, onDocumentC
         )}
       </div>
 
-
-
       <div
         {...getDocumentRootProps()}
         className="flex-center bg-dark-3 flex h-40 cursor-pointer flex-col overflow-hidden rounded-xl bg-grey-50">
@@ -204,37 +166,6 @@ export function FileUploader({ imageUrl, documentUrl, onImageChange, onDocumentC
           </div>
         )}
       </div>
-
-      <div
-        {...getDiagramRootProps()}
-        className="flex-center bg-dark-3 flex h-40 cursor-pointer flex-col overflow-hidden rounded-xl bg-grey-50">
-        <input {...getDiagramInputProps()} className="cursor-pointer" />
-
-        {uploadedDiagram ? (
-          <div className="flex-center flex-col">
-            <Image
-              src={getFileIcon(uploadedDiagram.name)}
-              width={40}
-              height={40}
-              alt="Diagram icon"
-            />
-            <p className="mt-2 text-sm">{uploadedDiagram.name}</p>
-            <a href={uploadedDiagram.url} target="_blank" rel="noopener noreferrer" className="mt-2 text-blue-500 hover:underline">
-            </a>
-          </div>
-        ) : (
-          <div className="flex-center flex-col py-5 text-grey-500">
-            <img src="/assets/icons/upload.svg" width={40} height={40} alt="file upload" />
-            <h3 className="mb-2 mt-2">Kéo sơ đồ ghế vào đây</h3>
-            <p className="p-medium-12 mb-4">PNG, JPG</p>
-            <Button type="button" className="rounded-full" disabled={isUploadingDocument}>
-              {isUploadingDocument ? 'Đang tải sơ đồ lên...' : 'Chọn sơ đồ từ máy tính'}
-            </Button>
-          </div>
-        )}
-      </div>
-      
-
     </div>
   )
 }
