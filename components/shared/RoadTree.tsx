@@ -32,6 +32,20 @@ const RoadTree = () => {
       color: "bg-orange-50"
     },
     {
+      icon: "/assets/icons/star.svg",
+      title: "Sự Kiện Yêu Thích",
+      description: "Xem các sự kiện yêu thích",
+      link: "/favorites",
+      color: "bg-pink-50"
+    },
+    {
+      icon: "/assets/icons/chart.svg",
+      title: "Thống Kê & Phân Tích",
+      description: "Xem thống kê và phân tích",
+      link: "/analytics",
+      color: "bg-cyan-50"
+    },
+    {
       icon: "/assets/icons/info.svg",
       title: "Về Chúng Tôi",
       description: "Tìm hiểu thêm về Evently",

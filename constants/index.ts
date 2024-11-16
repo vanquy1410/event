@@ -12,6 +12,10 @@ export const headerLinks = [
     route: '/event-page',
   },
   {
+    label: 'Thư viện',
+    route: '/favorites',
+  },
+  {
     label: 'Vé',
     route: '/profile',
   },

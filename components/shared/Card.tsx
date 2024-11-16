@@ -1,22 +1,26 @@
+"use client"
+
 import { IEvent } from '@/lib/database/models/event.model'
 import { formatDateTime } from '@/lib/utils'
-import { auth } from '@clerk/nextjs'
+import { useUser } from '@clerk/nextjs'
 import Image from 'next/image'
 import Link from 'next/link'
 import React from 'react'
 import { DeleteConfirmation } from './DeleteConfirmation'
 import { DeleteOrder } from './DeleteOrder'
+import FavoriteButton from '@/components/shared/FavoriteButton'
 
 type CardProps = {
   event: Partial<IEvent> & { _id: string; title: string; imageUrl?: string },
   hasOrderLink?: boolean,
   hidePrice?: boolean,
-  orderId?: string
+  orderId?: string,
+  onFavoriteChange?: () => void
 }
 
-const Card = ({ event, hasOrderLink, hidePrice, orderId }: CardProps) => {
-  const { sessionClaims } = auth();
-  const userId = sessionClaims?.userId as string;
+const Card = ({ event, hasOrderLink, hidePrice, orderId, onFavoriteChange }: CardProps) => {
+  const { user } = useUser();
+  const userId = user?.publicMetadata?.userId as string;
 
   const isEventCreator = userId === event.organizer?._id?.toString();
 
@@ -24,7 +28,7 @@ const Card = ({ event, hasOrderLink, hidePrice, orderId }: CardProps) => {
     <div className="group relative flex min-h-[380px] w-full max-w-[400px] flex-col overflow-hidden rounded-xl bg-white shadow-md transition-all hover:shadow-lg md:min-h-[438px]">
       <Link 
         href={`/events/${event._id}`}
-        style={{backgroundImage: `url(${event.imageUrl || '/assets/images/event-default.png'})`}}
+        style={{ backgroundImage: `url(${event.imageUrl})` }}
         className="flex-center flex-grow bg-gray-50 bg-cover bg-center text-grey-500"
       />
       
@@ -45,18 +49,27 @@ const Card = ({ event, hasOrderLink, hidePrice, orderId }: CardProps) => {
       )}
 
       <div className="flex min-h-[230px] flex-col gap-3 p-5 md:gap-4"> 
-        {!hidePrice && event.isFree !== undefined && event.price !== undefined && (
-          <div className="flex gap-2">
-            <span className="p-semibold-14 w-min rounded-full bg-green-100 px-4 py-1 text-green-60">
-              {event.isFree ? 'FREE' : `$${event.price}`}
-            </span>
-            {event.category?.name && (
-              <p className="p-semibold-14 w-min rounded-full bg-grey-500/10 px-4 py-1 text-grey-500 line-clamp-1">
-                {event.category.name}
-              </p>
-            )}
-          </div>
-        )}
+        <div className="flex justify-between items-center">
+          {!hidePrice && event.isFree !== undefined && event.price !== undefined && (
+            <div className="flex gap-2">
+              <span className="p-semibold-14 w-min rounded-full bg-green-100 px-4 py-1 text-green-60">
+                {event.isFree ? 'FREE' : `$${event.price}`}
+              </span>
+              {event.category?.name && (
+                <p className="p-semibold-14 w-min rounded-full bg-grey-500/10 px-4 py-1 text-grey-500 line-clamp-1">
+                  {event.category.name}
+                </p>
+              )}
+            </div>
+          )}
+          {userId && (
+            <FavoriteButton 
+              eventId={event._id} 
+              userId={userId} 
+              onFavoriteChange={onFavoriteChange}
+            />
+          )}
+        </div>
 
         <p className="p-medium-14 text-grey-500">
           {event.startDateTime ? formatDateTime(event.startDateTime).dateTime : 'Chưa có ngày'}
