@@ -44,17 +44,25 @@ const EventForm = ({ userId, type, event, eventId }: EventFormProps) => {
     resolver: zodResolver(eventFormSchema),
     defaultValues: {
       ...initialValues,
-      // documentUrl: '',
+      imageUrl: event?.imageUrl || '',
     }
   })
  
   const onSubmit = async (values: z.infer<typeof eventFormSchema>) => {
     let uploadedImageUrl = values.imageUrl;
 
+    if (!uploadedImageUrl && !files.length) {
+      form.setError('imageUrl', {
+        type: 'manual',
+        message: 'Vui lòng chọn hình ảnh cho sự kiện'
+      });
+      return;
+    }
+
     if (files.length > 0) {
       const formData = new FormData();
       formData.append('file', files[0]);
-      formData.append('eventId', eventId || 'new'); // Sử dụng 'new' nếu là sự kiện mới
+      formData.append('eventId', eventId || 'new');
 
       try {
         const response = await fetch('/api/s3-storage', {
@@ -67,17 +75,21 @@ const EventForm = ({ userId, type, event, eventId }: EventFormProps) => {
         }
 
         const data = await response.json();
-        uploadedImageUrl = data.updatedEvent.images[data.updatedEvent.images.length - 1];
+        uploadedImageUrl = data.fileUrl;
       } catch (error) {
         console.error('Lỗi khi upload ảnh:', error);
-        // Xử lý lỗi ở đây (ví dụ: hiển thị thông báo lỗi)
+        return;
       }
     }
 
     if (type === 'Create') {
       try {
         const newEvent = await createEvent({
-          event: { ...values, imageUrl: uploadedImageUrl, categoryId: values.categoryId },
+          event: { 
+            ...values, 
+            imageUrl: uploadedImageUrl,
+            categoryId: values.categoryId 
+          },
           userId,
           path: '/profile'
         })
@@ -376,8 +388,9 @@ const EventForm = ({ userId, type, event, eventId }: EventFormProps) => {
           className="button col-span-2 w-full"
         >
           {form.formState.isSubmitting ? (
-            'Submitting...'
-          ): `${type} Event `}</Button>
+            'Đang xử lý...'
+          ): type === 'Create' ? 'Thêm sự kiện' : 'Cập nhật sự kiện'}
+        </Button>
       </form>
     </Form>
   )
