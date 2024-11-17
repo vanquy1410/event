@@ -23,7 +23,7 @@ const Footer = () => {
         <div className="flex flex-col items-center gap-4 sm:items-start">
           <Link href='/'>
             <Image 
-              src="/assets/images/logo.svg"
+              src="/assets/images/logo1.svg"
               alt="logo"
               width={128}
               height={38}
