@@ -13,7 +13,7 @@ const Header = () => {
         <div className="flex items-center gap-4">
           <Link href="/" className="w-36">
             <Image 
-              src="/assets/images/logo.svg" width={128} height={38}
+              src="/assets/images/logo1.svg" width={128} height={38}
               alt="Evently logo" 
             />
           </Link>
