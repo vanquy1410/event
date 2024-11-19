@@ -1,10 +1,21 @@
 "use client"
 
 import { useState, useEffect } from 'react';
-import { Button } from '@/components/ui/button';
 import Link from 'next/link';
+import { Button } from '@/components/ui/button';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from '@/components/ui/alert-dialog';
 
-interface CancelTicketNotification {
+interface CanceledTicket {
   _id: string;
   orderId: string;
   eventTitle: string;
@@ -14,55 +25,92 @@ interface CancelTicketNotification {
   message: string;
 }
 
-export default function CancelTicketList() {
-  const [cancelTickets, setCancelTickets] = useState<CancelTicketNotification[]>([]);
-  const [loading, setLoading] = useState(true);
+export default function CanceledTicketsPage() {
+  const [canceledTickets, setCanceledTickets] = useState<CanceledTicket[]>([]);
 
   useEffect(() => {
-    const fetchCancelTickets = async () => {
+    const fetchCanceledTickets = async () => {
       try {
         const response = await fetch('/api/cancel-notifications');
         const data = await response.json();
-        setCancelTickets(data.notifications);
+        setCanceledTickets(data.notifications);
       } catch (error) {
-        console.error('Lỗi khi lấy danh sách vé hủy:', error);
-      } finally {
-        setLoading(false);
+        console.error('Lỗi khi tải danh sách vé hủy:', error);
       }
     };
 
-    fetchCancelTickets();
+    fetchCanceledTickets();
   }, []);
 
-  if (loading) return <div>Đang tải...</div>;
+  const handleHideTicket = (ticketId: string) => {
+    setCanceledTickets(prevTickets => 
+      prevTickets.filter(ticket => ticket._id !== ticketId)
+    );
+  };
 
   return (
-    <div className="bg-white shadow-md rounded-lg p-4">
-      <h2 className="text-xl font-bold mb-4">Danh sách vé đã hủy</h2>
-      {cancelTickets.length === 0 ? (
-        <p>Không có vé hủy nào.</p>
-      ) : (
-        <ul className="space-y-4">
-          {cancelTickets.map((ticket) => (
-            <li key={ticket._id} className="border-b pb-4">
-              <div className="flex justify-between items-start">
-                <div>
-                  <p className="font-semibold">{ticket.eventTitle}</p>
-                  <p>Email: {ticket.userEmail}</p>
-                  <p>Giá vé: {ticket.ticketPrice.toLocaleString()}đ</p>
-                  <p>Ngày hủy: {new Date(ticket.cancelDate).toLocaleString('vi-VN')}</p>
-                  <p className="text-gray-600">{ticket.message}</p>
-                </div>
-                <Button asChild variant="outline">
-                  <Link href={`/admin/dashboard/notifications/cancel-tickets/${ticket.orderId}`}>
-                    Chi tiết
-                  </Link>
-                </Button>
-              </div>
-            </li>
-          ))}
-        </ul>
-      )}
-    </div>
+    <>
+      <section className="bg-primary-50 bg-dotted-pattern bg-cover bg-center py-5 md:py-10">
+        <div className="wrapper flex items-center justify-center sm:justify-between">
+          <h3 className='h3-bold text-center sm:text-left'>Danh sách vé đã hủy</h3>
+          <Button asChild size="lg" className="button hidden sm:flex">
+            <Link href="/admin/dashboard">
+              Quay lại Dashboard
+            </Link>
+          </Button>
+        </div>
+      </section>
+
+      <section className="wrapper my-8">
+        <div className="overflow-x-auto">
+          <table className="min-w-full bg-white border border-gray-300">
+            <thead>
+              <tr>
+                <th className="py-2 px-4 border-b">Mã đơn hàng</th>
+                <th className="py-2 px-4 border-b">Tên sự kiện</th>
+                <th className="py-2 px-4 border-b">Email người hủy</th>
+                <th className="py-2 px-4 border-b">Giá vé</th>
+                <th className="py-2 px-4 border-b">Ngày hủy</th>
+                <th className="py-2 px-4 border-b">Ghi chú</th>
+                <th className="py-2 px-4 border-b">Hành động</th>
+              </tr>
+            </thead>
+            <tbody>
+              {canceledTickets.map((ticket) => (
+                <tr key={ticket._id}>
+                  <td className="py-2 px-4 border-b">{ticket.orderId}</td>
+                  <td className="py-2 px-4 border-b">{ticket.eventTitle}</td>
+                  <td className="py-2 px-4 border-b">{ticket.userEmail}</td>
+                  <td className="py-2 px-4 border-b">
+                    {ticket.ticketPrice.toLocaleString()} VNĐ
+                  </td>
+                  <td className="py-2 px-4 border-b">
+                    {new Date(ticket.cancelDate).toLocaleString()}
+                  </td>
+                  <td className="py-2 px-4 border-b">{ticket.message}</td>
+                  <td className="py-2 px-4 border-b">
+                    <AlertDialog>
+                      <AlertDialogTrigger asChild>
+                        <Button variant="outline">Xóa</Button>
+                      </AlertDialogTrigger>
+                      <AlertDialogContent>
+                        <AlertDialogHeader>
+                          <AlertDialogTitle>Xóa vé đã hủy</AlertDialogTitle>
+                          <AlertDialogDescription>Bạn có chắc chắn muốn xóa vé đã hủy này khỏi danh sách hiển thị không?</AlertDialogDescription>
+                        </AlertDialogHeader>
+                        <AlertDialogFooter>
+                          <AlertDialogCancel>Hủy</AlertDialogCancel>
+                          <AlertDialogAction onClick={() => handleHideTicket(ticket._id)}>Xóa</AlertDialogAction>
+                        </AlertDialogFooter>
+                      </AlertDialogContent>
+                    </AlertDialog>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </section>
+    </>
   );
 }

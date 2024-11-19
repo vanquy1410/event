@@ -3,6 +3,17 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from '@/components/ui/alert-dialog';
 
 interface CanceledTicket {
   _id: string;
@@ -32,6 +43,12 @@ export default function CanceledTicketsPage() {
     fetchCanceledTickets();
   }, []);
 
+  const handleHideTicket = (ticketId: string) => {
+    setCanceledTickets(prevTickets => 
+      prevTickets.filter(ticket => ticket._id !== ticketId)
+    );
+  };
+
   return (
     <>
       <section className="bg-primary-50 bg-dotted-pattern bg-cover bg-center py-5 md:py-10">
@@ -56,6 +73,7 @@ export default function CanceledTicketsPage() {
                 <th className="py-2 px-4 border-b">Giá vé</th>
                 <th className="py-2 px-4 border-b">Ngày hủy</th>
                 <th className="py-2 px-4 border-b">Ghi chú</th>
+                <th className="py-2 px-4 border-b">Hành động</th>
               </tr>
             </thead>
             <tbody>
@@ -71,6 +89,32 @@ export default function CanceledTicketsPage() {
                     {new Date(ticket.cancelDate).toLocaleString()}
                   </td>
                   <td className="py-2 px-4 border-b">{ticket.message}</td>
+                  <td className="py-2 px-4 border-b">
+                    <AlertDialog>
+                      <AlertDialogTrigger asChild>
+                        <Button variant="outline" className="bg-green-500 hover:bg-green-600 text-white">
+                          Xác nhận
+                        </Button>
+                      </AlertDialogTrigger>
+                      <AlertDialogContent>
+                        <AlertDialogHeader>
+                          <AlertDialogTitle>Xác nhận xóa vé</AlertDialogTitle>
+                          <AlertDialogDescription>
+                            Bạn có chắc chắn muốn xóa vé này khỏi danh sách hiển thị không?
+                          </AlertDialogDescription>
+                        </AlertDialogHeader>
+                        <AlertDialogFooter>
+                          <AlertDialogCancel>Hủy</AlertDialogCancel>
+                          <AlertDialogAction 
+                            onClick={() => handleHideTicket(ticket._id)}
+                            className="bg-green-500 hover:bg-green-600"
+                          >
+                            Xác nhận
+                          </AlertDialogAction>
+                        </AlertDialogFooter>
+                      </AlertDialogContent>
+                    </AlertDialog>
+                  </td>
                 </tr>
               ))}
             </tbody>
