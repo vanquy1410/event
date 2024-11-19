@@ -24,7 +24,7 @@ export default function AdminDashboardLayout({
   }
 
   return (
-    <div className="flex h-screen overflow-hidden">
+    <div className="flex h-screen">
       <Sidebar />
       <main className="flex-1 overflow-auto bg-white">
         <div className="p-8">

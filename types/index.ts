@@ -215,3 +215,14 @@ export interface BlogFormData {
   tags: string[];
 }
 
+interface CancelTicketNotification {
+  _id: string;
+  orderId: string;
+  userId: string;
+  userEmail: string;
+  eventTitle: string;
+  ticketPrice: number;
+  cancelDate: Date;
+  message: string;
+}
+
