@@ -17,6 +17,7 @@ import { ObjectId } from 'mongodb';
 import User from '../database/models/user.model';
 import { revalidatePath } from 'next/cache';
 import { updateEvent } from './event.actions';
+import CancelNotification from '../database/models/cancelNotification.model'
 
 export const checkoutOrder = async (order: CheckoutOrderParams) => {
   const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!);
@@ -275,14 +276,29 @@ export async function cancelOrder({ orderId }: { orderId: string }) {
       throw new Error('Event not found');
     }
 
+    const buyer = await User.findById(order.buyer);
+    if (!buyer) {
+      throw new Error('Buyer not found');
+    }
+
+    // Tạo thông báo hủy vé
+    await CancelNotification.create({
+      orderId: order._id,
+      userId: order.buyer,
+      userEmail: buyer.email,
+      eventTitle: event.title,
+      ticketPrice: order.totalAmount,
+      message: `Vé sự kiện "${event.title}" đã được hủy bởi người dùng ${buyer.firstName} ${buyer.lastName}`
+    });
+
     // Cập nhật ghế đã hủy
     const updatedSeats = [...(event.seats || [])];
     if (order.selectedSeat !== undefined) {
-      updatedSeats[order.selectedSeat] = false; // Đánh dấu ghế đã hủy
+      updatedSeats[order.selectedSeat] = false;
     }
     
     await updateEvent({
-      userId: order.buyer, // Sử dụng buyerId từ đơn hàng
+      userId: order.buyer,
       event: {
         _id: event._id,
         currentParticipants: (event.currentParticipants || 0) - 1,
@@ -292,6 +308,7 @@ export async function cancelOrder({ orderId }: { orderId: string }) {
     });
     
     await OrderModel.findByIdAndDelete(orderId);
+
   } catch (error) {
     handleError(error);
   }
