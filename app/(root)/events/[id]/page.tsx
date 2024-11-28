@@ -8,6 +8,8 @@ import ReviewForm from '@/components/shared/ReviewForm';
 import ReviewList from '@/components/shared/ReviewList';
 import { getReviewsByEvent } from '@/lib/actions/review.actions';
 import { auth, currentUser } from "@clerk/nextjs";
+import SeatingMap from '@/components/shared/SeatingMap';
+import SeatingChart from '@/components/shared/SeatingChart';
 
 const EventDetails = async ({ params, searchParams }: SearchParamProps) => {
   const event = await getEventById(params.id);
@@ -129,7 +131,12 @@ const EventDetails = async ({ params, searchParams }: SearchParamProps) => {
         />
     </section>
 
-    
+    <SeatingChart
+      participantLimit={event.participantLimit}
+      currentParticipants={event.currentParticipants}
+      seats={event.seats || []}
+    />
+
     </>
   )
 }
