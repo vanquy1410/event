@@ -5,11 +5,24 @@ export interface IEvent {
   _id: string;
   title: string;
   description: string;
+  price: string;
+  isFree: boolean;
   imageUrl: string;
+  location: string;
   startDateTime: Date;
   endDateTime: Date;
-  price: string;
-  url?: string;
+  url: string;
+  organizer: {
+    _id: string;
+    firstName: string;
+    lastName: string;
+  };
+  category: {
+    _id: string;
+    name: string;
+  };
+  participantLimit: number;
+  currentParticipants: number;
 }
 
 export interface IOrder extends Document {
@@ -245,4 +258,31 @@ export type OrderData = {
     description: string;
   };
 };
+
+export interface IOrderItem {
+  _id: string;
+  createdAt: Date;
+  stripeId: string;
+  totalAmount: string;
+  event: {
+    _id: string;
+    title: string;
+    description: string;
+    imageUrl: string;
+    startDateTime: Date;
+    endDateTime: Date;
+    seats: boolean[];
+    currentParticipants: number;
+    url: string;
+  };
+  buyer: string;
+  buyerName: string;
+  eventTitle: string;
+  selectedSeat: number;
+  seatType: {
+    id: string;
+    name: string;
+    description: string;
+  };
+}
 

@@ -7,7 +7,8 @@ import {
   GetOrdersByEventParams, 
   GetOrdersByUserParams, 
   Order,
-  OrderData
+  OrderData,
+  IOrderItem
 } from "@/types";
 import { redirect } from 'next/navigation';
 import { handleError } from '../utils';
@@ -168,7 +169,7 @@ export async function getOrdersByEvent({ searchString, eventId }: GetOrdersByEve
 // GET ORDERS BY USER
 export async function getOrdersByUser({
   userId,
-  limit = 10,
+  limit = 3,
   page,
 }: {
   userId: string
@@ -204,6 +205,7 @@ export async function getOrdersByUser({
     }
   } catch (error) {
     handleError(error)
+    return { data: [], totalPages: 0 }
   }
 }
 
