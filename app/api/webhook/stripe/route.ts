@@ -33,8 +33,8 @@ export async function POST(req: Request) {
         selectedSeat: Number(selectedSeat),
         seatType,
         stripeId: session.id,
-        totalAmount: (session.amount_total! / 100).toString(),
-      });
+        totalAmount: session.amount_total!.toString(),
+        });
 
       return NextResponse.json({ message: 'Order created successfully', order });
     }

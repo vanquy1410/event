@@ -40,8 +40,8 @@ export default async function Home({ searchParams }: SearchParamProps) {
       <section className="bg-primary-50 bg-dotted-pattern bg-contain py-5 md:py-10">
         <div className="wrapper grid grid-cols-1 gap-5 md:grid-cols-2 2xl:gap-0">
           <div className="flex flex-col justify-center gap-8">
-            <h1 className="h1-bold">Evently - Chắp cánh cho mọi ý tưởng sự kiện</h1>
-            <p className="p-regular-20 md:p-regular-24">Từ ý tưởng đến hiện thực, Evently là người bạn đồng hành đáng tin cậy trong mọi sự kiện của bạn.</p>
+            <h1 className="h1-bold">Star Evently - Chắp cánh cho mọi ý tưởng sự kiện</h1>
+            <p className="p-regular-20 md:p-regular-24">Từ ý tưởng đến hiện thực, Star Evently là người bạn đồng hành đáng tin cậy trong mọi sự kiện của bạn.</p>
             <Button size="lg" asChild className="button w-full sm:w-fit">
               <Link href="/event-page">
                 Khám phá ngay
@@ -89,9 +89,9 @@ export default async function Home({ searchParams }: SearchParamProps) {
           <span className="bg-gray-200 text-gray-800 px-3 py-1 rounded-full">Sự kiện công nghệ</span>
           <span className="bg-gray-200 text-gray-800 px-3 py-1 rounded-full">Hội thảo</span>
           <span className="bg-gray-200 text-gray-800 px-3 py-1 rounded-full">Khóa học</span>
-          <span className="bg-gray-200 text-gray-800 px-3 py-1 rounded-full">Triển lãm</span>
-          <span className="bg-gray-200 text-gray-800 px-3 py-1 rounded-full">Webinar</span>
-          <span className="bg-gray-200 text-gray-800 px-3 py-1 rounded-full">Networking</span>
+          <span className="bg-gray-200 text-gray-800 px-3 py-1 rounded-full">Concert</span>
+          <span className="bg-gray-200 text-gray-800 px-3 py-1 rounded-full">Hacking</span>
+          <span className="bg-gray-200 text-gray-800 px-3 py-1 rounded-full">Kịch</span>
         </div>
       </section>
 
@@ -113,7 +113,7 @@ export default async function Home({ searchParams }: SearchParamProps) {
       </section>
       
       <section className="wrapper my-12">
-        <h2 className="h2-bold mb-4">Khám Phá Evently</h2>
+        <h2 className="h2-bold mb-4">Khám Phá Star Evently</h2>
         <RoadTree />
       </section>
     </>

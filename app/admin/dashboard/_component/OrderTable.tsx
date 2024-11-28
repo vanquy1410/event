@@ -75,7 +75,7 @@ export default function OrderTable({ orders, onDelete, onSearch }: OrderTablePro
               <td className="py-2 px-4 border-b">{order.eventTitle}</td>
               <td className="py-2 px-4 border-b">{order.username}</td>
               <td className="py-2 px-4 border-b">{new Date(order.createdAt).toLocaleString()}</td>
-              <td className="py-2 px-4 border-b">{order.totalAmount.toLocaleString()} $</td>
+              <td className="py-2 px-4 border-b">{order.totalAmount.toLocaleString()} đ</td>
               <td className="py-2 px-4 border-b">
                 <DeleteConfirmation orderId={order._id} onDelete={onDelete} />
               </td>
