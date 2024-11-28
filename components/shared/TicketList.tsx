@@ -13,14 +13,14 @@ import {
   DialogFooter,
   DialogClose
 } from "@/components/ui/dialog"
-import { IOrder } from '@/types'
+import { IOrderItem } from '@/types'
 import Pagination from './Pagination'
 import { cancelOrder } from '@/lib/actions/order.actions';
 import Link from 'next/link';
 
 interface TicketListProps {
   userId: string
-  orders: IOrder[]
+  orders: IOrderItem[]
   page: number
   totalPages: number
 }
@@ -35,9 +35,27 @@ const TicketList = ({ userId, orders, page, totalPages }: TicketListProps) => {
 
     try {
       await cancelOrder({ orderId: selectedOrderId });
-      setOrderList(orderList.filter(order => order._id !== selectedOrderId));
+      
+      // Cập nhật UI ngay lập tức
+      setOrderList(prevOrders => {
+        const canceledOrder = prevOrders.find(order => order._id === selectedOrderId);
+        if (canceledOrder) {
+          // Cập nhật trạng thái ghế trong event
+          const updatedSeats = [...canceledOrder.event.seats];
+          updatedSeats[canceledOrder.selectedSeat] = false;
+          
+          // Cập nhật số lượng người tham gia
+          canceledOrder.event.currentParticipants = 
+            (canceledOrder.event.currentParticipants || 0) - 1;
+        }
+        return prevOrders.filter(order => order._id !== selectedOrderId);
+      });
+
       setSelectedOrderId(null);
       setIsConfirming(false);
+      
+      // Reload trang để cập nhật trạng thái mới nhất
+      window.location.reload();
     } catch (error) {
       console.error('Lỗi khi hủy đơn hàng:', error);
       alert('Có lỗi xảy ra khi hủy đơn hàng. Vui lòng thử lại.');
@@ -56,7 +74,7 @@ const TicketList = ({ userId, orders, page, totalPages }: TicketListProps) => {
     }
   }, [isConfirming]);
 
-  const openQRCodeTab = (order: IOrder) => {
+  const openQRCodeTab = (order: IOrderItem) => {
     const qrData = JSON.stringify({
       orderId: order._id,
       eventTitle: order.event.title,
@@ -84,7 +102,7 @@ const TicketList = ({ userId, orders, page, totalPages }: TicketListProps) => {
           </tr>
         </thead>
         <tbody className="bg-white divide-y divide-gray-200">
-          {orderList?.map((order: IOrder, index: number) => (
+          {orderList?.map((order: IOrderItem, index: number) => (
             <tr key={order._id} className="hover:bg-gray-50">
               <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{index + 1}</td>
               <td className="px-6 py-4 whitespace-nowrap">
@@ -126,10 +144,24 @@ const TicketList = ({ userId, orders, page, totalPages }: TicketListProps) => {
                         className="rounded-md mx-auto"
                       />
                       <div className="space-y-2">
-                        <p className="text-gray-700"><strong className="text-primary-500">Mô tả:</strong> {order.event.description}</p>
-                        <p className="text-gray-700"><strong className="text-primary-500">Giá:</strong> {order.totalAmount}</p>
-                        <p className="text-gray-700"><strong className="text-primary-500">Bắt đầu:</strong> {formatDateTime(order.event.startDateTime).dateTime}</p>
-                        <p className="text-gray-700"><strong className="text-primary-500">Kết thúc:</strong> {formatDateTime(order.event.endDateTime).dateTime}</p>
+                        <p className="text-gray-700">
+                          <strong className="text-primary-500">Mô tả:</strong> {order.event.description}
+                        </p>
+                        <p className="text-gray-700">
+                          <strong className="text-primary-500">Giá:</strong> {order.totalAmount}
+                        </p>
+                        <p className="text-gray-700">
+                          <strong className="text-primary-500">Vị trí ghế:</strong> Số {order.selectedSeat + 1}
+                        </p>
+                        <p className="text-gray-700">
+                          <strong className="text-primary-500">Hạng ghế:</strong> {order.seatType?.name || 'Chưa có thông tin'}
+                        </p>
+                        <p className="text-gray-700">
+                          <strong className="text-primary-500">Bắt đầu:</strong> {formatDateTime(order.event.startDateTime).dateTime}
+                        </p>
+                        <p className="text-gray-700">
+                          <strong className="text-primary-500">Kết thúc:</strong> {formatDateTime(order.event.endDateTime).dateTime}
+                        </p>
                       </div>
                     </div>
                     <DialogFooter>

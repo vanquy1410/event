@@ -5,6 +5,8 @@ import { IEvent } from '@/lib/database/models/event.model';
 import { Button } from '../ui/button';
 import { checkoutOrder } from '@/lib/actions/order.actions';
 import { updateEvent } from '@/lib/actions/event.actions';
+import { getSeatType } from '@/utils/seatUtils';
+import { OrderData } from '@/types';
 
 loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY!);
 
@@ -22,18 +24,26 @@ const Checkout = ({ event, userId, selectedSeat }: { event: IEvent; userId: stri
   }, []);
 
   const onCheckout = async () => {
-    const order = {
+    const rowIndex = Math.floor(selectedSeat / 10);
+    const seatType = getSeatType(rowIndex);
+
+    const order: OrderData = {
       eventTitle: event.title,
       eventId: event._id,
       price: event.price,
       isFree: event.isFree,
       buyerId: userId,
-      selectedSeat: selectedSeat 
+      selectedSeat: selectedSeat,
+      seatType: {
+        id: seatType.id,
+        name: seatType.name,
+        description: seatType.description
+      }
     };
 
     await checkoutOrder(order);
-
-    // After successful checkout
+    
+    // Cập nhật trạng thái ghế
     const updatedSeats = [...(event.seats || [])];
     updatedSeats[selectedSeat] = true;
     await updateEvent({

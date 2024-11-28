@@ -46,6 +46,7 @@ const CheckoutButton = ({ event }: { event: IEvent }) => {
               participantLimit={event.participantLimit}
               seats={event.seats || []}
               onSeatSelect={handleSeatSelection}
+              basePrice={Number(event.price)}
             />
             {selectedSeat !== null && (
               <Checkout event={event} userId={userId} selectedSeat={selectedSeat} />

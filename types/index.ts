@@ -5,23 +5,41 @@ export interface IEvent {
   _id: string;
   title: string;
   description: string;
+  price: string;
+  isFree: boolean;
   imageUrl: string;
+  location: string;
   startDateTime: Date;
   endDateTime: Date;
-  price: string;
-  url?: string;
+  url: string;
+  organizer: {
+    _id: string;
+    firstName: string;
+    lastName: string;
+  };
+  category: {
+    _id: string;
+    name: string;
+  };
+  participantLimit: number;
+  currentParticipants: number;
 }
 
 export interface IOrder extends Document {
   buyerName: string;
   selectedSeat: number;
+  seatType: {
+    id: string;
+    name: string;
+    description: string;
+  };
   _id: string;
   createdAt: Date;
   stripeId: string;
   totalAmount: string;
   event: IEvent;
   buyer: string;
-  seats?: boolean[]
+  seats?: boolean[];
 }
 
 // Thêm type Order
@@ -156,12 +174,13 @@ export type CheckoutOrderParams = {
 }
 
 export type CreateOrderParams = {
-  selectedSeat: any;
-  stripeId: string
-  eventId: string
-  buyerId: string
-  totalAmount: string
-  createdAt: Date
+  eventId: string;
+  buyerId: string;
+  eventTitle: string;
+  price: string;
+  isFree: boolean;
+  selectedSeat: number;
+  seatType: string;
 }
 
 export type GetOrdersByEventParams = {
@@ -224,5 +243,46 @@ interface CancelTicketNotification {
   ticketPrice: number;
   cancelDate: Date;
   message: string;
+}
+
+export type OrderData = {
+  eventTitle: string;
+  eventId: string;
+  price: string;
+  isFree: boolean;
+  buyerId: string;
+  selectedSeat: number;
+  seatType: {
+    id: string;
+    name: string;
+    description: string;
+  };
+};
+
+export interface IOrderItem {
+  _id: string;
+  createdAt: Date;
+  stripeId: string;
+  totalAmount: string;
+  event: {
+    _id: string;
+    title: string;
+    description: string;
+    imageUrl: string;
+    startDateTime: Date;
+    endDateTime: Date;
+    seats: boolean[];
+    currentParticipants: number;
+    url: string;
+  };
+  buyer: string;
+  buyerName: string;
+  eventTitle: string;
+  selectedSeat: number;
+  seatType: {
+    id: string;
+    name: string;
+    description: string;
+  };
 }
 
