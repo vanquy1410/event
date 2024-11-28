@@ -15,13 +15,18 @@ export interface IEvent {
 export interface IOrder extends Document {
   buyerName: string;
   selectedSeat: number;
+  seatType: {
+    id: string;
+    name: string;
+    description: string;
+  };
   _id: string;
   createdAt: Date;
   stripeId: string;
   totalAmount: string;
   event: IEvent;
   buyer: string;
-  seats?: boolean[]
+  seats?: boolean[];
 }
 
 // Thêm type Order
@@ -156,12 +161,13 @@ export type CheckoutOrderParams = {
 }
 
 export type CreateOrderParams = {
-  selectedSeat: any;
-  stripeId: string
-  eventId: string
-  buyerId: string
-  totalAmount: string
-  createdAt: Date
+  eventId: string;
+  buyerId: string;
+  eventTitle: string;
+  price: string;
+  isFree: boolean;
+  selectedSeat: number;
+  seatType: string;
 }
 
 export type GetOrdersByEventParams = {
@@ -225,4 +231,18 @@ interface CancelTicketNotification {
   cancelDate: Date;
   message: string;
 }
+
+export type OrderData = {
+  eventTitle: string;
+  eventId: string;
+  price: string;
+  isFree: boolean;
+  buyerId: string;
+  selectedSeat: number;
+  seatType: {
+    id: string;
+    name: string;
+    description: string;
+  };
+};
 

@@ -6,7 +6,8 @@ import {
   CreateOrderParams, 
   GetOrdersByEventParams, 
   GetOrdersByUserParams, 
-  Order
+  Order,
+  OrderData
 } from "@/types";
 import { redirect } from 'next/navigation';
 import { handleError } from '../utils';
@@ -18,21 +19,22 @@ import User from '../database/models/user.model';
 import { revalidatePath } from 'next/cache';
 import { updateEvent } from './event.actions';
 import CancelNotification from '../database/models/cancelNotification.model'
+import Image from 'next/image';
+import { formatDateTime } from '../utils';
 
-export const checkoutOrder = async (order: CheckoutOrderParams) => {
-  const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!);
-
-  const price = order.isFree ? 0 : Number(order.price) * 100;
-
+export const checkoutOrder = async (order: OrderData) => {
   try {
+    const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!);
+    
     const session = await stripe.checkout.sessions.create({
       line_items: [
         {
           price_data: {
-            currency: 'usd',
-            unit_amount: price,
+            currency: 'vnd',
+            unit_amount: Number(order.price) * 100,
             product_data: {
-              name: order.eventTitle
+              name: order.eventTitle,
+              description: `Vé ${order.seatType.name} - Ghế số ${order.selectedSeat + 1}`
             }
           },
           quantity: 1
@@ -41,7 +43,8 @@ export const checkoutOrder = async (order: CheckoutOrderParams) => {
       metadata: {
         eventId: order.eventId,
         buyerId: order.buyerId,
-        selectedSeat: order.selectedSeat,
+        selectedSeat: order.selectedSeat.toString(),
+        seatType: JSON.stringify(order.seatType)
       },
       mode: 'payment',
       success_url: `${process.env.NEXT_PUBLIC_SERVER_URL}/profile`,
@@ -54,40 +57,46 @@ export const checkoutOrder = async (order: CheckoutOrderParams) => {
   }
 }
 
-export const createOrder = async (order: CreateOrderParams): Promise<Order | null> => {
+export const createOrder = async (orderData: {
+  eventId: string;
+  buyerId: string;
+  selectedSeat: number;
+  seatType: string;
+  stripeId: string;
+  totalAmount: string;
+}): Promise<Order | null> => {
   try {
     await connectToDatabase();
     
-    const event = await Event.findById(order.eventId);
-    const buyer = await User.findById(order.buyerId);
+    const event = await Event.findById(orderData.eventId);
+    const buyer = await User.findById(orderData.buyerId);
     
     if (!event || !buyer) {
       throw new Error('Event or Buyer not found');
     }
-    
-    // Cập nhật ghế đã chọn
-    const updatedSeats = [...(event.seats || [])];
-    if (order.selectedSeat !== undefined) {
-      updatedSeats[order.selectedSeat] = true; // Đánh dấu ghế đã chọn
-    }
 
-    // Tạo đơn hàng
+    const seatType = JSON.parse(orderData.seatType);
+    
     const newOrder = await OrderModel.create({
-      ...order,
-      event: order.eventId,
-      buyer: order.buyerId,
+      stripeId: orderData.stripeId,
+      totalAmount: orderData.totalAmount,
+      event: orderData.eventId,
+      buyer: orderData.buyerId,
       eventTitle: event.title,
       buyerName: `${buyer.firstName} ${buyer.lastName}`,
-      username: buyer.username,
-      selectedSeat: order.selectedSeat, // Lưu ghế đã chọn
+      selectedSeat: orderData.selectedSeat,
+      seatType: seatType
     });
 
-    // Cập nhật sự kiện với ghế đã chọn
+    // Cập nhật trạng thái ghế trong event
+    const updatedSeats = [...(event.seats || [])];
+    updatedSeats[orderData.selectedSeat] = true;
+    
     await updateEvent({
-      userId: buyer._id, // Sử dụng ID của người mua
+      userId: buyer._id,
       event: {
         _id: event._id,
-        currentParticipants: (event.currentParticipants || 0) + 1, // Tăng số lượng người tham gia
+        currentParticipants: (event.currentParticipants || 0) + 1,
         seats: updatedSeats,
       },
       path: `/events/${event._id}`
@@ -96,7 +105,7 @@ export const createOrder = async (order: CreateOrderParams): Promise<Order | nul
     return JSON.parse(JSON.stringify(newOrder));
   } catch (error) {
     handleError(error);
-    return null; // Trả về null nếu có lỗi
+    return null;
   }
 }
 

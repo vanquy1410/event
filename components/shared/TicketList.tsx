@@ -126,10 +126,24 @@ const TicketList = ({ userId, orders, page, totalPages }: TicketListProps) => {
                         className="rounded-md mx-auto"
                       />
                       <div className="space-y-2">
-                        <p className="text-gray-700"><strong className="text-primary-500">Mô tả:</strong> {order.event.description}</p>
-                        <p className="text-gray-700"><strong className="text-primary-500">Giá:</strong> {order.totalAmount}</p>
-                        <p className="text-gray-700"><strong className="text-primary-500">Bắt đầu:</strong> {formatDateTime(order.event.startDateTime).dateTime}</p>
-                        <p className="text-gray-700"><strong className="text-primary-500">Kết thúc:</strong> {formatDateTime(order.event.endDateTime).dateTime}</p>
+                        <p className="text-gray-700">
+                          <strong className="text-primary-500">Mô tả:</strong> {order.event.description}
+                        </p>
+                        <p className="text-gray-700">
+                          <strong className="text-primary-500">Giá:</strong> {order.totalAmount}
+                        </p>
+                        <p className="text-gray-700">
+                          <strong className="text-primary-500">Vị trí ghế:</strong> Số {order.selectedSeat + 1}
+                        </p>
+                        <p className="text-gray-700">
+                          <strong className="text-primary-500">Hạng ghế:</strong> {order.seatType?.name || 'Chưa có thông tin'}
+                        </p>
+                        <p className="text-gray-700">
+                          <strong className="text-primary-500">Bắt đầu:</strong> {formatDateTime(order.event.startDateTime).dateTime}
+                        </p>
+                        <p className="text-gray-700">
+                          <strong className="text-primary-500">Kết thúc:</strong> {formatDateTime(order.event.endDateTime).dateTime}
+                        </p>
                       </div>
                     </div>
                     <DialogFooter>

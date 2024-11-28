@@ -1,40 +1,50 @@
-import stripe from 'stripe'
-import { NextResponse } from 'next/server'
-import { createOrder } from '@/lib/actions/order.actions'
+import { createOrder } from '@/lib/actions/order.actions';
+import { NextResponse } from 'next/server';
+import stripe from 'stripe';
 
-export async function POST(request: Request) {
-  const body = await request.text()
+const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET!;
 
-  const sig = request.headers.get('stripe-signature') as string
-  const endpointSecret = process.env.STRIPE_WEBHOOK_SECRET!
-
-  let event
-
+export async function POST(req: Request) {
   try {
-    event = stripe.webhooks.constructEvent(body, sig, endpointSecret)
-  } catch (err) {
-    return NextResponse.json({ message: 'Webhook error', error: err })
-  }
+    const body = await req.text();
+    const signature = req.headers.get('stripe-signature') as string;
+    const stripeClient = new stripe(process.env.STRIPE_SECRET_KEY!);
 
-  // Get the ID and type
-  const eventType = event.type
-
-  // CREATE
-  if (eventType === 'checkout.session.completed') {
-    const { id, amount_total, metadata } = event.data.object
-
-    const order = {
-      stripeId: id,
-      eventId: metadata?.eventId || '',
-      buyerId: metadata?.buyerId || '',
-      totalAmount: amount_total ? (amount_total / 100).toString() : '0',
-      createdAt: new Date(),
-      selectedSeat: metadata?.selectedSeat || 0, 
+    let event;
+    try {
+      event = stripe.webhooks.constructEvent(
+        body,
+        signature,
+        webhookSecret
+      );
+    } catch (error) {
+      return NextResponse.json({ error: 'Webhook signature failed' }, { status: 400 });
     }
 
-    const newOrder = await createOrder(order)
-    return NextResponse.json({ message: 'OK', order: newOrder })
-  }
+    // Xử lý sự kiện thanh toán thành công
+    if (event.type === 'checkout.session.completed') {
+      const session = event.data.object as stripe.Checkout.Session;
+      const { eventId, buyerId, selectedSeat, seatType } = session.metadata!;
 
-  return new Response('', { status: 200 })
+      // Tạo order mới
+      const order = await createOrder({
+        eventId,
+        buyerId,
+        selectedSeat: Number(selectedSeat),
+        seatType,
+        stripeId: session.id,
+        totalAmount: (session.amount_total! / 100).toString(),
+      });
+
+      return NextResponse.json({ message: 'Order created successfully', order });
+    }
+
+    return NextResponse.json({ message: 'Event received' });
+  } catch (error) {
+    console.error('Webhook error:', error);
+    return NextResponse.json(
+      { error: 'Internal server error' },
+      { status: 500 }
+    );
+  }
 }
