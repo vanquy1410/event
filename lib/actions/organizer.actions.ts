@@ -61,7 +61,7 @@ export async function updateOrganizerEvent(id: string, eventData: Partial<IOrgan
 
 export async function updateOrganizerEventStatus(organizerId: string, status: 'approved' | 'rejected') {
   try {
-    const response = await fetch(`/api/organizer/${organizerId}`, {
+    const response = await fetch(`/api/organizer-admin/${organizerId}`, {
       method: 'PATCH',
       headers: {
         'Content-Type': 'application/json',

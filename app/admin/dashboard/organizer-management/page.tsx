@@ -6,6 +6,7 @@ import { Button } from '@/components/ui/button'
 import { getOrganizerEvents, updateOrganizerEventStatus } from '@/lib/actions/organizer.actions';
 import OrganizerTable from '../_component/OrganizerTable';
 import { IOrganizer } from '@/lib/database/models/organizer.model';
+import { toast } from 'react-hot-toast';
 
 const OrganizerManagementPage: React.FC = () => {
   const [organizers, setOrganizers] = useState<IOrganizer[]>([]);
@@ -29,13 +30,18 @@ const OrganizerManagementPage: React.FC = () => {
   const handleStatusUpdate = async (organizerId: string, status: 'approved' | 'rejected') => {
     try {
       const updatedOrganizer = await updateOrganizerEventStatus(organizerId, status);
-      setOrganizers(organizers.map((org) => 
-        org._id === organizerId ? { ...org, status: updatedOrganizer.status } : org
-      ));
-      setError(null); // Xóa thông báo lỗi nếu cập nhật thành công
+      
+      if (updatedOrganizer) {
+        setOrganizers(prev => 
+          prev.map(org => 
+            org._id === organizerId ? { ...org, status: updatedOrganizer.status } : org
+          )
+        );
+        toast.success('Cập nhật trạng thái thành công');
+      }
     } catch (error) {
       console.error('Lỗi khi cập nhật trạng thái:', error);
-      setError(error instanceof Error ? error.message : 'Không thể cập nhật trạng thái. Vui lòng thử lại.');
+      toast.error('Có lỗi xảy ra khi cập nhật trạng thái');
     }
   };
 
