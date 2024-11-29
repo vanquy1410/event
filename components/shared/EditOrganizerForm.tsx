@@ -40,6 +40,26 @@ const EditOrganizerForm = ({ initialData, onSubmit, onCancel, organizerId }: Edi
   };
 
   const handleDateChange = (date: Date, field: 'startDateTime' | 'endDateTime') => {
+    const now = new Date();
+    
+    if (field === 'startDateTime') {
+      if (date < now) {
+        toast.error('Thời gian bắt đầu không được nhỏ hơn thời gian hiện tại');
+        return;
+      }
+      if (formData.endDateTime < date) {
+        toast.error('Thời gian kết thúc phải sau thời gian bắt đầu');
+        return;
+      }
+    }
+
+    if (field === 'endDateTime') {
+      if (date < formData.startDateTime) {
+        toast.error('Thời gian kết thúc phải sau thời gian bắt đầu');
+        return;
+      }
+    }
+
     setFormData(prev => ({
       ...prev,
       [field]: date
@@ -107,6 +127,7 @@ const EditOrganizerForm = ({ initialData, onSubmit, onCancel, organizerId }: Edi
             onChange={(date: Date) => handleDateChange(date, 'startDateTime')}
             showTimeSelect
             dateFormat="Pp"
+            minDate={new Date()}
             className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
           />
         </div>
@@ -118,6 +139,7 @@ const EditOrganizerForm = ({ initialData, onSubmit, onCancel, organizerId }: Edi
             onChange={(date: Date) => handleDateChange(date, 'endDateTime')}
             showTimeSelect
             dateFormat="Pp"
+            minDate={formData.startDateTime}
             className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
           />
         </div>
