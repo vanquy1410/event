@@ -25,10 +25,9 @@ export async function createOrganizerEvent(eventData: Omit<IOrganizer, 'status'>
   }
 }
 
-export async function getOrganizerEvents(status?: 'pending' | 'approved' | 'rejected') {
+export async function getOrganizerEvents() {
   try {
-    const url = status ? `/api/organizer?status=${status}` : '/api/organizer';
-    const response = await fetch(url);
+    const response = await fetch('/api/organizer');
     if (!response.ok) {
       throw new Error('Lỗi khi lấy danh sách sự kiện');
     }
@@ -41,25 +40,28 @@ export async function getOrganizerEvents(status?: 'pending' | 'approved' | 'reje
 
 export async function updateOrganizerEvent(id: string, eventData: Partial<IOrganizer>) {
   try {
-    await connectToDatabase();
-    const updatedOrganizer = await Organizer.findByIdAndUpdate(
-      id,
-      { $set: eventData },
-      { new: true }
-    );
-    if (!updatedOrganizer) {
-      throw new Error('Không tìm thấy ban tổ chức');
+    const response = await fetch(`/api/organizer/${id}`, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(eventData),
+    });
+
+    if (!response.ok) {
+      throw new Error('Lỗi khi cập nhật');
     }
-    return updatedOrganizer.toObject();
+
+    return await response.json();
   } catch (error) {
-    console.error('Lỗi khi cập nhật thông tin ban tổ chức:', error);
+    console.error('Lỗi khi cập nhật:', error);
     throw error;
   }
 }
 
 export async function updateOrganizerEventStatus(organizerId: string, status: 'approved' | 'rejected') {
   try {
-    const response = await fetch(`/api/organizer/${organizerId}`, {
+    const response = await fetch(`/api/organizer-admin/${organizerId}`, {
       method: 'PATCH',
       headers: {
         'Content-Type': 'application/json',

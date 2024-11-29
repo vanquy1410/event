@@ -20,7 +20,10 @@ const formSchema = z.object({
   eventTitle: z.string().min(1, 'Tên sự kiện là bắt buộc'),
   description: z.string().min(1, 'Mô tả là bắt buộc'),
   location: z.string().min(1, 'Địa điểm là bắt buộc'),
-  startDateTime: z.date(),
+  startDateTime: z.date().refine(
+    (date) => date >= new Date(),
+    'Thời gian bắt đầu không được nhỏ hơn thời gian hiện tại'
+  ),
   endDateTime: z.date(),
   eventType: z.string().min(1, 'Hình thức là bắt buộc'),
   price: z.number().min(0, 'Giá không được âm'),
@@ -179,6 +182,7 @@ const OrganizerEventForm: React.FC<OrganizerEventFormProps> = ({ setOrganizers, 
                   onChange={(date: Date) => field.onChange(date)}
                   showTimeSelect
                   dateFormat="Pp"
+                  minDate={new Date()}
                 />
               </FormControl>
               <FormMessage />
@@ -197,6 +201,7 @@ const OrganizerEventForm: React.FC<OrganizerEventFormProps> = ({ setOrganizers, 
                   onChange={(date: Date) => field.onChange(date)}
                   showTimeSelect
                   dateFormat="Pp"
+                  minDate={field.value}
                 />
               </FormControl>
               <FormMessage />

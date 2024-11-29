@@ -3,36 +3,23 @@ import React, { useState, useEffect } from 'react';
 import OrganizerEventForm from '@/components/shared/OrganizerEventForm';
 import OrganizerList from '@/components/shared/OrganizerList';
 import { Button } from '@/components/ui/button';
-import { getOrganizerEvents } from '@/lib/actions/organizer.actions';
+import { getOrganizerEvents, updateOrganizerEvent } from '@/lib/actions/organizer.actions';
 import { IOrganizer } from '@/lib/database/models/organizer.model';
-// import EditOrganizerButton from '@/components/shared/EditOrganizerButton';
-import EditOrganizerForm from '@/components/shared/EditOrganizerForm';
-import { updateOrganizerEvent } from '@/lib/actions/organizer.actions';
-import { useRouter } from 'next/navigation';
 import { useUser } from '@clerk/nextjs';
 import Link from 'next/link';
-import { FaHome } from 'react-icons/fa';
+import { toast } from 'react-hot-toast';
+import Header from '@/components/shared/Header';
+import Footer from '@/components/shared/Footer';
 
 const OrganizerPage = () => {
-  const [showForm, setShowForm] = useState(false);
   const [organizers, setOrganizers] = useState<IOrganizer[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [isEditing, setIsEditing] = useState(false);
-  const [organizerData, setOrganizerData] = useState({
-    name: '',
-    email: '',
-    description: '',
-    price: 0,
-    status: '',
-  });
-  const [editingOrganizerId, setEditingOrganizerId] = useState<string | null>(null);
+  const { user } = useUser();
   const [userData, setUserData] = useState({
     name: '',
     email: '',
   });
-  const router = useRouter();
-  const { user } = useUser();
 
   useEffect(() => {
     if (user) {
@@ -48,150 +35,78 @@ const OrganizerPage = () => {
       try {
         setLoading(true);
         const events = await getOrganizerEvents();
-        setOrganizers(events);
+        const userEvents = events.filter((event: IOrganizer) => 
+          event.email === user?.primaryEmailAddress?.emailAddress
+        );
+        setOrganizers(userEvents);
         setError(null);
       } catch (error) {
-        console.error('Lỗi khi lấy danh sách sự kiện:', error);
-        setError('Không thể tải danh sách sự kiện. Vui lòng thử lại sau.');
+        console.error('Lỗi khi tải danh sách:', error);
+        setError('Không thể tải danh sách. Vui lòng thử lại sau.');
       } finally {
         setLoading(false);
       }
     };
 
-    fetchOrganizers();
-  }, []);
-
-  const handleEditSubmit = async (data: any) => {
-    if (!editingOrganizerId) {
-      console.error('Không có ID ban tổ chức để cập nhật');
-      return;
+    if (user) {
+      fetchOrganizers();
     }
+  }, [user]);
+
+  const handleEdit = async (updatedData: IOrganizer) => {
     try {
-      const response = await fetch('/api/updateOrganizer', {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ id: editingOrganizerId, ...data }),
-      });
-      if (!response.ok) {
-        const errorText = await response.text();
-        console.error('Server response:', errorText);
-        throw new Error('Lỗi khi cập nhật thông tin ban tổ chức');
-      }
-      const updatedOrganizer = await response.json();
-      setOrganizers(prevOrganizers => 
-        prevOrganizers.map(org => 
-          org._id === editingOrganizerId ? { ...org, ...updatedOrganizer } : org
+      const updatedOrganizer = await updateOrganizerEvent(updatedData._id, updatedData);
+      setOrganizers(prev => 
+        prev.map(org => 
+          org._id === updatedData._id ? updatedOrganizer : org
         )
       );
-      setIsEditing(false);
-      setEditingOrganizerId(null);
+      toast.success('Cập nhật thành công!');
     } catch (error) {
-      console.error('Lỗi khi cập nhật thông tin ban tổ chức:', error);
-      // Xử l lỗi (ví dụ: hiển thị thông báo lỗi cho người dùng)
-    }
-  };
-
-  const handleEditCancel = () => {
-    setIsEditing(false);
-  };
-
-  const handleEdit = (id: string) => {
-    const organizerToEdit = organizers.find(org => org._id === id);
-    if (organizerToEdit) {
-      if (organizerToEdit.status === 'pending') {
-        setEditingOrganizerId(id);
-        setOrganizerData({
-          name: organizerToEdit.name, // Keep the original name
-          email: organizerToEdit.email, // Keep the original email
-          description: organizerToEdit.description,
-          price: organizerToEdit.price,
-          status: organizerToEdit.status,
-        });
-        setIsEditing(true);
-      } else {
-        alert('Chỉ có thể chỉnh sửa phiếu đang ở trạng thái chờ duyệt.');
-      }
-    } else {
-      console.error('Không tìm thấy ban tổ chức với ID:', id);
-    }
-  };
-
-  const handleCancel = async (id: string) => {
-    const organizerToCancel = organizers.find(org => org._id === id);
-    if (organizerToCancel) {
-      if (organizerToCancel.status === 'pending') {
-        if (confirm('Bạn có chắc chắn muốn hủy đăng ký này không?')) {
-          try {
-            const response = await fetch('/api/cancelOrganizer', {
-              method: 'PUT',
-              headers: {
-                'Content-Type': 'application/json',
-              },
-              body: JSON.stringify({ id }),
-            });
-            if (!response.ok) {
-              const errorText = await response.text();
-              console.error('Server response:', errorText);
-              throw new Error('Lỗi khi hủy đăng ký');
-            }
-            const updatedOrganizer = await response.json();
-            setOrganizers(prevOrganizers => 
-              prevOrganizers.map(org => 
-                org._id === id ? updatedOrganizer : org
-              )
-            );
-            alert('Đã hủy đăng ký thành công.');
-          } catch (error) {
-            console.error('Lỗi khi hủy đăng ký:', error);
-            alert('Có lỗi xảy ra khi hủy đăng ký. Vui lòng thử lại sau.');
-          }
-        }
-      } else {
-        alert('Chỉ có thể hủy đăng ký đang ở trạng thái chờ duyệt.');
-      }
-    } else {
-      console.error('Không tìm thấy ban tổ chức với ID:', id);
+      console.error('Lỗi khi cập nhật:', error);
+      toast.error('Có lỗi xảy ra khi cập nhật');
     }
   };
 
   return (
-    <div className="container mx-auto py-10">
-      <div className="flex justify-between items-center mb-5">
-        <h1 className="text-2xl font-bold">Đăng ký ban tổ chức sự kiện</h1>
-        <Button asChild variant="outline">
-          <Link href="/" className="flex items-center gap-2">
-            <FaHome /> Quay về trang chủ
-          </Link>
-        </Button>
-      </div>
-      <Button onClick={() => setShowForm(!showForm)}>
-        {showForm ? 'Ẩn form' : 'Tạo sự kiện ban tổ chức'}
-      </Button>
-      {showForm && <OrganizerEventForm setOrganizers={setOrganizers} userData={userData} />}
-      {loading && <p>Đang tải...</p>}
-      {error && <p className="text-red-500">{error}</p>}
-      {!loading && !error && (
-        <OrganizerList 
-          organizers={organizers} 
-          onEdit={handleEdit} 
-          onCancel={handleCancel}
-          onViewDashboard={(id) => router.push(`/admin/dashboard?organizerId=${id}`)}
-        />
-      )}
-      {isEditing && (
-        <div className="mt-8 bg-white p-6 rounded-lg shadow-md">
-          <h2 className="text-2xl font-semibold mb-4">Chỉnh sửa thông tin ban tổ chức</h2>
-          <EditOrganizerForm
-            initialData={organizerData}
-            onSubmit={handleEditSubmit}
-            onCancel={handleEditCancel}
-            organizerId={editingOrganizerId}
+    <>
+      <Header />
+      
+      <main className="flex-1">
+        <section className="bg-primary-50 bg-dotted-pattern bg-cover bg-center py-5 md:py-10">
+          <div className="wrapper flex items-center justify-center sm:justify-between">
+            <h3 className='h3-bold text-center sm:text-left'>Đăng ký Ban tổ chức</h3>
+            <Button asChild size="lg" className="button hidden sm:flex">
+              <Link href="/">
+                Quay về trang chủ
+              </Link>
+            </Button>
+          </div>
+        </section>
+
+        <div className="wrapper my-8">
+          <OrganizerEventForm 
+            setOrganizers={setOrganizers}
+            userData={userData}
           />
+          
+          {loading ? (
+            <div>Đang tải...</div>
+          ) : error ? (
+            <div className="text-red-500">{error}</div>
+          ) : (
+            <OrganizerList
+              organizers={organizers}
+              onEdit={handleEdit}
+              onCancel={(id) => {/* Xử lý hủy */}}
+              onViewDashboard={(id) => {/* Xử lý xem dashboard */}}
+            />
+          )}
         </div>
-      )}
-    </div>
+      </main>
+
+      <Footer />
+    </>
   );
 };
 
