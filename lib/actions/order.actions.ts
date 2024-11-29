@@ -32,7 +32,7 @@ export const checkoutOrder = async (order: OrderData) => {
         {
           price_data: {
             currency: 'vnd',
-            unit_amount: Number(order.price) * 1000,
+            unit_amount: Number(order.price) * 100,
             product_data: {
               name: order.eventTitle,
               description: `Vé ${order.seatType.name} - Ghế số ${order.selectedSeat + 1}`
