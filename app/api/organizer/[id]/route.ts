@@ -39,3 +39,30 @@ export async function PUT(
     );
   }
 }
+
+export async function GET(
+  request: Request,
+  { params }: { params: { id: string } }
+) {
+  try {
+    await connectToDatabase();
+    const id = params.id;
+    
+    const organizer = await Organizer.findById(id);
+    
+    if (!organizer) {
+      return NextResponse.json(
+        { error: 'Không tìm thấy ban tổ chức' },
+        { status: 404 }
+      );
+    }
+
+    return NextResponse.json(organizer);
+  } catch (error) {
+    console.error('Lỗi khi lấy thông tin ban tổ chức:', error);
+    return NextResponse.json(
+      { error: 'Lỗi khi lấy thông tin ban tổ chức' },
+      { status: 500 }
+    );
+  }
+}
