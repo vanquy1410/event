@@ -4,6 +4,7 @@ import { Button } from '@/components/ui/button';
 import EditOrganizerForm from '@/components/shared/EditOrganizerForm';
 import { toast } from 'react-hot-toast';
 import OrganizerDetailModal from '@/components/shared/OrganizerDetailModal';
+import { useRouter } from 'next/navigation';
 
 interface OrganizerListProps {
   organizers: IOrganizer[];
@@ -16,6 +17,7 @@ const OrganizerList: React.FC<OrganizerListProps> = ({ organizers, onEdit, onCan
   const [editingOrganizer, setEditingOrganizer] = useState<IOrganizer | null>(null);
   const [selectedOrganizer, setSelectedOrganizer] = useState<IOrganizer | null>(null);
   const [isDetailModalOpen, setIsDetailModalOpen] = useState(false);
+  const router = useRouter();
 
   const handleEdit = (organizer: IOrganizer) => {
     const organizerWithDates = {
@@ -116,7 +118,7 @@ const OrganizerList: React.FC<OrganizerListProps> = ({ organizers, onEdit, onCan
                   <div className="flex space-x-2">
                     {organizer.status === 'approved' ? (
                       <Button
-                        onClick={() => onViewDashboard(organizer._id)}
+                        onClick={() => router.push(`/organizer/dashboard/${organizer._id}`)}
                         className="bg-blue-500 hover:bg-blue-600"
                         size="sm"
                       >

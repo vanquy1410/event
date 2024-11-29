@@ -3,7 +3,7 @@ import { Poppins } from 'next/font/google'
 import './globals.css'
 import { ClerkProvider } from '@clerk/nextjs'
 import ChatbotScript from '@/components/shared/Chatbot'
-import { Toaster } from 'react-hot-toast';
+import { Toaster } from 'sonner';
 
 const poppins = Poppins({
   subsets: ['latin'],
@@ -30,7 +30,7 @@ export default function RootLayout({
         <body className={poppins.variable}>
           {children}
           <ChatbotScript />
-          <Toaster />
+          <Toaster position="top-center" richColors />
         </body>
       </html>
     </ClerkProvider>

@@ -15,6 +15,8 @@ export interface IOrganizer {
   participantLimit: number;
   status: 'pending' | 'approved' | 'rejected' | 'cancelled';
   documents: string[];
+  digitalSignature?: string;
+  contractUrl?: string;
 }
 
 const OrganizerSchema = new Schema<IOrganizer>({
@@ -34,7 +36,9 @@ const OrganizerSchema = new Schema<IOrganizer>({
     enum: ['pending', 'approved', 'rejected'],
     default: 'pending'
   },
-  documents: [{ type: String }]
+  documents: [{ type: String }],
+  digitalSignature: { type: String },
+  contractUrl: { type: String }
 });
 
 let Organizer: Model<IOrganizer>;
