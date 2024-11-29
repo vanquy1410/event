@@ -125,7 +125,9 @@ const TicketList = ({ userId, orders, page, totalPages }: TicketListProps) => {
               </td>
               <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{order.event.title}</td>
               <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{order.event.description.substring(0, 50)}...</td>
-              <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{order.totalAmount} đ</td>
+              <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                ${Number(order.totalAmount).toFixed(2)}
+              </td>
               <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{formatDateTime(order.event.startDateTime).dateTime}</td>
               <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{formatDateTime(order.event.endDateTime).dateTime}</td>
               <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
