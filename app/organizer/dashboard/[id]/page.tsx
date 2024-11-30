@@ -9,6 +9,7 @@ import { useRouter } from 'next/navigation';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { toast } from "sonner";
 import { IOrganizer } from '@/lib/database/models/organizer.model';
+import PaymentForm from '@/components/shared/PaymentForm';
 
 export default function OrganizerDashboard({ params }: { params: { id: string } }) {
   const [organizer, setOrganizer] = useState<IOrganizer | null>(null);
@@ -119,6 +120,16 @@ export default function OrganizerDashboard({ params }: { params: { id: string } 
               )}
             </div>
           </div>
+        </div>
+
+        <div className="bg-white rounded-lg shadow-lg p-6">
+          <h2 className="text-xl font-semibold mb-4">Thanh toán</h2>
+          <PaymentForm
+            organizerId={params.id}
+            eventTitle={organizer.eventTitle}
+            price={organizer.price}
+            signature={organizer.digitalSignature || null}
+          />
         </div>
       </div>
 
