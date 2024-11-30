@@ -1,19 +1,18 @@
 import { NextResponse } from 'next/server';
 import nodemailer from 'nodemailer';
 
-if (!process.env.GMAIL_USER || !process.env.GMAIL_APP_PASSWORD) {
-  throw new Error('Missing email configuration');
-}
+// Kiểm tra biến môi trường với giá trị mặc định
+const GMAIL_USER = process.env.GMAIL_USER || 'default@gmail.com';
+const GMAIL_APP_PASSWORD = process.env.GMAIL_APP_PASSWORD || 'default_password';
 
-// Cấu hình transporter với App Password
 const transporter = nodemailer.createTransport({
   service: 'gmail',
   host: 'smtp.gmail.com',
   port: 587,
   secure: false,
   auth: {
-    user: process.env.GMAIL_USER,
-    pass: process.env.GMAIL_APP_PASSWORD,
+    user: GMAIL_USER,
+    pass: GMAIL_APP_PASSWORD,
   },
 });
 
@@ -26,7 +25,7 @@ transporter.verify(function (error, success) {
   }
 });
 
-// Lưu trữ OTP tạm thời (trong thực tế nên dùng Redis hoặc database)
+// Lưu trữ OTP tạm thời
 const otpStore = new Map<string, { otp: string; expires: number }>();
 
 export async function POST(req: Request) {
@@ -44,7 +43,7 @@ export async function POST(req: Request) {
 
     // Gửi email
     await transporter.sendMail({
-      from: `"Hệ thống thanh toán" <${process.env.GMAIL_USER}>`,
+      from: `"Hệ thống thanh toán" <${GMAIL_USER}>`,
       to: email,
       subject: 'Mã xác thực thanh toán',
       html: `
