@@ -117,13 +117,22 @@ const OrganizerList: React.FC<OrganizerListProps> = ({ organizers, onEdit, onCan
                 <td className="py-3 px-4 border-b">
                   <div className="flex space-x-2">
                     {organizer.status === 'approved' ? (
-                      <Button
-                        onClick={() => router.push(`/organizer/dashboard/${organizer._id}`)}
-                        className="bg-blue-500 hover:bg-blue-600"
-                        size="sm"
-                      >
-                        Xem Dashboard
-                      </Button>
+                      <>
+                        <Button
+                          onClick={() => router.push(`/organizer/dashboard/${organizer._id}`)}
+                          className="bg-blue-500 hover:bg-blue-600"
+                          size="sm"
+                        >
+                          Xem hợp đồng và thanh toán
+                        </Button>
+                        <Button
+                          onClick={() => router.push(`/admin/dashboard/${organizer._id}`)}
+                          className="bg-green-500 hover:bg-green-600"
+                          size="sm"
+                        >
+                          Xem Dashboard
+                        </Button>
+                      </>
                     ) : (
                       <>
                         <Button
