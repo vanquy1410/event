@@ -36,9 +36,52 @@ const CheckoutForm = ({
     email: '',
   });
 
+  const [otp, setOtp] = useState('');
+  const [isOtpSent, setIsOtpSent] = useState(false);
+  const [isOtpVerified, setIsOtpVerified] = useState(false);
+
+  const handleSendOtp = async () => {
+    try {
+      const response = await fetch('/api/send-otp', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ email: paymentInfo.email }),
+      });
+
+      const data = await response.json();
+      
+      if (response.ok) {
+        setIsOtpSent(true);
+        toast.success('Mã OTP đã được gửi đến email của bạn');
+      } else {
+        throw new Error(data.error);
+      }
+    } catch (error: any) {
+      toast.error(error.message || 'Không thể gửi mã OTP');
+    }
+  };
+
+  const handleVerifyOtp = async () => {
+    // Trong thực tế, bạn sẽ cần verify OTP với server
+    // Đây là ví dụ đơn giản
+    if (otp.length === 6) {
+      setIsOtpVerified(true);
+      toast.success('Xác thực OTP thành công');
+    } else {
+      toast.error('Mã OTP không hợp lệ');
+    }
+  };
+
   const handlePayment = async (e: React.FormEvent) => {
     e.preventDefault();
     
+    if (!isOtpVerified) {
+      toast.error('Vui lòng xác thực OTP trước khi thanh toán');
+      return;
+    }
+
     if (!stripe || !elements) {
       toast.error('Stripe chưa được khởi tạo');
       return;
@@ -142,14 +185,42 @@ const CheckoutForm = ({
             onChange={(e) => setPaymentInfo(prev => ({ ...prev, name: e.target.value }))}
             required
           />
-          <Input
-            name="email"
-            type="email"
-            placeholder="Email"
-            value={paymentInfo.email}
-            onChange={(e) => setPaymentInfo(prev => ({ ...prev, email: e.target.value }))}
-            required
-          />
+          <div className="flex gap-2">
+            <Input
+              name="email"
+              type="email"
+              placeholder="Email"
+              value={paymentInfo.email}
+              onChange={(e) => setPaymentInfo(prev => ({ ...prev, email: e.target.value }))}
+              required
+            />
+            <Button 
+              type="button"
+              onClick={handleSendOtp}
+              disabled={!paymentInfo.email || isOtpVerified}
+            >
+              Gửi OTP
+            </Button>
+          </div>
+
+          {isOtpSent && !isOtpVerified && (
+            <div className="flex gap-2">
+              <Input
+                type="text"
+                placeholder="Nhập mã OTP"
+                value={otp}
+                onChange={(e) => setOtp(e.target.value)}
+                maxLength={6}
+              />
+              <Button 
+                type="button"
+                onClick={handleVerifyOtp}
+              >
+                Xác thực
+              </Button>
+            </div>
+          )}
+
           <div className="border rounded-md p-3">
             <CardElement 
               options={{
@@ -170,7 +241,7 @@ const CheckoutForm = ({
 
         <Button
           type="submit"
-          disabled={isProcessing || !stripe}
+          disabled={isProcessing || !stripe || !isOtpVerified}
           className="w-full"
         >
           {isProcessing ? 'Đang xử lý...' : 'Thanh toán ngay'}
