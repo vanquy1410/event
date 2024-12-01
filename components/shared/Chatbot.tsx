@@ -8,7 +8,7 @@ const ChatbotScript = () => {
     const script = document.createElement('script');
     //script.src = `//code.tidio.co/${process.env.TIDIO_KEY}.js`; // Thay MA_CODE_CUA_BAN bằng mã script từ Tidio
 
-    script.src = `//code.tidio.co/k0u8pjce4ezyv6s80nbxjzcgmcfva3xh.js`;
+    script.src = `//code.tidio.co/9cqxdfdqikbtf3zsqxpgtpby7ijgaxrf.js`;
     script.async = true;
     document.body.appendChild(script);
 
