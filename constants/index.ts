@@ -20,7 +20,7 @@ export const headerLinks = [
     route: '/profile',
   },
   {
-    label: 'Đăng ký ban tổ chức',
+    label: 'Đăng ký tổ chức sự kiện',
     route: '/organizer',
   },
   {

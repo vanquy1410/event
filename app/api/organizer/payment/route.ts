@@ -8,6 +8,9 @@ export async function POST(req: Request) {
     await connectToDatabase();
 
     const { organizerId, eventTitle, price, signature } = await req.json();
+    
+    // Thêm log để kiểm tra
+    console.log("Creating payment with organizerId:", organizerId);
 
     // Cập nhật trạng thái thanh toán cho organizer
     const updatedOrganizer = await Organizer.findByIdAndUpdate(
@@ -22,6 +25,7 @@ export async function POST(req: Request) {
     );
 
     if (!updatedOrganizer) {
+      console.log("Không tìm thấy organizer với ID:", organizerId);
       return NextResponse.json(
         { error: 'Không tìm thấy thông tin ban tổ chức' },
         { status: 404 }
@@ -30,12 +34,14 @@ export async function POST(req: Request) {
 
     // Tạo bản ghi thanh toán mới
     const payment = await Payment.create({
-      organizerId,
+      organizerId: organizerId.toString(), // Đảm bảo organizerId là string
       eventTitle,
       amount: price,
       status: 'success',
       paymentDate: new Date()
     });
+
+    console.log("Created payment:", payment);
 
     return NextResponse.json({
       success: true,
