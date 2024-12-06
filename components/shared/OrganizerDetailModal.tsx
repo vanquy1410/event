@@ -31,7 +31,7 @@ const OrganizerDetailModal = ({ isOpen, onClose, organizer }: OrganizerDetailMod
           {/* Header cố định */}
           <div className="bg-gradient-to-r from-purple-600 to-blue-500 p-6">
             <DialogTitle className="text-2xl font-bold text-white mb-2">
-              Chi tiết phiếu đăng ký ban tổ chức
+              Chi tiết phiếu đăng ký tổ chức sự kiện
             </DialogTitle>
             <button 
               onClick={onClose}

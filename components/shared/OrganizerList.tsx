@@ -62,7 +62,7 @@ const OrganizerList: React.FC<OrganizerListProps> = ({ organizers, onEdit, onCan
 
   return (
     <div className="mt-6">
-      <h2 className="text-2xl font-bold mb-4">Danh sách phiếu đăng ký ban tổ chức</h2>
+      <h2 className="text-2xl font-bold mb-4">Danh sách phiếu đăng ký tổ chức sự kiện</h2>
       
       {editingOrganizer ? (
         <EditOrganizerForm
