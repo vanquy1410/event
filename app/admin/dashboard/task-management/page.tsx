@@ -26,6 +26,9 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { toast } from 'react-hot-toast';
+import 'tailwindcss/tailwind.css';
+import ReactQuill from 'react-quill';
+import 'react-quill/dist/quill.snow.css';
 
 
 interface User {
@@ -41,6 +44,11 @@ interface Task {
   startDate: Date;
   endDate: Date;
   status: 'pending' | 'in-progress' | 'completed';
+}
+
+interface Event {
+  _id: string;
+  name: string;
 }
 
 export default function TaskManagementPage() {
@@ -103,9 +111,15 @@ export default function TaskManagementPage() {
   };
 
   const handleDateChange = (date: Date | null, field: 'startDate' | 'endDate') => {
-    if (date) {
-      setNewTask({ ...newTask, [field]: date });
+    const today = new Date();
+    if (date && date < today) {
+      return;
     }
+    setNewTask({ ...newTask, [field]: date });
+  };
+
+  const handleDescriptionChange = (value: string) => {
+    setNewTask({ ...newTask, description: value });
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -212,9 +226,15 @@ export default function TaskManagementPage() {
     };
 
     const handleDateChange = (date: Date | null, field: 'startDate' | 'endDate') => {
-      if (date) {
-        setEditedTask({ ...editedTask, [field]: date });
+      const today = new Date();
+      if (date && date < today) {
+        return;
       }
+      setEditedTask({ ...editedTask, [field]: date });
+    };
+
+    const handleDescriptionChange = (value: string) => {
+      setEditedTask({ ...editedTask, description: value });
     };
 
     const handleSubmit = (e: React.FormEvent) => {
@@ -231,10 +251,9 @@ export default function TaskManagementPage() {
           placeholder="Tiêu đề công việc"
           className="mb-2"
         />
-        <Textarea
-          name="description"
+        <ReactQuill
           value={editedTask.description}
-          onChange={handleInputChange}
+          onChange={handleDescriptionChange}
           placeholder="Mô tả công việc"
           className="mb-2"
         />
@@ -271,59 +290,68 @@ export default function TaskManagementPage() {
     );
   };
 
+  const getShortDescription = (description: string) => {
+    return description.length > 30 ? description.substring(0, 30) + '...' : description;
+  };
+
   return (
-    <div className="p-4">
-      <h1 className="text-2xl font-bold mb-4">Quản lý công việc</h1>
+    <div className="p-4 bg-gray-100 min-h-screen">
+      <h1 className="text-2xl font-bold mb-4 text-center text-blue-600">Quản lý công việc</h1>
       
-      <Button onClick={() => setShowForm(!showForm)} className="mb-4">
+      <Button onClick={() => setShowForm(!showForm)} className="mb-4 bg-blue-500 text-white">
         {showForm ? 'Ẩn form' : 'Thêm công việc mới'}
       </Button>
 
       {showForm && (
-        <form onSubmit={handleSubmit} className="mb-8">
+        <form onSubmit={handleSubmit} className="mb-8 bg-white p-4 rounded shadow-md">
           <Input
             name="title"
             value={newTask.title}
             onChange={handleInputChange}
             placeholder="Tiêu đề công việc"
-            className="mb-2"
+            className="mb-2 border border-gray-300 p-2 rounded"
           />
-          <Textarea
-            name="description"
+          <ReactQuill
             value={newTask.description}
-            onChange={handleInputChange}
+            onChange={handleDescriptionChange}
             placeholder="Mô tả công việc"
             className="mb-2"
           />
-          <Select
-            value={newTask.assignedTo || "default"}
-            onValueChange={(value) => setNewTask(prevTask => ({ ...prevTask, assignedTo: value }))}
-          >
-            <SelectTrigger className="mb-2">
-              <SelectValue placeholder="Chọn người được giao" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="default" disabled>Chọn người được giao</SelectItem>
-              {users.map((user) => (
-                <SelectItem key={user.id} value={user.username}>
-                  {user.username}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-          <div className="flex gap-2 mb-2">
+          <div className="mb-2">
+            <Select
+              value={newTask.assignedTo || "default"}
+              onValueChange={(value) => setNewTask(prevTask => ({ ...prevTask, assignedTo: value }))}
+            >
+              <SelectTrigger className="border border-gray-300 p-2 rounded">
+                <SelectValue placeholder="Chọn người được giao" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="default" disabled>Chọn người được giao</SelectItem>
+                {users.map((user) => (
+                  <SelectItem key={user.id} value={user.username}>
+                    {user.username}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+          <div className="border border-gray-300 p-2 rounded">
+          Ngày bắt đầu
             <DatePicker
               selected={newTask.startDate}
               onChange={(date) => handleDateChange(date, 'startDate')}
               placeholderText="Ngày bắt đầu"
             />
+          </div>
+          <div className="border border-gray-300 p-2 rounded">
+          Ngày kết thúc
             <DatePicker
               selected={newTask.endDate}
               onChange={(date) => handleDateChange(date, 'endDate')}
               placeholderText="Ngày kết thúc"
             />
           </div>
-          <Button type="submit">Thêm công việc</Button>
+          <Button type="submit" className="bg-green-500 text-white">Thêm công việc</Button>
         </form>
       )}
 
@@ -331,8 +359,8 @@ export default function TaskManagementPage() {
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         {['pending', 'in-progress', 'completed'].map((status) => (
-          <div key={status} className="border p-4 rounded">
-            <h2 className="font-bold mb-2">
+          <div key={status} className="border p-4 rounded bg-white shadow-md">
+            <h2 className="font-bold mb-2 text-lg">
               {status === 'pending' && 'Chờ xử lý'}
               {status === 'in-progress' && 'Đang thực hiện'}
               {status === 'completed' && 'Hoàn thành'}
@@ -340,7 +368,7 @@ export default function TaskManagementPage() {
             {tasks
               .filter((task) => task.status === status)
               .map((task) => (
-                <div key={task._id} className="border p-2 mb-2 rounded bg-white">
+                <div key={task._id} className="border p-2 mb-2 rounded bg-gray-50 shadow-sm">
                   <div className="flex justify-between items-start mb-2">
                     <h3 className="font-bold">{task.title}</h3>
                     {status === 'pending' && (
@@ -350,7 +378,7 @@ export default function TaskManagementPage() {
                             <FaEdit />
                           </Button>
                         </DialogTrigger>
-                        <DialogContent>
+                        <DialogContent className="bg-white rounded-lg shadow-lg">
                           <DialogHeader>
                             <DialogTitle>Chỉnh sửa công việc</DialogTitle>
                           </DialogHeader>
@@ -359,19 +387,30 @@ export default function TaskManagementPage() {
                       </Dialog>
                     )}
                   </div>
-                  <p>{task.description}</p>
+                  {/* <p>{getShortDescription(task.description)}</p> */}
+                  <Dialog>
+                    <DialogTrigger asChild>
+                      <Button variant="default" className="mt-2">Xem chi tiết công việc</Button>
+                    </DialogTrigger>
+                    <DialogContent className="bg-white rounded-lg shadow-lg">
+                      <DialogHeader>
+                        <DialogTitle className="text-lg font-bold">Chi tiết công việc</DialogTitle>
+                      </DialogHeader>
+                      <div dangerouslySetInnerHTML={{ __html: task.description }} />
+                    </DialogContent>
+                  </Dialog>
                   <p>Người được giao: {task.assignedTo || 'Chưa xác định'}</p>
                   <p>Bắt đầu: {new Date(task.startDate).toLocaleDateString()}</p>
                   <p>Kết thúc: {new Date(task.endDate).toLocaleDateString()}</p>
                   <div className="mt-2 flex justify-between items-center">
                     <div>
                       {status === 'pending' && (
-                        <Button onClick={() => handleStatusChange(task._id, 'in-progress')} className="mr-2">
+                        <Button onClick={() => handleStatusChange(task._id, 'in-progress')} className="mr-2 bg-yellow-500 text-white">
                           Bắt đầu thực hiện
                         </Button>
                       )}
                       {status === 'in-progress' && (
-                        <Button onClick={() => handleStatusChange(task._id, 'completed')} className="mr-2">
+                        <Button onClick={() => handleStatusChange(task._id, 'completed')} className="mr-2 bg-blue-500 text-white">
                           Hoàn thành
                         </Button>
                       )}
@@ -381,11 +420,11 @@ export default function TaskManagementPage() {
                     </div>
                     <AlertDialog>
                       <AlertDialogTrigger asChild>
-                        <Button variant="destructive" title="Xóa">
+                        <Button variant="destructive" title="Xóa" className="bg-red-500 text-white">
                           <FaTrash />
                         </Button>
                       </AlertDialogTrigger>
-                      <AlertDialogContent>
+                      <AlertDialogContent className="bg-white rounded-lg shadow-lg">
                         <AlertDialogHeader>
                           <AlertDialogTitle>Bạn có chắc chắn muốn xóa?</AlertDialogTitle>
                           <AlertDialogDescription>

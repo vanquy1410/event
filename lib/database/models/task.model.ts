@@ -7,6 +7,7 @@ export interface ITask extends Document {
   startDate: Date;
   endDate: Date;
   status: 'pending' | 'in-progress' | 'completed';
+  labels: string[];
 }
 
 const TaskSchema = new Schema<ITask>({
@@ -16,6 +17,7 @@ const TaskSchema = new Schema<ITask>({
   startDate: { type: Date, required: true },
   endDate: { type: Date, required: true },
   status: { type: String, enum: ['pending', 'in-progress', 'completed'], default: 'pending' },
+  labels: [{ type: String }],
 }, { timestamps: true });
 
 const Task = models.Task || model<ITask>('Task', TaskSchema);
