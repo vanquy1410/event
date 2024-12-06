@@ -126,7 +126,7 @@ const OrganizerList: React.FC<OrganizerListProps> = ({ organizers, onEdit, onCan
                           Xem hợp đồng và thanh toán
                         </Button>
                         <Button
-                          onClick={() => router.push(`/admin/dashboard/${organizer._id}`)}
+                          onClick={() => router.push(`/organizer-dashboard`)}
                           className="bg-green-500 hover:bg-green-600"
                           size="sm"
                         >
