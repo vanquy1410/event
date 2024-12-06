@@ -62,7 +62,7 @@ const OrganizerList: React.FC<OrganizerListProps> = ({ organizers, onEdit, onCan
 
   return (
     <div className="mt-6">
-      <h2 className="text-2xl font-bold mb-4">Danh sách phiếu đăng ký ban tổ chức</h2>
+      <h2 className="text-2xl font-bold mb-4">Danh sách phiếu đăng ký tổ chức sự kiện</h2>
       
       {editingOrganizer ? (
         <EditOrganizerForm
@@ -126,7 +126,7 @@ const OrganizerList: React.FC<OrganizerListProps> = ({ organizers, onEdit, onCan
                           Xem hợp đồng và thanh toán
                         </Button>
                         <Button
-                          onClick={() => router.push(`/admin/dashboard/${organizer._id}`)}
+                          onClick={() => router.push(`/organizer-dashboard`)}
                           className="bg-green-500 hover:bg-green-600"
                           size="sm"
                         >

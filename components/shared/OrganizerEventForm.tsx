@@ -78,7 +78,7 @@ const OrganizerEventForm: React.FC<OrganizerEventFormProps> = ({ setOrganizers, 
       const newOrganizer = await response.json();
       setOrganizers(prev => [...prev, newOrganizer]);
       form.reset();
-      toast.success('Đăng ký ban tổ chức thành công! Phiếu đang ở trạng thái chờ duyệt.', {
+      toast.success('Đăng ký tổ chức sự kiện thành công! Phiếu đang ở trạng thái chờ duyệt.', {
         duration: 5000,
         position: 'top-center',
         icon: '🎉',
