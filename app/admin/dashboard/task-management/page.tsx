@@ -88,14 +88,12 @@ export default function TaskManagementPage() {
     try {
       const response = await fetch('/api/users');
       const data = await response.json();
-      console.log('Raw user data:', data);
       if (Array.isArray(data) && data.length > 0) {
         const formattedUsers = data.map(user => ({
           id: user._id || user.id,
           username: user.username || `${user.firstName} ${user.lastName}`.trim()
         }));
         setUsers(formattedUsers);
-        console.log('Fetched users:', formattedUsers);
       } else {
         console.log('No users found or invalid data format');
         setUsers([]);
@@ -124,14 +122,12 @@ export default function TaskManagementPage() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    console.log('Submitting task:', newTask);
     const response = await fetch('/api/tasks', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(newTask),
     });
     if (response.ok) {
-      console.log('Task added successfully');
       fetchTasks();
       setNewTask({
         title: '',
