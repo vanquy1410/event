@@ -10,6 +10,7 @@ import { getReviewsByEvent } from '@/lib/actions/review.actions';
 import { auth, currentUser } from "@clerk/nextjs";
 import SeatingMap from '@/components/shared/SeatingMap';
 import SeatingChart from '@/components/shared/SeatingChart';
+import ContentEditor from '@/components/shared/ContentEditor';
 
 const EventDetails = async ({ params, searchParams }: SearchParamProps) => {
   const event = await getEventById(params.id);
@@ -51,7 +52,7 @@ const EventDetails = async ({ params, searchParams }: SearchParamProps) => {
             <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
               <div className="flex gap-3">
                 <p className="p-bold-20 rounded-full bg-green-500/10 px-5 py-2 text-green-700">
-                {event.isFree ? 'FREE' : `$${event.price}`}
+                {event.isFree ? 'FREE' : `${event.price} đ`}
                 </p>
                 <p className="p-medium-16 rounded-full bg-grey-500/10 px-4 py-2.5 text-grey-500">
                   {event.category?.name || 'Uncategorized'}
@@ -98,8 +99,7 @@ const EventDetails = async ({ params, searchParams }: SearchParamProps) => {
 
           <div className="flex flex-col gap-2">
             <p className="p-bold-20 text-grey-600">Nội dung:</p>
-            <p className="p-medium-16 lg:p-regular-18">{event.description}</p>
-            {/* <p className="p-medium-16 lg:p-regular-18 truncate text-primary-500 underline">{event.url}</p> */}
+            <ContentEditor value={event.description} />
           </div>
         </div>
       </div>

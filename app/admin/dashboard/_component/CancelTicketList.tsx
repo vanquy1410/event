@@ -93,7 +93,7 @@ export default function CanceledTicketsPage() {
                       <AlertDialogTrigger asChild>
                         <Button variant="outline">Xóa</Button>
                       </AlertDialogTrigger>
-                      <AlertDialogContent>
+                      <AlertDialogContent className="bg-white rounded-lg shadow-lg">
                         <AlertDialogHeader>
                           <AlertDialogTitle>Xóa vé đã hủy</AlertDialogTitle>
                           <AlertDialogDescription>Bạn có chắc chắn muốn xóa vé đã hủy này khỏi danh sách hiển thị không?</AlertDialogDescription>

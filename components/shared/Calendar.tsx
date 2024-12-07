@@ -21,11 +21,23 @@ const Calendar: React.FC<CalendarProps> = ({ events, selectedDate, onDateChange 
     return {
       style: {
         backgroundColor: '#7857FF',
-        borderRadius: '5px',
+        borderRadius: '8px',
         opacity: 0.8,
         color: 'white',
         border: '0px',
-        display: 'block'
+        display: 'block',
+        whiteSpace: 'nowrap',
+        overflow: 'hidden',
+        textOverflow: 'ellipsis',
+        maxWidth: '180px', // Giới hạn chiều rộng của sự kiện
+      }
+    };
+  };
+
+  const dayPropGetter = (date: Date) => {
+    return {
+      style: {
+        position: 'relative',
       }
     };
   };
@@ -38,7 +50,7 @@ const Calendar: React.FC<CalendarProps> = ({ events, selectedDate, onDateChange 
     ...event,
     start: new Date(event.startDateTime),
     end: new Date(event.endDateTime),
-    title: event.title
+    title: event.title,
   }));
 
   return (
@@ -50,6 +62,7 @@ const Calendar: React.FC<CalendarProps> = ({ events, selectedDate, onDateChange 
         endAccessor="end"
         style={{ height: '100%' }}
         eventPropGetter={eventStyleGetter}
+        dayPropGetter={dayPropGetter}
         onSelectEvent={handleEventClick}
         views={['month']}
         date={selectedDate}

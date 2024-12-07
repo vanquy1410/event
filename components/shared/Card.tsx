@@ -53,7 +53,7 @@ const Card = ({ event, hasOrderLink, hidePrice, orderId, onFavoriteChange }: Car
           {!hidePrice && event.isFree !== undefined && event.price !== undefined && (
             <div className="flex gap-2">
               <span className="p-semibold-14 w-min rounded-full bg-green-100 px-4 py-1 text-green-60">
-              {event.isFree ? 'FREE' : `$${event.price}`}
+              {event.isFree ? 'FREE' : `${event.price} đ`}
               </span>
               {event.category?.name && (
                 <p className="p-semibold-14 w-min rounded-full bg-grey-500/10 px-4 py-1 text-grey-500 line-clamp-1">

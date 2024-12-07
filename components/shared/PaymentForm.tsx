@@ -256,7 +256,7 @@ const PaymentForm: React.FC<PaymentFormProps> = (props) => {
   const options: StripeElementsOptions = {
     mode: 'payment',
     currency: 'vnd',
-    amount: props.price * 100,
+    amount: props.price * 1000,
   };
 
   return (

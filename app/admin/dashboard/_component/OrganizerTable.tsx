@@ -35,7 +35,7 @@ export default function OrganizerTable({ organizers, onStatusUpdate, onSearch, o
             {status === 'approved' ? 'Chấp nhận' : 'Từ chối'}
           </Button>
         </AlertDialogTrigger>
-        <AlertDialogContent>
+        <AlertDialogContent className="bg-white rounded-lg shadow-lg">
           <AlertDialogHeader>
             <AlertDialogTitle>Xác nhận thay đổi trạng thái</AlertDialogTitle>
             <AlertDialogDescription>

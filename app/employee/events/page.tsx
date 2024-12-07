@@ -51,12 +51,13 @@ const EmployeeEventsPage = () => {
 
       <section className="wrapper my-8">
         <EventTable 
-          events={events} 
-          onDelete={handleDelete} 
+          events={events}
+          onDelete={handleDelete}
           onSearch={setQuery}
           onCategoryChange={setCategory}
-          filterType="all"
-        />
+          filterType="all" currentPage={0} totalPages={0} onPageChange={function (page: number): void {
+            throw new Error('Function not implemented.');
+          } }        />
       </section>
       {error && <p className="text-red-500">{error}</p>}
     </>

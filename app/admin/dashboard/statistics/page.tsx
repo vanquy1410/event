@@ -19,7 +19,7 @@ export default async function StatisticsPage() {
         <StatisticsCard
           title="Sự kiện phổ biến nhất"
           value={popularEvent.name}
-          subValue={`${popularEvent.participants} ngưi tham gia`}
+          subValue={`${popularEvent.participants} người tham gia`}
         />
         <StatisticsCard
           title="Tổng số đơn hàng"

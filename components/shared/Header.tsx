@@ -8,7 +8,7 @@ import NotificationDropdown from "./NotificationDropdown"
 
 const Header = () => {
   return (
-    <header className="w-full border-b">
+    <header className="w-full border-b bg-violet-400 py-8">
       <div className="wrapper flex items-center justify-between">
         <div className="flex items-center gap-4">
           <Link href="/" className="w-36">

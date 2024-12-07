@@ -11,7 +11,7 @@ import { eventDefaultValues } from "@/constants"
 import Dropdown from "./Dropdown"
 import { Textarea } from "@/components/ui/textarea"
 import { FileUploader } from "./FileUploader"
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import Image from "next/image"
 import DatePicker from "react-datepicker";
 
@@ -20,7 +20,14 @@ import { Checkbox } from "../ui/checkbox"
 import { useRouter } from "next/navigation"
 import { createEvent, updateEvent } from "@/lib/actions/event.actions"
 import { IEvent } from "@/lib/database/models/event.model"
+import dynamic from 'next/dynamic';
+import 'react-quill/dist/quill.snow.css';
 
+// Khai báo ReactQuill
+const ReactQuill = dynamic(() => import('react-quill'), {
+  ssr: false,
+  loading: () => <p>Please wait for loading…</p>,
+});
 
 type EventFormProps = {
   userId: string
@@ -168,7 +175,11 @@ const EventForm = ({ userId, type, event, eventId }: EventFormProps) => {
               render={({ field }) => (
                 <FormItem className="w-full">
                   <FormControl className="h-72">
-                    <Textarea placeholder="Mô tả" {...field} className="textarea rounded-2xl" />
+                    <ReactQuill 
+                      value={field.value} 
+                      onChange={(value) => form.setValue('description', value)} 
+                      placeholder="Mô tả"                
+                    />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -194,7 +205,8 @@ const EventForm = ({ userId, type, event, eventId }: EventFormProps) => {
               )}
             />
         </div>
-
+        <div></div>
+        <div></div>
         <div className="flex flex-col gap-5 md:flex-row">
           <FormField
               control={form.control}
@@ -238,7 +250,14 @@ const EventForm = ({ userId, type, event, eventId }: EventFormProps) => {
                       <p className="ml-3 whitespace-nowrap text-grey-600">Ngày bắt đầu:</p>
                       <DatePicker 
                         selected={field.value} 
-                        onChange={(date: Date) => field.onChange(date)} 
+                        onChange={(date: Date) => {
+                          const today = new Date();
+                          if (date < today) {
+                            alert("Ngày bắt đầu không được nhỏ hơn ngày hiện tại.");
+                            return;
+                          }
+                          field.onChange(date);
+                        }} 
                         showTimeSelect
                         timeInputLabel="Time:"
                         dateFormat="MM/dd/yyyy h:mm aa"
@@ -269,7 +288,14 @@ const EventForm = ({ userId, type, event, eventId }: EventFormProps) => {
                       <p className="ml-3 whitespace-nowrap text-grey-600">Ngày kết thúc:</p>
                       <DatePicker 
                         selected={field.value} 
-                        onChange={(date: Date) => field.onChange(date)} 
+                        onChange={(date: Date) => {
+                          const startDate = form.getValues("startDateTime");
+                          if (date < new Date(startDate)) {
+                            alert("Ngày kết thúc không được nhỏ hơn ngày bắt đầu.");
+                            return;
+                          }
+                          field.onChange(date);
+                        }} 
                         showTimeSelect
                         timeInputLabel="Time:"
                         dateFormat="MM/dd/yyyy h:mm aa"
@@ -364,7 +390,7 @@ const EventForm = ({ userId, type, event, eventId }: EventFormProps) => {
                       alt="user"
                       width={24}
                       height={24}
-                      className="filter-grey"
+                      // className="filter-grey"
                     />
                     <Input 
                       type="number" 
