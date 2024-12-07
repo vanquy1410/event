@@ -3,26 +3,13 @@
 import { useState, useEffect } from 'react';
 import { useUser } from '@clerk/nextjs';
 import { Button } from '@/components/ui/button';
-import { DatePicker } from '@/components/ui/date-picker';
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-  AlertDialogTrigger,
-} from "@/components/ui/alert-dialog";
-import { FaTrash } from 'react-icons/fa';
-import { toast } from 'react-hot-toast';
+import { Textarea } from '@/components/ui/textarea';
 import { Calendar, momentLocalizer } from 'react-big-calendar';
 import moment from 'moment';
 import 'react-big-calendar/lib/css/react-big-calendar.css';
-import { Textarea } from '@/components/ui/textarea';
 import ReactQuill from 'react-quill';
 import 'react-quill/dist/quill.snow.css';
+import { toast } from 'react-hot-toast';
 import {
   Dialog,
   DialogContent,
@@ -51,41 +38,6 @@ interface Note {
 
 const localizer = momentLocalizer(moment);
 
-const messages = {
-  allDay: 'Cả ngày',
-  previous: 'Trc',
-  next: 'Sau',
-  today: 'Hôm nay',
-  month: 'Tháng',
-  week: 'Tuần',
-  day: 'Ngày',
-  agenda: 'Lịch công việc',
-  date: 'Ngày',
-  time: 'Thời gian',
-  event: 'S kiện',
-  noEventsInRange: 'Không có sự kiện nào trong khoảng thời gian này.',
-  showMore: (total: number) => `+ Xem thêm (${total})`,
-  sunday: 'Chủ Nhật',
-  monday: 'Thứ Hai',
-  tuesday: 'Thứ Ba',
-  wednesday: 'Thứ Tư',
-  thursday: 'Thứ Năm',
-  friday: 'Thứ Sáu',
-  saturday: 'Thứ Bảy',
-};
-
-const eventStyleGetter = (event: any) => {
-  let style = {
-    backgroundColor: event.resource === 'task' ? '#3174ad' : '#4caf50',
-    borderRadius: '5px',
-    opacity: 0.8,
-    color: 'white',
-    border: '0px',
-    display: 'block'
-  };
-  return { style };
-};
-
 export default function EmployeeTasksPage() {
   const { user, isLoaded } = useUser();
   const [tasks, setTasks] = useState<Task[]>([]);
@@ -107,10 +59,8 @@ export default function EmployeeTasksPage() {
       return;
     }
     try {
-      console.log('Fetching tasks for user:', user.username);
       const response = await fetch(`/api/tasks?assignedTo=${user.username}`);
       const data = await response.json();
-      console.log('API Response:', data);
       if (Array.isArray(data)) {
         setTasks(data);
       } else {
@@ -188,8 +138,6 @@ export default function EmployeeTasksPage() {
       }
 
       const result = await response.json();
-      
-      // Cập nhật ID của ghi chú từ server và chuyển đổi date thành đối tượng Date
       const savedNote: Note = {
         ...newNoteObject,
         id: result.noteId,
@@ -199,8 +147,6 @@ export default function EmployeeTasksPage() {
       setNotes([...notes, savedNote]);
       setNewNote('');
       toast.success('Ghi chú đã được lưu thành công');
-      
-      // Gọi lại fetchNotes để cập nhật danh sách ghi chú từ server
       await fetchNotes();
     } catch (error) {
       console.error('Lỗi khi lưu ghi chú:', error);
@@ -288,41 +234,9 @@ export default function EmployeeTasksPage() {
                     </div>
                   </div>
                 </div>
-              ))}
+              ))} 
           </div>
         ))}
-      </div>
-
-      <div className="mb-8">
-        <h2 className="text-xl font-semibold mb-4">Lịch công việc</h2>
-        <Calendar
-          localizer={localizer}
-          events={calendarEvents}
-          startAccessor="start"
-          endAccessor="end"
-          style={{ height: 500 }}
-          messages={messages}
-          formats={{
-            monthHeaderFormat: (date: Date) => moment(date).format('MMMM YYYY'),
-            dayFormat: (date: Date, culture: string, localizer: any) =>
-              localizer.format(date, 'dddd', culture),
-            dayHeaderFormat: (date: Date) => moment(date).format('dddd DD/MM'),
-            dayRangeHeaderFormat: ({ start, end }: { start: Date; end: Date }) =>
-              `${moment(start).format('D MMMM')} - ${moment(end).format('D MMMM YYYY')}`,
-          }}
-          views={['month', 'week', 'day', 'agenda']}
-          eventPropGetter={eventStyleGetter}
-        />
-        <div className="mt-4 flex items-center justify-start space-x-4">
-          <div className="flex items-center">
-            <div className="w-4 h-4 bg-[#3174ad] mr-2"></div>
-            <span>Công việc</span>
-          </div>
-          <div className="flex items-center">
-            <div className="w-4 h-4 bg-[#4caf50] mr-2"></div>
-            <span>Ghi chú</span>
-          </div>
-        </div>
       </div>
 
       <div className="mb-8">
