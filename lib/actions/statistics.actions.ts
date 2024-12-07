@@ -2,10 +2,11 @@ import { connectToDatabase } from '@/lib/database';
 import Event from '@/lib/database/models/event.model';
 import Order from '@/lib/database/models/order.model';
 import User from '@/lib/database/models/user.model';
+import Category from '@/lib/database/models/category.model';
 
 export async function getMostPopularEvent() {
   await connectToDatabase();
-  const popularEvent = await Event.findOne().sort('-totalParticipants').limit(1);
+  const popularEvent = await Event.findOne().sort('-currentParticipants').limit(1);
   
   const chartData = await Event.aggregate([
     { $sort: { totalParticipants: -1 } },
@@ -15,7 +16,7 @@ export async function getMostPopularEvent() {
 
   return {
     name: popularEvent.title,
-    participants: popularEvent.totalParticipants,
+    participants: popularEvent.currentParticipants,
     chartData
   };
 }

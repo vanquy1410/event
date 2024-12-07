@@ -27,7 +27,7 @@ export default function OrderTable({ orders, onDelete, onSearch }: OrderTablePro
             <FaTrash />
           </Button>
         </AlertDialogTrigger>
-        <AlertDialogContent>
+        <AlertDialogContent className="bg-white rounded-lg shadow-lg">
           <AlertDialogHeader>
             <AlertDialogTitle>Bạn có chắc chắn muốn xóa?</AlertDialogTitle>
             <AlertDialogDescription>

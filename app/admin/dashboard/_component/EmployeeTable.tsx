@@ -28,7 +28,7 @@ export default function EmployeeTable({ employees, onDelete, onSearch }: Employe
             <FaTrash />
           </Button>
         </AlertDialogTrigger>
-        <AlertDialogContent>
+        <AlertDialogContent className="bg-white rounded-lg shadow-lg">
           <AlertDialogHeader>
             <AlertDialogTitle>Bạn có chắc chắn muốn xóa?</AlertDialogTitle>
             <AlertDialogDescription>

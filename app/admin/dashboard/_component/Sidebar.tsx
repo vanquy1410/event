@@ -24,7 +24,7 @@ const navItems = [
   { href: "/admin/dashboard/order-management", label: "Quản lý đơn hàng", icon: FaShoppingCart },
   { href: "/admin/dashboard/employee-management", label: "Quản lý nhân viên", icon: FaUserTie },
   { href: "/admin/dashboard/contact-form-management", label: "Quản lý form liên hệ", icon: FaAddressBook },
-  { href: "/admin/dashboard/organizer-management", label: "Quản lý ban tổ chức", icon: FaSitemap },
+  { href: "/admin/dashboard/organizer-management", label: "Quản lý tổ chức sự kiện", icon: FaSitemap },
   { href: "/admin/dashboard/resource-management", label: "Quản lý tài nguyên", icon: FaBox },
   { href: "/admin/dashboard/blog-management", label: "Quản lý Blog", icon: FaBlog },
   { 

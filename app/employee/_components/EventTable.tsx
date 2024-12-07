@@ -7,7 +7,15 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { useEffect, useState } from 'react';
 import { getAllCategories } from '@/lib/actions/category.actions';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog"
+// import ReactQuill from 'react-quill';
+import 'react-quill/dist/quill.snow.css';
 
+import dynamic from 'next/dynamic';
+
+const ReactQuill = dynamic(() => import('react-quill'), {
+  ssr: false,
+  loading: () => <p>Please wait for loading…</p>,
+});
 
 interface Event {
   _id: string;
@@ -16,7 +24,6 @@ interface Event {
   startDateTime: string;
   endDateTime: string;
   imageUrl: string;
-  url2: string;
   category: {
     name: string;
   };
@@ -24,14 +31,26 @@ interface Event {
 }
 
 interface EventTableProps {
-  events: Event[];
+  events: any[];
   onDelete: (id: string) => void;
   onSearch: (query: string) => void;
   onCategoryChange: (category: string) => void;
-  filterType: 'all' | 'ending-soon' | 'ended';
+  filterType: string;
+  currentPage: number;
+  totalPages: number;
+  onPageChange: (page: number) => void;
 }
 
-export default function EventTable({ events, onDelete, onSearch, onCategoryChange, filterType }: EventTableProps) {
+export default function EventTable({ 
+  events, 
+  onDelete, 
+  onSearch, 
+  onCategoryChange, 
+  filterType,
+  currentPage,
+  totalPages,
+  onPageChange 
+}: EventTableProps) {
   const [categories, setCategories] = useState<{_id: string, name: string}[]>([]);
 
   useEffect(() => {
@@ -50,7 +69,7 @@ export default function EventTable({ events, onDelete, onSearch, onCategoryChang
             <FaTrash />
           </Button>
         </AlertDialogTrigger>
-        <AlertDialogContent>
+        <AlertDialogContent className="bg-white rounded-lg shadow-lg">
           <AlertDialogHeader>
             <AlertDialogTitle>Bạn có chắc chắn muốn xóa?</AlertDialogTitle>
             <AlertDialogDescription>
@@ -119,7 +138,14 @@ export default function EventTable({ events, onDelete, onSearch, onCategoryChang
                 />
               </td>
               <td className="py-2 px-4 border-b">{event.title}</td>
-              <td className="py-2 px-4 border-b">{event.description.substring(0, 50)}...</td>
+              <td className="py-2 px-4 border-b">
+                <ReactQuill 
+                  value={event.description.length > 20 ? `${event.description.substring(0, 30)}...` : event.description}
+                  readOnly={true}
+                  theme="snow"
+                  modules={{ toolbar: false }}
+                />
+              </td>
               <td className="py-2 px-4 border-b">{event.category?.name || 'Uncategorized'}</td>
               <td className="py-2 px-4 border-b">{new Date(event.startDateTime).toLocaleString()}</td>
               <td className="py-2 px-4 border-b">{new Date(event.endDateTime).toLocaleString()}</td>
@@ -142,6 +168,44 @@ export default function EventTable({ events, onDelete, onSearch, onCategoryChang
           ))}
         </tbody>
       </table>
+      <div className="mt-4 flex items-center justify-between">
+        <div className="text-sm text-gray-700">
+          Trang {currentPage} / {totalPages}
+        </div>
+        
+        <div className="flex gap-2">
+          <Button
+            onClick={() => onPageChange(currentPage - 1)}
+            disabled={currentPage <= 1}
+            variant="outline"
+          >
+            Trang trước
+          </Button>
+          
+          <div className="flex gap-1">
+            {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
+              <Button
+                key={page}
+                onClick={() => onPageChange(page)}
+                variant={currentPage === page ? "default" : "outline"}
+                className={`w-10 h-10 ${
+                  currentPage === page ? "bg-primary-500 text-white" : ""
+                }`}
+              >
+                {page}
+              </Button>
+            ))}
+          </div>
+
+          <Button
+            onClick={() => onPageChange(currentPage + 1)}
+            disabled={currentPage >= totalPages}
+            variant="outline"
+          >
+            Trang sau
+          </Button>
+        </div>
+      </div>
     </>
   );
 }

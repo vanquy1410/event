@@ -72,7 +72,7 @@ export default function UploadDocumentModal({ isOpen, onClose, onUploadSuccess, 
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent>
+      <DialogContent className="bg-white rounded-lg shadow-lg">
         <DialogHeader>
           <DialogTitle>Upload Tài liệu</DialogTitle>
         </DialogHeader>

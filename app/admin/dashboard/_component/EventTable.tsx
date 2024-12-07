@@ -7,7 +7,15 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { useEffect, useState } from 'react';
 import { getAllCategories } from '@/lib/actions/category.actions';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog"
+// import ReactQuill from 'react-quill';
+import 'react-quill/dist/quill.snow.css';
 
+import dynamic from 'next/dynamic';
+
+const ReactQuill = dynamic(() => import('react-quill'), {
+  ssr: false,
+  loading: () => <p>Please wait for loading…</p>,
+});
 
 interface Event {
   _id: string;
@@ -61,7 +69,7 @@ export default function EventTable({
             <FaTrash />
           </Button>
         </AlertDialogTrigger>
-        <AlertDialogContent>
+        <AlertDialogContent className="bg-white rounded-lg shadow-lg">
           <AlertDialogHeader>
             <AlertDialogTitle>Bạn có chắc chắn muốn xóa?</AlertDialogTitle>
             <AlertDialogDescription>
@@ -130,7 +138,14 @@ export default function EventTable({
                 />
               </td>
               <td className="py-2 px-4 border-b">{event.title}</td>
-              <td className="py-2 px-4 border-b">{event.description.substring(0, 50)}...</td>
+              <td className="py-2 px-4 border-b">
+                <ReactQuill 
+                  value={event.description.length > 20 ? `${event.description.substring(0, 30)}...` : event.description}
+                  readOnly={true}
+                  theme="snow"
+                  modules={{ toolbar: false }}
+                />
+              </td>
               <td className="py-2 px-4 border-b">{event.category?.name || 'Uncategorized'}</td>
               <td className="py-2 px-4 border-b">{new Date(event.startDateTime).toLocaleString()}</td>
               <td className="py-2 px-4 border-b">{new Date(event.endDateTime).toLocaleString()}</td>
