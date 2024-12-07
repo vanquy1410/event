@@ -5,7 +5,7 @@ import { usePathname } from "next/navigation";
 import { useState } from "react";
 import { FaHome, FaChartBar, FaUsers, FaCalendarAlt, FaShoppingCart, 
          FaUserTie, FaAddressBook, FaSitemap, FaBox, FaBlog, 
-         FaBell, FaTasks, FaChevronLeft, FaChevronRight, FaTicketAlt } from "react-icons/fa";
+         FaBell, FaTasks, FaChevronLeft, FaChevronRight, FaTicketAlt, FaMoneyBill } from "react-icons/fa";
 
 const navItems = [
   { href: "/", label: "Trang chủ", icon: FaHome },
@@ -21,10 +21,16 @@ const navItems = [
       { href: "/admin/dashboard/event-management/ended", label: "Sự kiện đã kết thúc", icon: FaCalendarAlt }
     ]
   },
+  { href: "/admin/dashboard/task-management", label: "Quản lý công việc", icon: FaTasks },
   { href: "/admin/dashboard/order-management", label: "Quản lý đơn hàng", icon: FaShoppingCart },
   { href: "/admin/dashboard/employee-management", label: "Quản lý nhân viên", icon: FaUserTie },
   { href: "/admin/dashboard/contact-form-management", label: "Quản lý form liên hệ", icon: FaAddressBook },
   { href: "/admin/dashboard/organizer-management", label: "Quản lý tổ chức sự kiện", icon: FaSitemap },
+  {
+    label: "Thanh toán tổ chức",
+    href: "/admin/dashboard/organizer-management/payments",
+    icon: FaMoneyBill
+  },
   { href: "/admin/dashboard/resource-management", label: "Quản lý tài nguyên", icon: FaBox },
   { href: "/admin/dashboard/blog-management", label: "Quản lý Blog", icon: FaBlog },
   { 
@@ -32,19 +38,10 @@ const navItems = [
     label: "Thông báo", 
     icon: FaBell, 
     subItems: [
-      { 
-        href: "/admin/dashboard/notifications/all", 
-        label: "Tất cả thông báo", 
-        icon: FaBell 
-      },
-      { 
-        href: "/admin/dashboard/notifications/canceled-tickets", 
-        label: "Thông báo vé hủy", 
-        icon: FaTicketAlt 
-      }
+      { href: "/admin/dashboard/notifications/all", label: "Tất cả thông báo", icon: FaBell },
+      { href: "/admin/dashboard/notifications/canceled-tickets", label: "Thông báo vé hủy", icon: FaTicketAlt }
     ]
-  },
-  { href: "/admin/dashboard/task-management", label: "Quản lý công việc", icon: FaTasks },
+  }
 ];
 
 export default function Sidebar() {
