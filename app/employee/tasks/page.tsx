@@ -1,26 +1,22 @@
 'use client'
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { useUser } from '@clerk/nextjs';
 import { Button } from '@/components/ui/button';
-import { DatePicker } from '@/components/ui/date-picker';
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-  AlertDialogTrigger,
-} from "@/components/ui/alert-dialog";
-import { FaTrash } from 'react-icons/fa';
-import { toast } from 'react-hot-toast';
+import { Textarea } from '@/components/ui/textarea';
 import { Calendar, momentLocalizer } from 'react-big-calendar';
 import moment from 'moment';
 import 'react-big-calendar/lib/css/react-big-calendar.css';
-import { Textarea } from '@/components/ui/textarea';
+import dynamic from 'next/dynamic';
+import 'react-quill/dist/quill.snow.css';
+import { toast } from 'react-hot-toast';
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
 
 moment.locale('vi');
 
@@ -77,11 +73,18 @@ const eventStyleGetter = (event: any) => {
   return { style };
 };
 
+const ReactQuill = dynamic(() => import('react-quill'), {
+  ssr: false,
+  loading: () => <p>Please wait for loading…</p>,
+});
+
 export default function EmployeeTasksPage() {
   const { user, isLoaded } = useUser();
   const [tasks, setTasks] = useState<Task[]>([]);
   const [notes, setNotes] = useState<Note[]>([]);
   const [newNote, setNewNote] = useState('');
+  const [expandedTaskId, setExpandedTaskId] = useState<string | null>(null);
+  const [selectedTask, setSelectedTask] = useState<Task | null>(null);
 
   useEffect(() => {
     if (isLoaded && user) {
@@ -177,8 +180,6 @@ export default function EmployeeTasksPage() {
       }
 
       const result = await response.json();
-      
-      // Cập nhật ID của ghi chú từ server và chuyển đổi date thành đối tượng Date
       const savedNote: Note = {
         ...newNoteObject,
         id: result.noteId,
@@ -195,6 +196,14 @@ export default function EmployeeTasksPage() {
       console.error('Lỗi khi lưu ghi chú:', error);
       toast.error('Có lỗi xảy ra khi lưu ghi chú');
     }
+  };
+
+  const handleToggleDescription = (taskId: string) => {
+    setExpandedTaskId(expandedTaskId === taskId ? null : taskId);
+  };
+
+  const handleOpenDescription = (task: Task) => {
+    setSelectedTask(task);
   };
 
   const calendarEvents = [
@@ -220,8 +229,8 @@ export default function EmployeeTasksPage() {
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         {['pending', 'in-progress', 'completed'].map((status) => (
-          <div key={status} className="border p-4 rounded">
-            <h2 className="font-bold mb-2">
+          <div key={status} className="border p-4 rounded-lg shadow-md bg-white">
+            <h2 className="font-bold mb-2 text-lg text-gray-800">
               {status === 'pending' && 'Chờ xử lý'}
               {status === 'in-progress' && 'Đang thực hiện'}
               {status === 'completed' && 'Hoàn thành'}
@@ -229,21 +238,37 @@ export default function EmployeeTasksPage() {
             {tasks
               .filter((task) => task.status === status)
               .map((task) => (
-                <div key={task._id} className="border p-2 mb-2 rounded bg-white">
-                  <h3 className="font-bold">{task.title}</h3>
-                  <p>{task.description}</p>
-                  <p>Người được giao: {task.assignedTo || 'Chưa xác định'}</p>
-                  <p>Bắt đầu: {new Date(task.startDate).toLocaleDateString()}</p>
-                  <p>Kết thúc: {new Date(task.endDate).toLocaleDateString()}</p>
+                <div key={task._id} className="border-b border-gray-200 p-2 mb-2 rounded bg-gray-50">
+                  <h3 className="font-semibold text-gray-700">{task.title}</h3>
+                  <Dialog>
+                    <DialogTrigger asChild>
+                      <Button onClick={() => handleOpenDescription(task)}>
+                        Xem mô tả
+                      </Button>
+                    </DialogTrigger>
+                    <DialogContent className="bg-white rounded-lg shadow-lg">
+                      <DialogHeader>
+                        <DialogTitle className="text-lg font-bold">Chi tiết công việc</DialogTitle>
+                      </DialogHeader>
+                      <ReactQuill 
+                        value={task.description} 
+                        readOnly={true} 
+                        theme="bubble" 
+                      />
+                    </DialogContent>
+                  </Dialog>
+                  <p className="text-sm text-gray-500">Người được giao: {task.assignedTo || 'Chưa xác định'}</p>
+                  <p className="text-sm text-gray-500">Bắt đầu: {new Date(task.startDate).toLocaleDateString()}</p>
+                  <p className="text-sm text-gray-500">Kết thúc: {new Date(task.endDate).toLocaleDateString()}</p>
                   <div className="mt-2 flex justify-between items-center">
                     <div>
                       {status === 'pending' && (
-                        <Button onClick={() => handleStatusChange(task._id, 'in-progress')} className="mr-2">
+                        <Button onClick={() => handleStatusChange(task._id, 'in-progress')} className="mr-2 bg-yellow-500 text-white hover:bg-yellow-600">
                           Bắt đầu thực hiện
                         </Button>
                       )}
                       {status === 'in-progress' && (
-                        <Button onClick={() => handleStatusChange(task._id, 'completed')} className="mr-2">
+                        <Button onClick={() => handleStatusChange(task._id, 'completed')} className="mr-2 bg-blue-500 text-white hover:bg-blue-600">
                           Hoàn thành
                         </Button>
                       )}

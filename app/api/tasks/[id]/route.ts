@@ -8,13 +8,13 @@ export async function PATCH(
 ) {
   try {
     const { id } = params;
-    const { status } = await req.json();
+    const { status, labels } = await req.json();
 
     await connectToDatabase();
 
     const updatedTask = await Task.findByIdAndUpdate(
       id,
-      { status },
+      { status, labels },
       { new: true }
     );
 
