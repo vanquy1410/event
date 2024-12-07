@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
@@ -27,9 +27,14 @@ import {
 } from "@/components/ui/dialog";
 import { toast } from 'react-hot-toast';
 import 'tailwindcss/tailwind.css';
-import ReactQuill from 'react-quill';
+// import ReactQuill from 'react-quill';
 import 'react-quill/dist/quill.snow.css';
+import dynamic from 'next/dynamic';
 
+const ReactQuill = dynamic(() => import('react-quill'), {
+  ssr: false,
+  loading: () => <p>Please wait for loading…</p>,
+});
 
 interface User {
   id: string;
