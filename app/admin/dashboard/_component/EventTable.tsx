@@ -7,8 +7,15 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { useEffect, useState } from 'react';
 import { getAllCategories } from '@/lib/actions/category.actions';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog"
-import ReactQuill from 'react-quill';
+// import ReactQuill from 'react-quill';
 import 'react-quill/dist/quill.snow.css';
+
+import dynamic from 'next/dynamic';
+
+const ReactQuill = dynamic(() => import('react-quill'), {
+  ssr: false,
+  loading: () => <p>Please wait for loading…</p>,
+});
 
 interface Event {
   _id: string;
