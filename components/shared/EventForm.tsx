@@ -69,7 +69,7 @@ const EventForm = ({ userId, type, event, eventId }: EventFormProps) => {
     if (files.length > 0) {
       const formData = new FormData();
       formData.append('file', files[0]);
-      formData.append('eventId', eventId || 'new');
+      formData.append('fileType', 'image');
 
       try {
         const response = await fetch('/api/s3-storage', {
@@ -78,7 +78,8 @@ const EventForm = ({ userId, type, event, eventId }: EventFormProps) => {
         });
 
         if (!response.ok) {
-          throw new Error('Upload ảnh thất bại');
+          const errorData = await response.json();
+          throw new Error(errorData.error || 'Upload ảnh thất bại');
         }
 
         const data = await response.json();
