@@ -67,6 +67,19 @@ const OrganizerList: React.FC<OrganizerListProps> = ({ organizers, onEdit, onCan
     setIsDetailModalOpen(true);
   };
 
+  const handleViewContract = async (organizerId: string) => {
+    try {
+      const response = await fetch(`/api/organizer/${organizerId}`);
+      if (!response.ok) {
+        throw new Error('Không thể tải thông tin hợp đồng');
+      }
+      
+      router.push(`/organizer/dashboard/${organizerId}`);
+    } catch (error) {
+      toast.error('Có lỗi xảy ra khi tải thông tin hợp đồng. Vui lòng thử lại sau.');
+    }
+  };
+
   return (
     <div className="mt-6">
       <h2 className="text-2xl font-bold mb-4">Danh sách phiếu đăng ký tổ chức sự kiện</h2>
@@ -126,7 +139,7 @@ const OrganizerList: React.FC<OrganizerListProps> = ({ organizers, onEdit, onCan
                     {organizer.status === 'approved' ? (
                       <>
                         <Button
-                          onClick={() => router.push(`/organizer/dashboard/${organizer._id}`)}
+                          onClick={() => handleViewContract(organizer._id)}
                           className="bg-blue-500 hover:bg-blue-600"
                           size="sm"
                         >

@@ -24,16 +24,24 @@ export default function OrganizerDashboard({ params }: { params: { id: string } 
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const data = await getOrganizerById(params.id);
+        setLoading(true);
+        const response = await fetch(`/api/organizer/${params.id}`);
+        if (!response.ok) {
+          throw new Error('Không thể tải thông tin ban tổ chức');
+        }
+        const data = await response.json();
         setOrganizer(data);
       } catch (err) {
-        setError('Không thể tải thông tin ban tổ chức');
-        console.error(err);
+        console.error('Lỗi:', err);
+        setError('Không thể tải thông tin ban tổ chức. Vui lòng thử lại sau.');
       } finally {
         setLoading(false);
       }
     };
-    fetchData();
+
+    if (params.id) {
+      fetchData();
+    }
   }, [params.id]);
 
   const handleSaveSignature = async () => {
@@ -62,6 +70,20 @@ export default function OrganizerDashboard({ params }: { params: { id: string } 
         toast.error('Có lỗi xảy ra khi lưu chữ ký');
         console.error(error);
       }
+    }
+  };
+
+  const handleViewContract = async (organizerId: string) => {
+    try {
+      // Kiểm tra trước khi chuyển hướng
+      const response = await fetch(`/api/organizer/${organizerId}`);
+      if (!response.ok) {
+        throw new Error('Không thể tải thông tin hợp đồng');
+      }
+      
+      router.push(`/organizer/dashboard/${organizerId}`);
+    } catch (error) {
+      toast.error('Có lỗi xảy ra khi tải thông tin hợp đồng. Vui lòng thử lại sau.');
     }
   };
 
