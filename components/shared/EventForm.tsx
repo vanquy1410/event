@@ -261,7 +261,7 @@ const EventForm = ({ userId, type, event, eventId }: EventFormProps) => {
                         }} 
                         showTimeSelect
                         timeInputLabel="Time:"
-                        dateFormat="MM/dd/yyyy h:mm aa"
+                        dateFormat="dd/MM/yyyy h:mm aa"
                         wrapperClassName="datePicker"
                       />
                     </div>
@@ -299,7 +299,7 @@ const EventForm = ({ userId, type, event, eventId }: EventFormProps) => {
                         }} 
                         showTimeSelect
                         timeInputLabel="Time:"
-                        dateFormat="MM/dd/yyyy h:mm aa"
+                        dateFormat="dd/MM/yyyy h:mm aa"
                         wrapperClassName="datePicker"
                       />
                     </div>
@@ -367,7 +367,7 @@ const EventForm = ({ userId, type, event, eventId }: EventFormProps) => {
                         height={24}
                       />
 
-                      <Input placeholder="URL" {...field} className="input-field" />
+                      <Input placeholder="URL" {...field} className="input-field" readOnly/>
                     </div>
 
                   </FormControl>
