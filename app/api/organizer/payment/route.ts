@@ -7,7 +7,7 @@ export async function POST(req: Request) {
   try {
     await connectToDatabase();
 
-    const { organizerId, eventTitle, price, signature } = await req.json();
+    const { organizerId, eventTitle, price, signature, paymentIntentId, email } = await req.json();
     
     // Thêm log để kiểm tra
     console.log("Creating payment with organizerId:", organizerId);
@@ -38,7 +38,10 @@ export async function POST(req: Request) {
       eventTitle,
       amount: price,
       status: 'success',
-      paymentDate: new Date()
+      paymentDate: new Date(),
+      paymentMethod: 'card',
+      paymentIntentId,
+      email
     });
 
     console.log("Created payment:", payment);

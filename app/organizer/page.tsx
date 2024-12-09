@@ -68,6 +68,28 @@ const OrganizerPage = () => {
     }
   };
 
+  const handleCancel = async (organizerId: string) => {
+    try {
+      const response = await fetch('/api/deleteOrganizer', {
+        method: 'DELETE',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ id: organizerId }),
+      });
+
+      if (!response.ok) {
+        throw new Error('Lỗi khi xóa phiếu đăng ký');
+      }
+
+      setOrganizers(prev => prev.filter(org => org._id !== organizerId));
+      toast.success('Xóa phiếu đăng ký thành công');
+    } catch (error) {
+      console.error('Lỗi:', error);
+      toast.error('Có lỗi xảy ra khi xóa phiếu đăng ký. Vui lòng thử lại sau.');
+    }
+  };
+
   return (
     <>
       <Header />
@@ -98,7 +120,7 @@ const OrganizerPage = () => {
             <OrganizerList
               organizers={organizers}
               onEdit={handleEdit}
-              onCancel={(id) => {/* Xử lý hủy */}}
+              onCancel={handleCancel}
               onViewDashboard={(id) => {/* Xử lý xem dashboard */}}
             />
           )}
