@@ -5,6 +5,7 @@ import EditOrganizerForm from '@/components/shared/EditOrganizerForm';
 import { toast } from 'react-hot-toast';
 import OrganizerDetailModal from '@/components/shared/OrganizerDetailModal';
 import { useRouter } from 'next/navigation';
+import { useUser } from "@clerk/nextjs";
 
 interface OrganizerListProps {
   organizers: IOrganizer[];
@@ -14,10 +15,16 @@ interface OrganizerListProps {
 }
 
 const OrganizerList: React.FC<OrganizerListProps> = ({ organizers, onEdit, onCancel, onViewDashboard }) => {
+  const { user } = useUser();
   const [editingOrganizer, setEditingOrganizer] = useState<IOrganizer | null>(null);
   const [selectedOrganizer, setSelectedOrganizer] = useState<IOrganizer | null>(null);
   const [isDetailModalOpen, setIsDetailModalOpen] = useState(false);
   const router = useRouter();
+
+  const checkUserRole = () => {
+    const userRole = user?.publicMetadata?.role as string;
+    return userRole === 'admin' || userRole === 'organizer';
+  };
 
   const handleEdit = (organizer: IOrganizer) => {
     const organizerWithDates = {
@@ -126,7 +133,16 @@ const OrganizerList: React.FC<OrganizerListProps> = ({ organizers, onEdit, onCan
                           Xem hợp đồng và thanh toán
                         </Button>
                         <Button
-                          onClick={() => router.push(`/organizer-dashboard`)}
+                          onClick={() => {
+                            if (checkUserRole()) {
+                              router.push(`/organizer-dashboard`);
+                            } else {
+                              toast.error("Bạn không có quyền hạn để vào trang này", {
+                                duration: 3000,
+                                position: "top-center",
+                              });
+                            }
+                          }}
                           className="bg-green-500 hover:bg-green-600"
                           size="sm"
                         >
