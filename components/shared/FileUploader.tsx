@@ -49,8 +49,8 @@ export function FileUploader({ imageUrl, documentUrl, onImageChange, onDocumentC
         })
 
         if (!response.ok) {
-          throw new Error('Upload hình ảnh thất bại')
-        }
+          const errorData = await response.json();
+          throw new Error(errorData.error || 'Upload hình ảnh thất bại');}
 
         const data = await response.json()
         onImageChange(data.fileUrl)
