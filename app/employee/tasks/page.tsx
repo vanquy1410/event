@@ -246,7 +246,7 @@ export default function EmployeeTasksPage() {
                         Xem mô tả
                       </Button>
                     </DialogTrigger>
-                    <DialogContent className="bg-white rounded-lg shadow-lg">
+                    <DialogContent className="bg-white rounded-lg shadow-lg overflow-auto max-h-96">
                       <DialogHeader>
                         <DialogTitle className="text-lg font-bold">Chi tiết công việc</DialogTitle>
                       </DialogHeader>
