@@ -142,13 +142,15 @@ const OrganizerList: React.FC<OrganizerListProps> = ({ organizers, onEdit, onCan
                         >
                           Chỉnh sửa
                         </Button>
-                        <Button
-                          onClick={() => onCancel(organizer._id)}
-                          variant="destructive"
-                          size="sm"
-                        >
-                          Hủy
-                        </Button>
+                        {organizer.status === 'pending' && (
+                          <Button
+                            onClick={() => onCancel(organizer._id)}
+                            variant="destructive"
+                            size="sm"
+                          >
+                            Hủy
+                          </Button>
+                        )}
                       </>
                     )}
                   </div>
