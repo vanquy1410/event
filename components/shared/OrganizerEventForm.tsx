@@ -283,7 +283,7 @@ const OrganizerEventForm: React.FC<OrganizerEventFormProps> = ({ setOrganizers, 
             name="price"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Giá vé ($)</FormLabel>
+                <FormLabel>Giá vé (đ)</FormLabel>
                 <FormControl>
                   <Input {...field} type="number" onChange={e => field.onChange(parseFloat(e.target.value))} />
                 </FormControl>

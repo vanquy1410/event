@@ -99,7 +99,7 @@ const EditOrganizerForm = ({ initialData, onSubmit, onCancel, organizerId }: Edi
         </div>
 
         <div>
-          <label className="block text-sm font-medium text-gray-700">Giá vé ($)</label>
+          <label className="block text-sm font-medium text-gray-700">Giá vé (đ)</label>
           <input
             type="number"
             name="price"
