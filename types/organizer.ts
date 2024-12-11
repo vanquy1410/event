@@ -13,7 +13,7 @@ export interface IScaleDetails {
 }
 
 export interface IOrganizer {
-  _id?: string;
+  _id: string;
   name: string;
   phoneNumber: string;
   email: string;
@@ -31,6 +31,7 @@ export interface IOrganizer {
   participantLimit: number;
   price: number;
   scaleDetails: IScaleDetails;
-  status?: 'pending' | 'approved' | 'rejected' | 'cancelled';
+  status: 'pending' | 'approved' | 'rejected' | 'cancelled';
   documents?: string[];
+  digitalSignature?: string;
 } 

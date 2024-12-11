@@ -4,7 +4,7 @@ import OrganizerEventForm from '@/components/shared/OrganizerEventForm';
 import OrganizerList from '@/components/shared/OrganizerList';
 import { Button } from '@/components/ui/button';
 import { getOrganizerEvents, updateOrganizerEvent } from '@/lib/actions/organizer.actions';
-import { IOrganizer } from '@/lib/database/models/organizer.model';
+import { IOrganizer } from '@/types/organizer';
 import { useUser } from '@clerk/nextjs';
 import Link from 'next/link';
 import { toast } from 'react-hot-toast';
