@@ -3,6 +3,8 @@
 import { connectToDatabase } from '@/lib/database';
 import { IOrganizer } from '@/types/organizer';
 import Organizer from '@/lib/database/models/organizer.model';
+import { headers } from 'next/headers';
+import { auth } from '@clerk/nextjs';
 
 export async function createOrganizerEvent(eventData: Omit<IOrganizer, '_id' | 'status'>) {
   try {
@@ -25,11 +27,24 @@ export async function createOrganizerEvent(eventData: Omit<IOrganizer, '_id' | '
 
 export async function getOrganizerEvents(): Promise<IOrganizer[]> {
   try {
-    await connectToDatabase();
-    const organizers = await Organizer.find({});
-    return organizers;
+    const { getToken } = auth();
+    const token = await getToken();
+    
+    const baseUrl = getBaseUrl();
+    const response = await fetch(`${baseUrl}/api/organizer`, {
+      headers: {
+        'Authorization': `Bearer ${token}`,
+      },
+      cache: 'no-store',
+    });
+
+    if (!response.ok) {
+      throw new Error('Lỗi khi tải danh sách ban tổ chức');
+    }
+
+    return await response.json();
   } catch (error) {
-    console.error('Lỗi khi lấy danh sách sự kiện:', error);
+    console.error('Lỗi khi tải danh sách ban tổ chức:', error);
     throw error;
   }
 }
@@ -57,20 +72,24 @@ export async function updateOrganizerEvent(id: string, eventData: Partial<IOrgan
 
 export async function updateOrganizerEventStatus(organizerId: string, status: 'approved' | 'rejected') {
   try {
-    const response = await fetch(`/api/organizer-admin/${organizerId}`, {
+    const { getToken } = auth();
+    const token = await getToken();
+    
+    const baseUrl = getBaseUrl();
+    const response = await fetch(`${baseUrl}/api/organizer-admin/${organizerId}`, {
       method: 'PATCH',
       headers: {
         'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`,
       },
       body: JSON.stringify({ status }),
     });
-    
+
     if (!response.ok) {
-      const errorText = await response.text();
-      console.error('Server response:', errorText);
-      throw new Error('Lỗi khi cập nhật trạng thái ban tổ chức');
+      const errorData = await response.json().catch(() => null);
+      throw new Error(errorData?.message || 'Lỗi khi cập nhật trạng thái');
     }
-    
+
     return await response.json();
   } catch (error) {
     console.error('Lỗi khi cập nhật trạng thái ban tổ chức:', error);
@@ -101,22 +120,26 @@ export async function updateOrganizerDocument(organizerId: string, documentUrl: 
 
 export async function getOrganizerById(id: string) {
   try {
-    const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000';
+    const baseUrl = getBaseUrl();
     const response = await fetch(`${baseUrl}/api/organizer/${id}`, {
-      method: 'GET',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      cache: 'no-store'
+      cache: 'no-store',
     });
 
     if (!response.ok) {
-      throw new Error('Lỗi khi lấy thông tin ban tổ chức');
+      throw new Error('Lỗi khi tải thông tin ban tổ chức');
     }
 
     return await response.json();
   } catch (error) {
-    console.error('Lỗi khi lấy thông tin ban tổ chức:', error);
+    console.error('Lỗi khi tải thông tin ban tổ chức:', error);
     throw error;
   }
 }
+
+// Hàm helper để lấy base URL
+const getBaseUrl = () => {
+  const headersList = headers();
+  const host = headersList.get('host');
+  const protocol = process?.env?.NODE_ENV === 'development' ? 'http' : 'https';
+  return `${protocol}://${host}`;
+};

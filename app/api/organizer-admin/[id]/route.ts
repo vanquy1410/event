@@ -1,12 +1,19 @@
 import { NextResponse } from 'next/server';
 import { connectToDatabase } from '@/lib/database';
 import Organizer from '@/lib/database/models/organizer.model';
+import { auth } from '@clerk/nextjs';
 
 export async function PATCH(
   request: Request,
   { params }: { params: { id: string } }
 ) {
   try {
+    const { userId } = auth();
+    
+    if (!userId) {
+      return new Response('Unauthorized', { status: 401 });
+    }
+
     await connectToDatabase();
     const { id } = params;
     const { status } = await request.json();
