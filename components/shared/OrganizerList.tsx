@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { IOrganizer } from '@/lib/database/models/organizer.model';
+import { IOrganizer } from '@/types/organizer';
 import { Button } from '@/components/ui/button';
 import EditOrganizerForm, { EditOrganizerFormProps } from '@/components/shared/EditOrganizerForm';
 import { toast } from 'react-hot-toast';

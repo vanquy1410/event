@@ -1,5 +1,5 @@
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { IOrganizer } from "@/lib/database/models/organizer.model";
+import { IOrganizer } from "@/types/organizer";
 import { format } from "date-fns";
 import { X } from "lucide-react";
 

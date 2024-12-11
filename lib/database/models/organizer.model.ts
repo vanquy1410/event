@@ -1,71 +1,7 @@
-import { Schema, model, models, Document, Model } from 'mongoose';
+import mongoose, { Schema } from 'mongoose';
+import { IOrganizer } from '@/types/organizer';
 
-// Định nghĩa interface cho venues trong scaleDetails
-export interface IVenue {
-  name: string;
-  capacity: number;
-  pricePerDay: number;
-  rating: number;
-  facilities: string[];
-}
-
-// Định nghĩa interface cho scaleDetails
-export interface IScaleDetails {
-  capacity: number;
-  basePrice: number;
-  venues: IVenue;
-}
-
-// Interface chính cho dữ liệu
-export interface IOrganizerData {
-  _id: string;
-  name: string;
-  phoneNumber: string;
-  email: string;
-  eventTitle: string;
-  description: string;
-  location: string;
-  startDateTime: Date;
-  endDateTime: Date;
-  eventType: string;
-  eventScale: string;
-  venueType: string;
-  venue: string;
-  expectedTicketPrice: number;
-  expectedRevenue: number;
-  participantLimit: number;
-  price: number;
-  scaleDetails: IScaleDetails;
-  status: 'pending' | 'approved' | 'rejected' | 'cancelled';
-  documents: string[];
-}
-
-// Interface cho model MongoDB
-export interface IOrganizer extends Document {
-  _id: string;
-  name: string;
-  phoneNumber: string;
-  email: string;
-  eventTitle: string;
-  description: string;
-  location: string;
-  startDateTime: Date;
-  endDateTime: Date;
-  eventType: string;
-  eventScale: string;
-  venueType: string;
-  venue: string;
-  expectedTicketPrice: number;
-  expectedRevenue: number;
-  participantLimit: number;
-  price: number;
-  scaleDetails: IScaleDetails;
-  status: 'pending' | 'approved' | 'rejected' | 'cancelled';
-  documents: string[];
-}
-
-// Schema definition
-const OrganizerSchema = new Schema<IOrganizer>({
+const OrganizerSchema = new Schema({
   name: { type: String, required: true },
   phoneNumber: { type: String, required: true },
   email: { type: String, required: true },
@@ -83,39 +19,26 @@ const OrganizerSchema = new Schema<IOrganizer>({
   participantLimit: { type: Number, required: true },
   price: { type: Number, required: true },
   scaleDetails: {
-    type: {
+    capacity: { type: Number, required: true },
+    basePrice: { type: Number, required: true },
+    venues: {
+      name: { type: String, required: true },
       capacity: { type: Number, required: true },
-      basePrice: { type: Number, required: true },
-      venues: {
-        type: {
-          name: { type: String, required: true },
-          capacity: { type: Number, required: true },
-          pricePerDay: { type: Number, required: true },
-          rating: { type: Number, required: true },
-          facilities: [{ type: String, required: true }]
-        },
-        required: true
-      }
-    },
-    required: true
+      pricePerDay: { type: Number, required: true },
+      rating: { type: Number },
+      facilities: [{ type: String }]
+    }
   },
   status: {
     type: String,
     enum: ['pending', 'approved', 'rejected', 'cancelled'],
     default: 'pending'
   },
-  documents: { type: [String], default: [] }
+  documents: [{ type: String }]
 }, {
   timestamps: true
 });
 
-// Model
-let Organizer: Model<IOrganizer>;
-
-try {
-  Organizer = models.Organizer || model<IOrganizer>('Organizer', OrganizerSchema);
-} catch {
-  Organizer = model<IOrganizer>('Organizer', OrganizerSchema);
-}
+const Organizer = mongoose.models.Organizer || mongoose.model<IOrganizer>('Organizer', OrganizerSchema);
 
 export default Organizer;

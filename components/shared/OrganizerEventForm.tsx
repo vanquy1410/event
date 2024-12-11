@@ -9,7 +9,7 @@ import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import DatePicker from 'react-datepicker';
 import "react-datepicker/dist/react-datepicker.css";
-import { IOrganizerData } from '@/lib/database/models/organizer.model';
+import { IOrganizer } from '@/types/organizer';
 import { getOrganizerEvents } from '@/lib/actions/organizer.actions';
 import toast from 'react-hot-toast';
 import {
@@ -50,7 +50,7 @@ const formSchema = z.object({
   ),
   endDateTime: z.date(),
   eventType: z.string().min(1, 'Hình thức là bắt buộc'),
-  eventScale: z.string().min(1, 'Vui lòng chọn quy mô sự ki���n'),
+  eventScale: z.string().min(1, 'Vui lòng chọn quy mô sự kiện'),
   venueType: z.string().min(1, 'Vui lòng chọn loại địa điểm'),
   venue: z.string().min(1, 'Vui lòng chọn địa điểm tổ chức'),
   expectedTicketPrice: z.number().min(0, 'Giá vé không được âm'),
@@ -60,7 +60,7 @@ const formSchema = z.object({
 type FormValues = z.infer<typeof formSchema>;
 
 interface OrganizerEventFormProps {
-  setOrganizers: React.Dispatch<React.SetStateAction<IOrganizerData[]>>;
+  setOrganizers: React.Dispatch<React.SetStateAction<IOrganizer[]>>;
   userData: {
     name: string;
     email: string;
@@ -95,23 +95,23 @@ const OrganizerEventForm: React.FC<OrganizerEventFormProps> = ({ setOrganizers, 
 
   const onSubmit = async (data: z.infer<typeof formSchema>) => {
     try {
-      // Lấy thông tin venue được chọn
       const selectedVenue = selectedScale?.venues[data.venueType as keyof typeof selectedScale.venues]
         .find(v => v.name === data.venue);
 
-      // Tính toán số người tham dự dự kiến
-      const expectedAttendees = Math.floor(
-        Math.min(
-          selectedScale?.capacity || 0,
-          selectedVenue?.capacity || 0
-        ) * (selectedScale?.expectedRevenue.occupancyRate || 0)
-      );
+      if (!selectedVenue) {
+        throw new Error('Lựa chọn địa điểm không hợp lệ');
+      }
 
       const formData = {
         ...data,
         expectedRevenue: estimatedRevenue,
         expectedTicketPrice: Number(data.expectedTicketPrice),
-        participantLimit: expectedAttendees, // Sử dụng số người dự kiến đã tính
+        participantLimit: Math.floor(
+          Math.min(
+            selectedScale?.capacity || 0,
+            selectedVenue?.capacity || 0
+          ) * (selectedScale?.expectedRevenue.occupancyRate || 0)
+        ),
         price: selectedVenue?.pricePerDay || 0,
         scaleDetails: {
           capacity: selectedScale?.capacity || 0,
@@ -121,25 +121,25 @@ const OrganizerEventForm: React.FC<OrganizerEventFormProps> = ({ setOrganizers, 
             capacity: selectedVenue?.capacity,
             pricePerDay: selectedVenue?.pricePerDay,
             rating: selectedVenue?.rating,
-            facilities: selectedVenue?.facilities
+            facilities: selectedVenue?.facilities || []
           }
         }
       };
 
       console.log('Sending data:', formData);
-      // Gửi request
-      const response = await fetch('/api/organizer', {
+      
+      const response = await fetch('/api/createOrganizerEvent', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(formData),
       });
 
-      const responseData = await response.json();
-
       if (!response.ok) {
-        throw new Error(responseData.error || 'Lỗi khi gửi form');
+        const errorData = await response.json();
+        throw new Error(errorData.error || errorData.details?.join(', ') || 'Lỗi khi gửi form');
       }
 
+      const responseData = await response.json();
       setOrganizers(prev => [...prev, responseData]);
       form.reset();
       
@@ -147,16 +147,16 @@ const OrganizerEventForm: React.FC<OrganizerEventFormProps> = ({ setOrganizers, 
         duration: 5000,
         position: 'top-center',
         icon: '🎉',
-        style: {
-          background: '#4CAF50',
-          color: '#fff',
-        },
       });
 
     } catch (error) {
       console.error('Lỗi:', error);
-      toast.error('Có lỗi xảy ra khi đăng ký. Vui lòng thử lại sau.', {
-        duration: 3000,
+
+      // Type guard to check if error is an instance of Error
+      const errorMessage = error instanceof Error ? error.message : 'Đã xảy ra lỗi không xác định';
+      
+      toast.error(`Lỗi: ${errorMessage}`, {
+        duration: 5000,
         position: 'top-center',
       });
     }
@@ -179,10 +179,15 @@ const OrganizerEventForm: React.FC<OrganizerEventFormProps> = ({ setOrganizers, 
         throw new Error('Lỗi khi hủy đăng ký');
       }
 
-      const updatedOrganizer = await response.json();
-      setOrganizers(prev => prev.map(org => 
-        org._id === organizerId ? { ...org, status: 'cancelled' } : org
-      ));
+      setOrganizers(prev => prev.map(org => {
+        if (org._id && org._id.toString() === organizerId) {
+          return { 
+            ...org, 
+            status: 'cancelled' 
+          } as IOrganizer;
+        }
+        return org;
+      }));
       
       toast.success('Hủy đăng ký thành công');
     } catch (error) {
