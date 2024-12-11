@@ -28,11 +28,12 @@ export const checkoutOrder = async (order: OrderData) => {
     const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!);
     
     const session = await stripe.checkout.sessions.create({
+      payment_method_types: ['card'],
       line_items: [
         {
           price_data: {
             currency: 'vnd',
-            unit_amount: Number(order.price) * 1000,
+            unit_amount: Number(order.price),
             product_data: {
               name: order.eventTitle,
               description: `Vé ${order.seatType.name} - Ghế số ${order.selectedSeat + 1}`
