@@ -28,7 +28,6 @@ const OrganizerDetailModal = ({ isOpen, onClose, organizer }: OrganizerDetailMod
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="max-w-4xl bg-white rounded-xl p-0 max-h-[80vh] overflow-hidden">
         <div className="relative h-full">
-          {/* Header cố định */}
           <div className="bg-gradient-to-r from-purple-600 to-blue-500 p-6">
             <DialogTitle className="text-2xl font-bold text-white mb-2">
               Chi tiết phiếu đăng ký tổ chức sự kiện
@@ -41,7 +40,6 @@ const OrganizerDetailModal = ({ isOpen, onClose, organizer }: OrganizerDetailMod
             </button>
           </div>
 
-          {/* Content có thể cuộn */}
           <div className="overflow-y-auto h-[calc(80vh-100px)]">
             <div className="p-6">
               <div className="grid grid-cols-2 gap-8">
@@ -61,7 +59,31 @@ const OrganizerDetailModal = ({ isOpen, onClose, organizer }: OrganizerDetailMod
                   <div className="space-y-3">
                     <InfoItem label="Tên sự kiện" value={organizer.eventTitle} />
                     <InfoItem label="Địa điểm" value={organizer.location} />
-                    <InfoItem label="Hình thức" value={organizer.eventType} />
+                    <InfoItem 
+                      label="Hình thức" 
+                      value={organizer.eventType === 'offline' ? 'Trực tiếp' : 'Trực tuyến'} 
+                    />
+                    <InfoItem 
+                      label="Quy mô" 
+                      value={
+                        organizer.eventScale === 'small' ? 'Nhỏ' :
+                        organizer.eventScale === 'medium' ? 'Trung bình' :
+                        organizer.eventScale === 'large' ? 'Lớn' : organizer.eventScale
+                      } 
+                    />
+                    <InfoItem 
+                      label="Loại địa điểm" 
+                      value={
+                        organizer.venueType === 'hotels' ? 'Khách sạn' :
+                        organizer.venueType === 'convention_centers' ? 'Trung tâm hội nghị' :
+                        organizer.venueType === 'restaurants' ? 'Nhà hàng' : organizer.venueType
+                      } 
+                    />
+                    <InfoItem label="Địa điểm cụ thể" value={organizer.venue} />
+                    <InfoItem 
+                      label="Chi tiết quy mô" 
+                      value={`${organizer.scaleDetails?.capacity || 0} người`} 
+                    />
                   </div>
                 </div>
 
@@ -86,12 +108,26 @@ const OrganizerDetailModal = ({ isOpen, onClose, organizer }: OrganizerDetailMod
                   </div>
                 </div>
 
-                {/* Thông tin khác */}
+                {/* Thông tin tài chính */}
                 <div className="bg-orange-50 p-6 rounded-xl">
-                  <h3 className="text-xl font-semibold text-orange-700 mb-4">Thông tin khác</h3>
+                  <h3 className="text-xl font-semibold text-orange-700 mb-4">Thông tin tài chính</h3>
                   <div className="space-y-3">
-                    <InfoItem label="Giá vé" value={`${organizer.price.toLocaleString('vi-VN')}đ`} />
-                    <InfoItem label="Số người tham dự" value={organizer.participantLimit.toString()} />
+                    <InfoItem 
+                      label="Chi phí địa điểm" 
+                      value={`${organizer.price?.toLocaleString('vi-VN')}đ`} 
+                    />
+                    <InfoItem 
+                      label="Số người tham dự dự kiến" 
+                      value={organizer.participantLimit?.toString() || '0'} 
+                    />
+                    <InfoItem 
+                      label="Giá vé dự kiến" 
+                      value={`${organizer.expectedTicketPrice?.toLocaleString('vi-VN')}đ`} 
+                    />
+                    <InfoItem 
+                      label="Doanh thu dự kiến" 
+                      value={`${organizer.expectedRevenue?.toLocaleString('vi-VN')}đ`} 
+                    />
                     <InfoItem 
                       label="Trạng thái" 
                       value={

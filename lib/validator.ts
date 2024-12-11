@@ -13,3 +13,14 @@ export const eventFormSchema = z.object({
   url: z.string(),
   participantLimit: z.number().min(1, 'Người tham gia ít nhất phải là 1'),
 })
+
+export const organizerFormSchema = z.object({
+  name: z.string().min(1, 'Họ và tên là bắt buộc'),
+  email: z.string().email('Email không hợp lệ'),
+  phoneNumber: z.string().min(1, 'Số điện thoại là bắt buộc'),
+  eventTitle: z.string().min(1, 'Tên sự kiện là bắt buộc'),
+  eventScale: z.string().min(1, 'Vui lòng chọn quy mô sự kiện'),
+  venue: z.string().min(1, 'Vui lòng chọn địa điểm tổ chức'),
+  expectedTicketPrice: z.number().min(0, 'Giá vé không được âm'),
+  expectedRevenue: z.number().min(0, 'Doanh thu dự kiến không được âm'),
+})

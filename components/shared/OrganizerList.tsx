@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { IOrganizer } from '@/lib/database/models/organizer.model';
 import { Button } from '@/components/ui/button';
-import EditOrganizerForm from '@/components/shared/EditOrganizerForm';
+import EditOrganizerForm, { EditOrganizerFormProps } from '@/components/shared/EditOrganizerForm';
 import { toast } from 'react-hot-toast';
 import OrganizerDetailModal from '@/components/shared/OrganizerDetailModal';
 import { useRouter } from 'next/navigation';
@@ -16,7 +16,7 @@ interface OrganizerListProps {
 
 const OrganizerList: React.FC<OrganizerListProps> = ({ organizers, onEdit, onCancel, onViewDashboard }) => {
   const { user } = useUser();
-  const [editingOrganizer, setEditingOrganizer] = useState<IOrganizer | null>(null);
+  const [editingOrganizer, setEditingOrganizer] = useState<EditOrganizerFormProps['initialData'] | null>(null);
   const [selectedOrganizer, setSelectedOrganizer] = useState<IOrganizer | null>(null);
   const [isDetailModalOpen, setIsDetailModalOpen] = useState(false);
   const router = useRouter();
@@ -28,9 +28,18 @@ const OrganizerList: React.FC<OrganizerListProps> = ({ organizers, onEdit, onCan
 
   const handleEdit = (organizer: IOrganizer) => {
     const organizerWithDates = {
-      ...organizer,
+      _id: organizer._id.toString(),
+      name: organizer.name,
+      email: organizer.email,
+      description: organizer.description,
+      price: organizer.price,
+      participantLimit: organizer.participantLimit,
       startDateTime: new Date(organizer.startDateTime),
-      endDateTime: new Date(organizer.endDateTime)
+      endDateTime: new Date(organizer.endDateTime),
+      location: organizer.location,
+      eventTitle: organizer.eventTitle,
+      phoneNumber: organizer.phoneNumber,
+      status: organizer.status
     };
     setEditingOrganizer(organizerWithDates);
   };
@@ -43,7 +52,7 @@ const OrganizerList: React.FC<OrganizerListProps> = ({ organizers, onEdit, onCan
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          id: editingOrganizer?._id,
+          id: editingOrganizer?._id as string,
           ...updatedData
         }),
       });
@@ -89,7 +98,7 @@ const OrganizerList: React.FC<OrganizerListProps> = ({ organizers, onEdit, onCan
           initialData={editingOrganizer}
           onSubmit={handleSubmitEdit}
           onCancel={() => setEditingOrganizer(null)}
-          organizerId={editingOrganizer._id}
+          organizerId={editingOrganizer._id as string}
         />
       ) : (
         <table className="min-w-full bg-white shadow-md rounded-lg overflow-hidden">
@@ -139,7 +148,7 @@ const OrganizerList: React.FC<OrganizerListProps> = ({ organizers, onEdit, onCan
                     {organizer.status === 'approved' ? (
                       <>
                         <Button
-                          onClick={() => handleViewContract(organizer._id)}
+                          onClick={() => handleViewContract(organizer._id as string)}
                           className="bg-blue-500 hover:bg-blue-600"
                           size="sm"
                         >
@@ -173,7 +182,7 @@ const OrganizerList: React.FC<OrganizerListProps> = ({ organizers, onEdit, onCan
                         </Button>
                         {organizer.status === 'pending' && (
                           <Button
-                            onClick={() => onCancel(organizer._id)}
+                            onClick={() => onCancel(organizer._id as string)}
                             variant="destructive"
                             size="sm"
                           >
