@@ -7,7 +7,8 @@ export default authMiddleware({
     '/api/webhook/clerk',
     '/api/webhook/stripe',
     '/api/uploadthing',
-    '/api/reviews'
+    '/api/reviews',
+    "/api/organizer-admin/(.*)", // Thêm route này
   ],
   ignoredRoutes: [
     '/api/webhook/clerk',
