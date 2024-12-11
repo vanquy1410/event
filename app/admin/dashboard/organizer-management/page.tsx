@@ -5,7 +5,7 @@ import Link from 'next/link';
 import { Button } from '@/components/ui/button'
 import { getOrganizerEvents, updateOrganizerEventStatus } from '@/lib/actions/organizer.actions';
 import OrganizerTable from '../_component/OrganizerTable';
-import { IOrganizer } from '@/lib/database/models/organizer.model';
+import { IOrganizer } from '@/types/organizer';
 import { toast } from 'react-hot-toast';
 
 const OrganizerManagementPage: React.FC = () => {

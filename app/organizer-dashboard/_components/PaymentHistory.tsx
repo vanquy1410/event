@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { IPayment } from '@/lib/database/models/payment.model';
-import { IOrganizer } from '@/lib/database/models/organizer.model';
+import { IOrganizer } from '@/types/organizer';
 
 interface PaymentHistoryProps {
   organizerId?: string;

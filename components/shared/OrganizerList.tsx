@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
-import { IOrganizer } from '@/lib/database/models/organizer.model';
+import { IOrganizer } from '@/types/organizer';
 import { Button } from '@/components/ui/button';
-import EditOrganizerForm from '@/components/shared/EditOrganizerForm';
+import EditOrganizerForm, { EditOrganizerFormProps } from '@/components/shared/EditOrganizerForm';
 import { toast } from 'react-hot-toast';
 import OrganizerDetailModal from '@/components/shared/OrganizerDetailModal';
 import { useRouter } from 'next/navigation';
@@ -16,7 +16,7 @@ interface OrganizerListProps {
 
 const OrganizerList: React.FC<OrganizerListProps> = ({ organizers, onEdit, onCancel, onViewDashboard }) => {
   const { user } = useUser();
-  const [editingOrganizer, setEditingOrganizer] = useState<IOrganizer | null>(null);
+  const [editingOrganizer, setEditingOrganizer] = useState<EditOrganizerFormProps['initialData'] | null>(null);
   const [selectedOrganizer, setSelectedOrganizer] = useState<IOrganizer | null>(null);
   const [isDetailModalOpen, setIsDetailModalOpen] = useState(false);
   const router = useRouter();
@@ -27,10 +27,21 @@ const OrganizerList: React.FC<OrganizerListProps> = ({ organizers, onEdit, onCan
   };
 
   const handleEdit = (organizer: IOrganizer) => {
+    if (!organizer._id) return;
+
     const organizerWithDates = {
-      ...organizer,
+      _id: organizer._id.toString(),
+      name: organizer.name,
+      email: organizer.email,
+      description: organizer.description,
+      price: organizer.price,
+      participantLimit: organizer.participantLimit,
       startDateTime: new Date(organizer.startDateTime),
-      endDateTime: new Date(organizer.endDateTime)
+      endDateTime: new Date(organizer.endDateTime),
+      location: organizer.location,
+      eventTitle: organizer.eventTitle,
+      phoneNumber: organizer.phoneNumber,
+      status: organizer.status || 'pending'
     };
     setEditingOrganizer(organizerWithDates);
   };
@@ -43,7 +54,7 @@ const OrganizerList: React.FC<OrganizerListProps> = ({ organizers, onEdit, onCan
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          id: editingOrganizer?._id,
+          id: editingOrganizer?._id as string,
           ...updatedData
         }),
       });
@@ -67,7 +78,9 @@ const OrganizerList: React.FC<OrganizerListProps> = ({ organizers, onEdit, onCan
     setIsDetailModalOpen(true);
   };
 
-  const handleViewContract = async (organizerId: string) => {
+  const handleViewContract = async (organizerId: string | undefined) => {
+    if (!organizerId) return;
+
     try {
       const response = await fetch(`/api/organizer/${organizerId}`);
       if (!response.ok) {
@@ -89,7 +102,7 @@ const OrganizerList: React.FC<OrganizerListProps> = ({ organizers, onEdit, onCan
           initialData={editingOrganizer}
           onSubmit={handleSubmitEdit}
           onCancel={() => setEditingOrganizer(null)}
-          organizerId={editingOrganizer._id}
+          organizerId={editingOrganizer._id as string}
         />
       ) : (
         <table className="min-w-full bg-white shadow-md rounded-lg overflow-hidden">
@@ -106,86 +119,90 @@ const OrganizerList: React.FC<OrganizerListProps> = ({ organizers, onEdit, onCan
             </tr>
           </thead>
           <tbody>
-            {organizers.map((organizer, index) => (
-              <tr key={index} className={index % 2 === 0 ? 'bg-gray-50' : 'bg-white'}>
-                <td className="py-3 px-4 border-b">{organizer.name}</td>
-                <td className="py-3 px-4 border-b">{organizer.eventTitle}</td>
-                <td className="py-3 px-4 border-b">{organizer.description.substring(0, 50)}...</td>
-                <td className="py-3 px-4 border-b">{organizer.price.toLocaleString('vi-VN')}</td>
-                <td className="py-3 px-4 border-b">{organizer.location}</td>
-                <td className="py-3 px-4 border-b">
-                  <span className={`px-3 py-1 rounded-full text-sm font-medium inline-block min-w-[100px] text-center ${
-                    organizer.status === 'approved' ? 'bg-green-200 text-green-800' :
-                    organizer.status === 'pending' ? 'bg-yellow-200 text-yellow-800' :
-                    'bg-red-200 text-red-800'
-                  }`}>
-                    {organizer.status === 'approved' ? 'Đã duyệt' :
-                     organizer.status === 'pending' ? 'Chờ duyệt' :
-                     'Từ chối'}
-                  </span>
-                </td>
-                <td className="py-3 px-4 border-b">
-                  <Button 
-                    onClick={() => handleViewDetail(organizer)}
-                    variant="outline"
-                    size="sm"
-                    className="text-blue-600 hover:text-blue-700"
-                  >
-                    Xem chi tiết
-                  </Button>
-                </td>
-                <td className="py-3 px-4 border-b">
-                  <div className="flex space-x-2">
-                    {organizer.status === 'approved' ? (
-                      <>
-                        <Button
-                          onClick={() => handleViewContract(organizer._id)}
-                          className="bg-blue-500 hover:bg-blue-600"
-                          size="sm"
-                        >
-                          Xem hợp đồng và thanh toán
-                        </Button>
-                        <Button
-                          onClick={() => {
-                            if (checkUserRole()) {
-                              router.push(`/organizer-dashboard`);
-                            } else {
-                              toast.error("Bạn không có quyền hạn để vào trang này", {
-                                duration: 3000,
-                                position: "top-center",
-                              });
-                            }
-                          }}
-                          className="bg-green-500 hover:bg-green-600"
-                          size="sm"
-                        >
-                          Xem Dashboard
-                        </Button>
-                      </>
-                    ) : (
-                      <>
-                        <Button
-                          onClick={() => handleEdit(organizer)}
-                          className="bg-purple-500 hover:bg-purple-600"
-                          size="sm"
-                        >
-                          Chỉnh sửa
-                        </Button>
-                        {organizer.status === 'pending' && (
+            {organizers.map((organizer, index) => {
+              if (!organizer._id) return null;
+              
+              return (
+                <tr key={organizer._id} className={index % 2 === 0 ? 'bg-gray-50' : 'bg-white'}>
+                  <td className="py-3 px-4 border-b">{organizer.name}</td>
+                  <td className="py-3 px-4 border-b">{organizer.eventTitle}</td>
+                  <td className="py-3 px-4 border-b">{organizer.description.substring(0, 50)}...</td>
+                  <td className="py-3 px-4 border-b">{organizer.price.toLocaleString('vi-VN')}</td>
+                  <td className="py-3 px-4 border-b">{organizer.location}</td>
+                  <td className="py-3 px-4 border-b">
+                    <span className={`px-3 py-1 rounded-full text-sm font-medium inline-block min-w-[100px] text-center ${
+                      organizer.status === 'approved' ? 'bg-green-200 text-green-800' :
+                      organizer.status === 'pending' ? 'bg-yellow-200 text-yellow-800' :
+                      'bg-red-200 text-red-800'
+                    }`}>
+                      {organizer.status === 'approved' ? 'Đã duyệt' :
+                       organizer.status === 'pending' ? 'Chờ duyệt' :
+                       'Từ chối'}
+                    </span>
+                  </td>
+                  <td className="py-3 px-4 border-b">
+                    <Button 
+                      onClick={() => handleViewDetail(organizer)}
+                      variant="outline"
+                      size="sm"
+                      className="text-blue-600 hover:text-blue-700"
+                    >
+                      Xem chi tiết
+                    </Button>
+                  </td>
+                  <td className="py-3 px-4 border-b">
+                    <div className="flex space-x-2">
+                      {organizer.status === 'approved' ? (
+                        <>
                           <Button
-                            onClick={() => onCancel(organizer._id)}
-                            variant="destructive"
+                            onClick={() => organizer._id && handleViewContract(organizer._id)}
+                            className="bg-blue-500 hover:bg-blue-600"
                             size="sm"
                           >
-                            Hủy
+                            Xem hợp đồng và thanh toán
                           </Button>
-                        )}
-                      </>
-                    )}
-                  </div>
-                </td>
-              </tr>
-            ))}
+                          <Button
+                            onClick={() => {
+                              if (checkUserRole()) {
+                                router.push(`/organizer-dashboard`);
+                              } else {
+                                toast.error("Bạn không có quyền hạn để vào trang này", {
+                                  duration: 3000,
+                                  position: "top-center",
+                                });
+                              }
+                            }}
+                            className="bg-green-500 hover:bg-green-600"
+                            size="sm"
+                          >
+                            Xem Dashboard
+                          </Button>
+                        </>
+                      ) : (
+                        <>
+                          <Button
+                            onClick={() => organizer._id && handleEdit(organizer)}
+                            className="bg-purple-500 hover:bg-purple-600"
+                            size="sm"
+                          >
+                            Chỉnh sửa
+                          </Button>
+                          {organizer.status === 'pending' && organizer._id && (
+                            <Button
+                              onClick={() => organizer._id && onCancel(organizer._id)}
+                              variant="destructive"
+                              size="sm"
+                            >
+                              Hủy
+                            </Button>
+                          )}
+                        </>
+                      )}
+                    </div>
+                  </td>
+                </tr>
+              );
+            })}
           </tbody>
         </table>
       )}

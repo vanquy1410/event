@@ -4,7 +4,7 @@ import DatePicker from 'react-datepicker';
 import "react-datepicker/dist/react-datepicker.css";
 import { toast } from 'react-hot-toast';
 
-interface EditOrganizerFormProps {
+export interface EditOrganizerFormProps {
   initialData: {
     _id: string;
     name: string;
@@ -16,13 +16,15 @@ interface EditOrganizerFormProps {
     endDateTime: Date;
     location: string;
     eventTitle: string;
+    phoneNumber: string;
+    status: string;
   };
   onSubmit: (data: any) => void;
   onCancel: () => void;
   organizerId: string;
 }
 
-const EditOrganizerForm = ({ initialData, onSubmit, onCancel, organizerId }: EditOrganizerFormProps) => {
+const EditOrganizerForm: React.FC<EditOrganizerFormProps> = ({ initialData, onSubmit, onCancel, organizerId }) => {
   const [formData, setFormData] = useState({
     ...initialData,
     startDateTime: new Date(initialData.startDateTime),

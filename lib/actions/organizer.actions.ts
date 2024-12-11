@@ -1,37 +1,33 @@
-import { IOrganizer } from '@/lib/database/models/organizer.model';
+'use server';
+
 import { connectToDatabase } from '@/lib/database';
+import { IOrganizer } from '@/types/organizer';
 import Organizer from '@/lib/database/models/organizer.model';
-import { handleError } from '@/lib/utils'; // Điều chỉnh đường dẫn nếu cần
 
-const API_BASE_URL = typeof window !== 'undefined' ? window.location.origin : 'http://localhost:3000';
-
-export async function createOrganizerEvent(eventData: Omit<IOrganizer, 'status'>) {
+export async function createOrganizerEvent(eventData: Omit<IOrganizer, '_id' | 'status'>) {
   try {
-    const response = await fetch('/api/createOrganizerEvent', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(eventData),
+    await connectToDatabase();
+    
+    const newOrganizer = new Organizer({
+      ...eventData,
+      status: 'pending',
+      documents: []
     });
-    if (!response.ok) {
-      const errorData = await response.json();
-      throw new Error(errorData.error || 'Lỗi khi tạo sự kiện');
-    }
-    return await response.json();
+
+    const savedOrganizer = await newOrganizer.save();
+    return savedOrganizer;
+
   } catch (error) {
     console.error('Lỗi khi tạo sự kiện:', error);
     throw error;
   }
 }
 
-export async function getOrganizerEvents() {
+export async function getOrganizerEvents(): Promise<IOrganizer[]> {
   try {
-    const response = await fetch('/api/organizer');
-    if (!response.ok) {
-      throw new Error('Lỗi khi lấy danh sách sự kiện');
-    }
-    return await response.json();
+    await connectToDatabase();
+    const organizers = await Organizer.find({});
+    return organizers;
   } catch (error) {
     console.error('Lỗi khi lấy danh sách sự kiện:', error);
     throw error;

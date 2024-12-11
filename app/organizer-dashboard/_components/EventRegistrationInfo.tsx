@@ -1,106 +1,58 @@
-import { IOrganizer } from '@/lib/database/models/organizer.model';
+import { IOrganizer } from '@/types/organizer';
+import PaymentHistory from './PaymentHistory';
 
 interface EventRegistrationInfoProps {
   data: IOrganizer | null;
   selectedEventId?: string;
 }
 
-export default function EventRegistrationInfo({ data, selectedEventId }: EventRegistrationInfoProps) {
-  const eventData = selectedEventId ? data : null;
-  
-  if (!eventData) return null;
-
-  const formatDate = (date: Date) => {
-    return new Date(date).toLocaleDateString('vi-VN', {
-      day: '2-digit',
-      month: '2-digit',
-      year: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit',
-    });
-  };
-
-  const formatPrice = (price: number) => {
-    return price ? price.toLocaleString('vi-VN') : '0';
-  };
+const EventRegistrationInfo: React.FC<EventRegistrationInfoProps> = ({ data, selectedEventId }) => {
+  if (!data) return null;
 
   return (
-    <div className="bg-white p-6 rounded-lg shadow">
-      <h2 className="text-xl font-semibold mb-4">Thông tin đăng ký sự kiện</h2>
-      
-      <div className="space-y-3">
-        <div className="grid grid-cols-2 gap-2">
-          <span className="text-gray-600">Tên người đăng ký:</span>
-          <span>{eventData.name}</span>
+    <div className="space-y-6">
+      <div className="bg-white rounded-lg shadow-lg p-6">
+        <h2 className="text-xl font-semibold mb-4">Chi tiết đăng ký sự kiện</h2>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <InfoItem label="Tên sự kiện" value={data.eventTitle} />
+          <InfoItem label="Địa điểm" value={data.location} />
+          <InfoItem label="Thời gian bắt đầu" value={new Date(data.startDateTime).toLocaleDateString('vi-VN')} />
+          <InfoItem label="Thời gian kết thúc" value={new Date(data.endDateTime).toLocaleDateString('vi-VN')} />
+          <InfoItem label="Loại sự kiện" value={data.eventType} />
+          <InfoItem label="Quy mô" value={data.eventScale} />
+          <InfoItem label="Số lượng người tham gia" value={data.participantLimit.toString()} />
+          <InfoItem label="Giá vé" value={`${data.price.toLocaleString('vi-VN')}đ`} />
+          <InfoItem label="Trạng thái" value={getStatusText(data.status)} />
         </div>
-
-        <div className="grid grid-cols-2 gap-2">
-          <span className="text-gray-600">Email:</span>
-          <span>{eventData.email}</span>
-        </div>
-
-        <div className="grid grid-cols-2 gap-2">
-          <span className="text-gray-600">Số điện thoại:</span>
-          <span>{eventData.phoneNumber}</span>
-        </div>
-
-        <div className="grid grid-cols-2 gap-2">
-          <span className="text-gray-600">Tên sự kiện:</span>
-          <span>{eventData.eventTitle}</span>
-        </div>
-
-        <div className="grid grid-cols-2 gap-2">
-          <span className="text-gray-600">Trạng thái:</span>
-          <span className={`font-medium ${
-            eventData.status === 'approved' ? 'text-green-600' : 
-            eventData.status === 'rejected' ? 'text-red-600' : 'text-yellow-600'
-          }`}>
-            {eventData.status === 'approved' ? 'Đã duyệt' : 
-             eventData.status === 'rejected' ? 'Từ chối' : 'Chờ duyệt'}
-          </span>
-        </div>
-
-        <div className="grid grid-cols-2 gap-2">
-          <span className="text-gray-600">Số người tham dự:</span>
-          <span>{eventData.participantLimit}</span>
-        </div>
-
-        <div className="grid grid-cols-2 gap-2">
-          <span className="text-gray-600">Giá vé:</span>
-          <span>{formatPrice(eventData.price)}đ</span>
-        </div>
-
-        <div className="grid grid-cols-2 gap-2">
-          <span className="text-gray-600">Địa điểm:</span>
-          <span>{eventData.location}</span>
-        </div>
-
-        <div className="grid grid-cols-2 gap-2">
-          <span className="text-gray-600">Mô tả:</span>
-          <span className="text-justify">{eventData.description}</span>
-        </div>
-
-        <div className="grid grid-cols-2 gap-2">
-          <span className="text-gray-600">Ngày bắt đầu:</span>
-          <span>{formatDate(new Date(eventData.startDateTime))}</span>
-        </div>
-
-        <div className="grid grid-cols-2 gap-2">
-          <span className="text-gray-600">Ngày kết thúc:</span>
-          <span>{formatDate(new Date(eventData.endDateTime))}</span>
-        </div>
-
-        {eventData.digitalSignature && (
-          <div className="grid grid-cols-2 gap-2">
-            <span className="text-gray-600">Chữ ký số:</span>
-            <img 
-              src={eventData.digitalSignature} 
-              alt="Digital Signature"
-              className="max-h-20 object-contain" 
-            />
-          </div>
-        )}
       </div>
+
+      {selectedEventId && (
+        <PaymentHistory organizerId={selectedEventId} />
+      )}
     </div>
   );
-} 
+};
+
+const InfoItem = ({ label, value }: { label: string; value: string }) => (
+  <div>
+    <span className="font-medium">{label}: </span>
+    <span className="text-gray-700">{value}</span>
+  </div>
+);
+
+const getStatusText = (status: string) => {
+  switch (status) {
+    case 'pending':
+      return 'Chờ duyệt';
+    case 'approved':
+      return 'Đã duyệt';
+    case 'rejected':
+      return 'Từ chối';
+    case 'cancelled':
+      return 'Đã hủy';
+    default:
+      return status;
+  }
+};
+
+export default EventRegistrationInfo; 

@@ -8,7 +8,7 @@ import Link from "next/link";
 import { useRouter } from 'next/navigation';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { toast } from "sonner";
-import { IOrganizer } from '@/lib/database/models/organizer.model';
+import { IOrganizer } from '@/types/organizer';
 import PaymentForm from '@/components/shared/PaymentForm';
 
 export default function OrganizerDashboard({ params }: { params: { id: string } }) {

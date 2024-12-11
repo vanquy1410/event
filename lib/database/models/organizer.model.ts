@@ -1,25 +1,7 @@
-import { Schema, model, models, Document, Model } from 'mongoose';
+import mongoose, { Schema } from 'mongoose';
+import { IOrganizer } from '@/types/organizer';
 
-export interface IOrganizer {
-  _id: string;
-  name: string;
-  phoneNumber: string;
-  email: string;
-  eventTitle: string;
-  description: string;
-  location: string;
-  startDateTime: Date;
-  endDateTime: Date;
-  eventType: string;
-  price: number;
-  participantLimit: number;
-  status: 'pending' | 'approved' | 'rejected' | 'cancelled';
-  documents: string[];
-  digitalSignature?: string;
-  contractUrl?: string;
-}
-
-const OrganizerSchema = new Schema<IOrganizer>({
+const OrganizerSchema = new Schema({
   name: { type: String, required: true },
   phoneNumber: { type: String, required: true },
   email: { type: String, required: true },
@@ -29,24 +11,34 @@ const OrganizerSchema = new Schema<IOrganizer>({
   startDateTime: { type: Date, required: true },
   endDateTime: { type: Date, required: true },
   eventType: { type: String, required: true },
-  price: { type: Number, required: true },
+  eventScale: { type: String, required: true },
+  venueType: { type: String, required: true },
+  venue: { type: String, required: true },
+  expectedTicketPrice: { type: Number, required: true },
+  expectedRevenue: { type: Number, required: true },
   participantLimit: { type: Number, required: true },
+  price: { type: Number, required: true },
+  scaleDetails: {
+    capacity: { type: Number, required: true },
+    basePrice: { type: Number, required: true },
+    venues: {
+      name: { type: String, required: true },
+      capacity: { type: Number, required: true },
+      pricePerDay: { type: Number, required: true },
+      rating: { type: Number },
+      facilities: [{ type: String }]
+    }
+  },
   status: {
     type: String,
-    enum: ['pending', 'approved', 'rejected'],
+    enum: ['pending', 'approved', 'rejected', 'cancelled'],
     default: 'pending'
   },
-  documents: [{ type: String }],
-  digitalSignature: { type: String },
-  contractUrl: { type: String }
+  documents: [{ type: String }]
+}, {
+  timestamps: true
 });
 
-let Organizer: Model<IOrganizer>;
-
-if (typeof models !== 'undefined' && models.Organizer) {
-  Organizer = models.Organizer as Model<IOrganizer>;
-} else {
-  Organizer = model<IOrganizer>('Organizer', OrganizerSchema);
-}
+const Organizer = mongoose.models.Organizer || mongoose.model<IOrganizer>('Organizer', OrganizerSchema);
 
 export default Organizer;

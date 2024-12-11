@@ -5,18 +5,10 @@ import { FaUpload, FaEye } from 'react-icons/fa';
 import UploadDocumentModal from './UploadDocumentModal';
 import ViewDocumentsModal from './ViewDocumentsModal';
 import { useState } from 'react';
-
-interface Organizer {
-  _id: string;
-  name: string;
-  eventTitle: string;
-  description: string;
-  status: 'pending' | 'approved' | 'rejected' | 'cancelled';
-  documents: string[];
-}
+import { IOrganizer } from '@/types/organizer';
 
 interface OrganizerTableProps {
-  organizers: Organizer[];
+  organizers: IOrganizer[];
   onStatusUpdate: (id: string, status: 'approved' | 'rejected') => void;
   onSearch: (query: string) => void;
   onDocumentUpdate: (organizerId: string, newDocument: string) => void;

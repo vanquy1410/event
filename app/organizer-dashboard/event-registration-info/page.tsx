@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useUser } from "@clerk/nextjs";
-import { IOrganizer } from "@/lib/database/models/organizer.model";
+import { IOrganizer } from "@/types/organizer";
 import { getOrganizerEvents } from "@/lib/actions/organizer.actions";
 import EventRegistrationInfo from "../_components/EventRegistrationInfo";
 
