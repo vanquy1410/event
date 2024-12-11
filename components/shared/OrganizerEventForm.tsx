@@ -507,6 +507,7 @@ const OrganizerEventForm: React.FC<OrganizerEventFormProps> = ({ setOrganizers, 
               </FormItem>
             )}
           />
+<<<<<<< HEAD
           <div className="grid grid-cols-2 gap-4">
             <FormField
               control={form.control}
@@ -571,6 +572,34 @@ const OrganizerEventForm: React.FC<OrganizerEventFormProps> = ({ setOrganizers, 
               </div>
             </div>
           )}
+=======
+          <FormField
+            control={form.control}
+            name="price"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Giá vé (đ)</FormLabel>
+                <FormControl>
+                  <Input {...field} type="number" onChange={e => field.onChange(parseFloat(e.target.value))} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          <FormField
+            control={form.control}
+            name="participantLimit"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Số người tham dự</FormLabel>
+                <FormControl>
+                  <Input {...field} type="number" onChange={e => field.onChange(parseInt(e.target.value))} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+>>>>>>> origin/main
           <Button type="submit">Gửi</Button>
         </form>
         <AlertDialog open={showCancelDialog} onOpenChange={setShowCancelDialog}>
