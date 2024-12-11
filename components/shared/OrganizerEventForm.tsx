@@ -210,7 +210,9 @@ const OrganizerEventForm: React.FC<OrganizerEventFormProps> = ({ setOrganizers, 
     venue: VenueType,
     ticketPrice: number
   ): number => {
-    const expectedAttendees = Math.min(scale.capacity, venue.capacity) * scale.expectedRevenue.occupancyRate;
+    const expectedAttendees = Math.floor(
+      Math.min(scale.capacity, venue.capacity) * scale.expectedRevenue.occupancyRate
+    );
     const totalRevenue = expectedAttendees * ticketPrice;
     const venueCost = venue.pricePerDay;
     const organizationCost = scale.basePrice;
@@ -507,6 +509,68 @@ const OrganizerEventForm: React.FC<OrganizerEventFormProps> = ({ setOrganizers, 
               </FormItem>
             )}
           />
+          <div className="space-y-4">
+            <FormField
+              control={form.control}
+              name="expectedTicketPrice"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Giá vé dự kiến (VNĐ)</FormLabel>
+                  <FormControl>
+                    <Input 
+                      type="number"
+                      {...field}
+                      onChange={(e) => {
+                        const value = Number(e.target.value);
+                        field.onChange(value);
+                        
+                        if (selectedScale && form.watch('venue')) {
+                          const venueType = selectedScale.venues[form.watch('venueType') as keyof typeof selectedScale.venues]
+                            .find(v => v.name === form.watch('venue'));
+                          if (venueType) {
+                            const newEstimatedRevenue = calculateEstimatedRevenue(
+                              selectedScale,
+                              venueType,
+                              value
+                            );
+                            setEstimatedRevenue(newEstimatedRevenue);
+                            form.setValue('expectedRevenue', newEstimatedRevenue);
+                          }
+                        }
+                      }}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            {/* Hiển thị thông tin chi tiết */}
+            {selectedScale && form.watch('venue') && (
+              <div className="bg-gray-50 p-4 rounded-lg space-y-2">
+                <h3 className="font-semibold text-lg">Thông tin chi tiết:</h3>
+                <div>
+                  <p>Quy mô tối đa: {selectedScale.capacity} nguời</p>
+                  <p>Chi phí tổ chức cơ bản: {selectedScale.basePrice.toLocaleString()}đ</p>
+                  <p>Chi phí địa điểm: {
+                    selectedScale.venues[form.watch('venueType') as keyof typeof selectedScale.venues]
+                      .find(v => v.name === form.watch('venue'))?.pricePerDay.toLocaleString()
+                  }đ/ngày</p>
+                  <p>Số người tham dự dự kiến: {Math.floor(
+                    Math.min(
+                      selectedScale.capacity,
+                      selectedScale.venues[form.watch('venueType') as keyof typeof selectedScale.venues]
+                        .find(v => v.name === form.watch('venue'))?.capacity || 0
+                    ) * selectedScale.expectedRevenue.occupancyRate
+                  )} người</p>
+                  <p>Giá vé đề xuất: {selectedScale.expectedRevenue.minTicketPrice.toLocaleString()}đ - {selectedScale.expectedRevenue.maxTicketPrice.toLocaleString()}đ</p>
+                  <p className="font-semibold text-green-600">
+                    Doanh thu dự kiến: {estimatedRevenue.toLocaleString()}đ
+                  </p>
+                </div>
+              </div>
+            )}
+          </div>
           <Button type="submit">Gửi</Button>
         </form>
         <AlertDialog open={showCancelDialog} onOpenChange={setShowCancelDialog}>

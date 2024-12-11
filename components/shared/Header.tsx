@@ -1,3 +1,6 @@
+"use client"
+
+import { useState, useEffect } from "react"
 import { SignedIn, SignedOut, UserButton } from "@clerk/nextjs"
 import Image from "next/image"
 import Link from "next/link"
@@ -7,6 +10,16 @@ import MobileNav from "./MobileNav"
 import NotificationDropdown from "./NotificationDropdown"
 
 const Header = () => {
+  const [isMounted, setIsMounted] = useState(false)
+
+  useEffect(() => {
+    setIsMounted(true)
+  }, [])
+
+  if (!isMounted) {
+    return null // hoặc return một skeleton/loading state
+  }
+
   return (
     <header className="w-full border-b bg-violet-400 py-8">
       <div className="wrapper flex items-center justify-between">
