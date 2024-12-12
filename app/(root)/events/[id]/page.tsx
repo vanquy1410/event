@@ -15,6 +15,8 @@ import ContentEditor from '@/components/shared/ContentEditor';
 const EventDetails = async ({ params, searchParams }: SearchParamProps) => {
   const event = await getEventById(params.id);
 
+  console.log('event', event)
+
   if (!event) {
     // Handle the case where the event is not found
     return <div>Event not found</div>;

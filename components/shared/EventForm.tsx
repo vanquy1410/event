@@ -22,6 +22,8 @@ import { createEvent, updateEvent } from "@/lib/actions/event.actions"
 import { IEvent } from "@/lib/database/models/event.model"
 import dynamic from 'next/dynamic';
 import 'react-quill/dist/quill.snow.css';
+import { IOrganizer } from "@/types/organizer"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../ui/select"
 
 // Khai báo ReactQuill
 const ReactQuill = dynamic(() => import('react-quill'), {
@@ -34,9 +36,11 @@ type EventFormProps = {
   type: "Create" | "Update"
   event?: IEvent,
   eventId?: string
+  eventsOrganizer?: IOrganizer[]
 }
 
-const EventForm = ({ userId, type, event, eventId }: EventFormProps) => {
+const EventForm = ({ userId, type, event, eventId, eventsOrganizer = [] }: EventFormProps) => {
+  const [eventSelected, setEventSelected] = useState<IOrganizer | null>(null);
   const [files, setFiles] = useState<File[]>([])
   const initialValues = event && type === 'Update' 
     ? { 
@@ -51,6 +55,8 @@ const EventForm = ({ userId, type, event, eventId }: EventFormProps) => {
     resolver: zodResolver(eventFormSchema),
     defaultValues: {
       ...initialValues,
+      categoryId: event?.category?._id || '',
+      eventOrganizerId: event?.eventOrganizerId || '',
       imageUrl: event?.imageUrl || '',
     }
   })
@@ -65,6 +71,23 @@ const EventForm = ({ userId, type, event, eventId }: EventFormProps) => {
       });
       return;
     }
+  
+    if(!values.eventOrganizerId) {
+      form.setError('eventOrganizerId', {
+        type: 'manual',
+        message: 'Vui lòng chọn sự kiện'
+      });
+      return
+    }
+
+    if(!values.categoryId) {
+      form.setError('categoryId', {
+        type: 'manual',
+        message: 'Vui lòng chọn danh mục'
+      });
+      return
+    }
+
 
     if (files.length > 0) {
       const formData = new FormData();
@@ -95,6 +118,7 @@ const EventForm = ({ userId, type, event, eventId }: EventFormProps) => {
         const newEvent = await createEvent({
           event: { 
             ...values, 
+            eventOrganizerId: eventSelected?._id || values.eventOrganizerId,
             imageUrl: uploadedImageUrl,
             categoryId: values.categoryId 
           },
@@ -122,6 +146,7 @@ const EventForm = ({ userId, type, event, eventId }: EventFormProps) => {
           userId,
           event: { 
             ...values, 
+            eventOrganizerId: eventSelected?._id || values.eventOrganizerId,
             _id: eventId, 
             imageUrl: uploadedImageUrl,
             categoryId: values.categoryId
@@ -139,10 +164,48 @@ const EventForm = ({ userId, type, event, eventId }: EventFormProps) => {
     }
   }
 
+  const handleChangeEventOrganizer = (value: string) => {
+    const event = eventsOrganizer.find(event => event._id === value);
+    setEventSelected(event || null);
+
+    form.setValue('eventOrganizerId', value);
+    form.setValue('title', event?.eventTitle || '');
+    form.setValue('description', event?.description || '');
+    form.setValue('location', event?.location || '');
+    form.setValue('startDateTime', new Date(event?.startDateTime || ''));
+    form.setValue('endDateTime', new Date(event?.endDateTime || ''));
+    form.setValue('price', (event?.expectedTicketPrice || 0).toString());
+    form.setValue('participantLimit', event?.participantLimit || 0);
+  }
+
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="flex flex-col gap-5">
-        <div className="flex flex-col gap-5 md:flex-row">
+        <div className="flex items-center flex-col gap-5 md:flex-row">
+        {
+          eventsOrganizer.length > 0 && (
+            <Select value={eventSelected?._id} onValueChange={handleChangeEventOrganizer}>
+          <SelectTrigger className="max-w-xs">
+            <SelectValue placeholder="Chọn sự kiện" />
+          </SelectTrigger>
+          <SelectContent>
+            {eventsOrganizer.map((event) => (
+              <SelectItem key={event._id} value={event._id}>
+                {event.eventTitle}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+          )
+        }
+        <FormField
+            control={form.control}
+            defaultValue={eventSelected?._id}
+            name="eventOrganizerId"
+            render={({ field }) => (
+              <Input type="hidden" {...field} value={eventSelected?._id} />
+            )}
+          />
           <FormField
             control={form.control}
             name="title"

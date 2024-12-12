@@ -1,11 +1,22 @@
 import EventForm from "@/components/shared/EventForm"
+import { IOrganizer } from "@/types/organizer";
 import { auth } from "@clerk/nextjs";
 
-const CreateEvent = () => {
-  const { sessionClaims } = auth();
-
+const CreateEvent = async () => {
+  const { sessionClaims, getToken } = auth();
   const userId = sessionClaims?.userId as string;
-  
+  const baseUrl =  process.env.NEXT_PUBLIC_APP_URL;
+  const token = await getToken();
+  const response = await fetch(`${baseUrl}/api/organizer`, {
+    headers: {
+      'Authorization': `Bearer ${token}`,
+    },
+    cache: 'no-store',
+  });
+
+  const data = await response.json() ?? [];
+  // approved events
+  const eventsOrganizer = data?.filter((event: IOrganizer) => event?.status === 'approved');
 
   return (
     <>
@@ -14,7 +25,7 @@ const CreateEvent = () => {
       </section>
 
       <div className="wrapper my-8">
-        <EventForm userId={userId} type="Create" />
+        <EventForm userId={userId} type="Create" eventsOrganizer={eventsOrganizer} />
       </div>
     </>
   )

@@ -86,6 +86,7 @@ export type CreateEventParams = {
     isFree: boolean
     url: string
     participantLimit: number // Add this line
+    eventOrganizerId: string // Add this line
   }
   path: string
 }
@@ -107,6 +108,7 @@ export type UpdateEventParams = {
     participantLimit?: number // Add this line
     currentParticipants?: number  // Add this line
     seats?: boolean[]  // Make sure this is also included
+    eventOrganizerId?: string // Add this line
   }
   path: string
 }

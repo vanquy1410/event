@@ -42,11 +42,16 @@ export async function createEvent({ event, userId, path }: CreateEventParams) {
 
     const newEvent = await Event.create({
       ...event,
+      eventOrganizerId: event.eventOrganizerId,
       category: event.categoryId,
       organizer: userId,
       seats: seats, // Thêm trường seats vào sự kiện
     });
 
+    console.log('====================================');
+    console.log('event', event);
+    console.log('newEvent', newEvent);
+    console.log('====================================');
     // Tạo thông báo mới
     await Notification.create({
       message: `Sự kiện mới "${newEvent.title}" đã được tạo`,
@@ -67,6 +72,22 @@ export async function getEventById(eventId: string) {
     await connectToDatabase()
 
     const event = await populateEvent(Event.findById(eventId))
+
+    if (!event) throw new Error('Event not found')
+
+    return JSON.parse(JSON.stringify(event))
+  } catch (error) {
+    handleError(error)
+  }
+}
+
+
+// GET ONE EVENT BY EVENT ORGANIZER ID
+export async function getEventByEventOrganizerId(eventOrgId: string) {
+  try {
+    await connectToDatabase()
+
+    const event = await populateEvent(Event.findOne({ eventOrganizerId: eventOrgId }))
 
     if (!event) throw new Error('Event not found')
 

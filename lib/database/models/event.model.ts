@@ -17,6 +17,7 @@ export interface IEvent extends Document {
   participantLimit: number;
   currentParticipants: number;  // Make sure this is included
   seats: boolean[];
+  eventOrganizerId: string;
 }
 
 const EventSchema = new Schema({
@@ -35,8 +36,10 @@ const EventSchema = new Schema({
   participantLimit: { type: Number, required: true },
   currentParticipants: { type: Number, default: 0 },
   seats: { type: [Boolean], default: [] },
+  eventOrganizerId: { type: Schema.Types.ObjectId, ref: 'Organizer' }
 })
 
-const Event = models.Event || model('Event', EventSchema);
+// const Event = models.Event || model('Event', EventSchema);
+const Event = models.Event || model<IEvent>('Event', EventSchema);
 
 export default Event;

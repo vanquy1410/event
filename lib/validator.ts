@@ -12,6 +12,7 @@ export const eventFormSchema = z.object({
   isFree: z.boolean(),
   url: z.string(),
   participantLimit: z.number().min(1, 'Người tham gia ít nhất phải là 1'),
+  eventOrganizerId: z.string().min(1, 'Chưa chọn đăng ký sự kiện'),
 })
 
 export const organizerFormSchema = z.object({
