@@ -254,11 +254,6 @@ export type OrderData = {
   isFree: boolean;
   buyerId: string;
   selectedSeat: number;
-  seatType: {
-    id: string;
-    name: string;
-    description: string;
-  };
 };
 
 export interface IOrderItem {

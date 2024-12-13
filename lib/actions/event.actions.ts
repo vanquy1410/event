@@ -83,17 +83,19 @@ export async function getEventById(eventId: string) {
 
 
 // GET ONE EVENT BY EVENT ORGANIZER ID
-export async function getEventByEventOrganizerId(eventOrgId: string) {
+export async function getEventByEventOrganizerId(organizerId: string) {
   try {
-    await connectToDatabase()
+    await connectToDatabase();
 
-    const event = await populateEvent(Event.findOne({ eventOrganizerId: eventOrgId }))
+    const event = await Event.findOne({ eventOrganizerId: organizerId });
+    
+    if (!event) {
+      return null;
+    }
 
-    if (!event) throw new Error('Event not found')
-
-    return JSON.parse(JSON.stringify(event))
+    return JSON.parse(JSON.stringify(event));
   } catch (error) {
-    handleError(error)
+    handleError(error);
   }
 }
 

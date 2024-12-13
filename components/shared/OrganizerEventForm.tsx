@@ -95,11 +95,19 @@ const OrganizerEventForm: React.FC<OrganizerEventFormProps> = ({ setOrganizers, 
 
   const onSubmit = async (data: z.infer<typeof formSchema>) => {
     try {
+      if (!selectedScale) {
+        throw new Error('Vui lòng chọn quy mô sự kiện');
+      }
+
       const selectedVenue = selectedScale?.venues[data.venueType as keyof typeof selectedScale.venues]
         .find(v => v.name === data.venue);
 
       if (!selectedVenue) {
-        throw new Error('Lựa chọn địa điểm không hợp lệ');
+        throw new Error('Vui lòng chọn địa điểm tổ chức');
+      }
+
+      if (data.endDateTime < data.startDateTime) {
+        throw new Error('Thời gian kết thúc phải sau thời gian bắt đầu');
       }
 
       const formData = {
@@ -117,16 +125,16 @@ const OrganizerEventForm: React.FC<OrganizerEventFormProps> = ({ setOrganizers, 
           capacity: selectedScale?.capacity || 0,
           basePrice: selectedScale?.basePrice || 0,
           venues: {
-            name: selectedVenue?.name,
-            capacity: selectedVenue?.capacity,
-            pricePerDay: selectedVenue?.pricePerDay,
-            rating: selectedVenue?.rating,
+            name: selectedVenue?.name || '',
+            capacity: selectedVenue?.capacity || 0,
+            pricePerDay: selectedVenue?.pricePerDay || 0,
+            rating: selectedVenue?.rating || 0,
             facilities: selectedVenue?.facilities || []
           }
         }
       };
 
-      console.log('Sending data:', formData);
+      console.log('Dữ liệu gửi đi:', formData);
       
       const response = await fetch('/api/createOrganizerEvent', {
         method: 'POST',
@@ -151,10 +159,7 @@ const OrganizerEventForm: React.FC<OrganizerEventFormProps> = ({ setOrganizers, 
 
     } catch (error) {
       console.error('Lỗi:', error);
-
-      // Type guard to check if error is an instance of Error
       const errorMessage = error instanceof Error ? error.message : 'Đã xảy ra lỗi không xác định';
-      
       toast.error(`Lỗi: ${errorMessage}`, {
         duration: 5000,
         position: 'top-center',

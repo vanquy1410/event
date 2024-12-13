@@ -37,7 +37,7 @@ export const checkoutOrder = async (order: OrderData) => {
             unit_amount: Number(order.price),
             product_data: {
               name: order.eventTitle,
-              description: `Vé ${order.seatType.name} - Ghế số ${order.selectedSeat + 1}`
+              description: `Ghế số ${order.selectedSeat + 1}`
             }
           },
           quantity: 1
@@ -46,8 +46,7 @@ export const checkoutOrder = async (order: OrderData) => {
       metadata: {
         eventId: order.eventId,
         buyerId: order.buyerId,
-        selectedSeat: order.selectedSeat.toString(),
-        seatType: JSON.stringify(order.seatType)
+        selectedSeat: order.selectedSeat.toString()
       },
       mode: 'payment',
       success_url: `${process.env.NEXT_PUBLIC_SERVER_URL}/profile`,
@@ -64,7 +63,6 @@ export const createOrder = async (orderData: {
   eventId: string;
   buyerId: string;
   selectedSeat: number;
-  seatType: string;
   stripeId: string;
   totalAmount: string;
 }): Promise<Order | null> => {
@@ -77,8 +75,6 @@ export const createOrder = async (orderData: {
     if (!event || !buyer) {
       throw new Error('Event or Buyer not found');
     }
-
-    const seatType = JSON.parse(orderData.seatType);
     
     const newOrder = await OrderModel.create({
       stripeId: orderData.stripeId,
@@ -87,8 +83,7 @@ export const createOrder = async (orderData: {
       buyer: orderData.buyerId,
       eventTitle: event.title,
       buyerName: `${buyer.firstName} ${buyer.lastName}`,
-      selectedSeat: orderData.selectedSeat,
-      seatType: seatType
+      selectedSeat: orderData.selectedSeat
     });
 
     // Cập nhật trạng thái ghế trong event
