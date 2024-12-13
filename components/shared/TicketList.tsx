@@ -17,6 +17,7 @@ import { IOrderItem } from '@/types'
 import Pagination from './Pagination'
 import { cancelOrder } from '@/lib/actions/order.actions';
 import Link from 'next/link';
+import dynamic from 'next/dynamic'
 
 interface TicketListProps {
   userId: string
@@ -24,6 +25,11 @@ interface TicketListProps {
   page: number
   totalPages: number
 }
+
+const ReactQuill = dynamic(() => import('react-quill'), {
+  ssr: false,
+  loading: () => <p>Please wait for loading…</p>,
+});
 
 const TicketList = ({ userId, orders, page, totalPages }: TicketListProps) => {
   const [orderList, setOrderList] = useState(orders);
@@ -124,7 +130,12 @@ const TicketList = ({ userId, orders, page, totalPages }: TicketListProps) => {
                 )}
               </td>
               <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{order.event.title}</td>
-              <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{order.event.description.substring(0, 50)}...</td>
+              <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                <ReactQuill 
+                  value={order.event.description} 
+                  readOnly={true} 
+                />
+              </td>
               <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                 {Number(order.totalAmount).toLocaleString('vi-VN') || 0} đ
               </td>
@@ -150,7 +161,8 @@ const TicketList = ({ userId, orders, page, totalPages }: TicketListProps) => {
                       />
                       <div className="space-y-2">
                         <p className="text-gray-700">
-                          <strong className="text-primary-500">Mô tả:</strong> {order.event.description}
+                          <strong className="text-primary-500">Mô tả:</strong>
+                          <ReactQuill value={order.event.description} readOnly={true} theme="bubble" />
                         </p>
                         <p className="text-gray-700">
                           <strong className="text-primary-500">Giá:</strong> {Number(order.totalAmount).toLocaleString('vi-VN') || 0} đ
