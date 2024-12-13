@@ -7,6 +7,7 @@ import { getOrganizerEvents } from "@/lib/actions/organizer.actions";
 import EventRegistrationInfo from "../_components/EventRegistrationInfo";
 import { IEvent } from "@/types";
 import { getEventByEventOrganizerId } from "@/lib/actions/event.actions";
+import { getOrdersByEventId } from "@/lib/actions/order.actions";
 
 export default function EventRegistrationInfoPage() {
   const { user } = useUser();
@@ -15,6 +16,7 @@ export default function EventRegistrationInfoPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [eventData, setEventData] = useState<IEvent | null>(null);
+  const [orders, setOrders] = useState<any[]>([]);
 
   useEffect(() => {
     const fetchOrganizerData = async () => {
@@ -67,16 +69,20 @@ export default function EventRegistrationInfoPage() {
     try {
       const event = await getEventByEventOrganizerId(e.target.value);
       setEventData(event);
+
+      const response = await getOrdersByEventId({
+        eventId: e.target.value,
+        limit: Number.MAX_SAFE_INTEGER,
+        page: 1
+      })
+
+      setOrders(response.data);
     } catch (error) {
       console.log('====================================');
       console.log('error', error);
       console.log('====================================');
     }
   }
-
-  console.log('====================================');
-  console.log('eventData', eventData);
-  console.log('====================================');
 
 
   return (
@@ -103,6 +109,7 @@ export default function EventRegistrationInfoPage() {
         data={selectedEvent || null}
         eventData={eventData}
         selectedEventId={selectedEventId || undefined}
+        orders={orders}
       />
     </div>
   );

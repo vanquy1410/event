@@ -325,3 +325,46 @@ export async function cancelOrder({ orderId }: { orderId: string }) {
     handleError(error);
   }
 }
+
+// GET ORDERS BY EVENT ID
+export async function getOrdersByEventId({
+  eventId,
+  limit = 3,
+  page,
+}: {
+  eventId: string
+  limit?: number
+  page: number
+}) {
+  try {
+    await connectToDatabase()
+
+    const skipAmount = (page - 1) * limit
+
+    const conditions = { eventId }
+
+    const orders = await OrderModel.find(conditions)
+      .sort({ createdAt: 'desc' })
+      .skip(skipAmount)
+      .limit(limit)
+      .populate({
+        path: 'event',
+        model: Event,
+        populate: {
+          path: 'organizer',
+          model: User,
+          select: '_id firstName lastName',
+        },
+      })
+
+    const ordersCount = await OrderModel.countDocuments(conditions)
+
+    return {
+      data: JSON.parse(JSON.stringify(orders)),
+      totalPages: Math.ceil(ordersCount / limit),
+    }
+  } catch (error) {
+    handleError(error)
+    return { data: [], totalPages: 0 }
+  }
+}
