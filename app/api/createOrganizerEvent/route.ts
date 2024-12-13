@@ -47,13 +47,21 @@ export async function POST(request: Request) {
           name: eventData.scaleDetails.venues.name,
           capacity: Number(eventData.scaleDetails.venues.capacity),
           pricePerDay: Number(eventData.scaleDetails.venues.pricePerDay),
-          rating: Number(eventData.scaleDetails.venues.rating),
+          rating: Number(eventData.scaleDetails.venues.rating) || 0,
           facilities: facilities
         }
       },
       status: 'pending',
       documents: []
     };
+
+    // Kiểm tra các giá trị số
+    if (isNaN(organizerData.scaleDetails.venues.rating)) {
+      return NextResponse.json(
+        { error: 'Rating phải là một số hợp lệ' },
+        { status: 400 }
+      );
+    }
 
     // Log dữ liệu trước khi lưu
     console.log('Attempting to save:', organizerData);

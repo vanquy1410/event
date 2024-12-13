@@ -86,8 +86,7 @@ const TicketList = ({ userId, orders, page, totalPages }: TicketListProps) => {
       eventTitle: order.event.title,
       buyer: order.buyer,
       totalAmount: order.totalAmount,
-      seatNumber: order.selectedSeat + 1,
-      seatType: order.seatType?.name || 'Chưa có thông tin'
+      seatNumber: order.selectedSeat + 1
     });
     const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?data=${encodeURIComponent(qrData)}&size=900x900`;
     window.open(qrUrl, '_blank');
@@ -169,9 +168,6 @@ const TicketList = ({ userId, orders, page, totalPages }: TicketListProps) => {
                         </p>
                         <p className="text-gray-700">
                           <strong className="text-primary-500">Vị trí ghế:</strong> Số {order.selectedSeat + 1}
-                        </p>
-                        <p className="text-gray-700">
-                          <strong className="text-primary-500">Hạng ghế:</strong> {order.seatType?.name || 'Chưa có thông tin'}
                         </p>
                         <p className="text-gray-700">
                           <strong className="text-primary-500">Bắt đầu:</strong> {formatDateTime(order.event.startDateTime).dateTime}

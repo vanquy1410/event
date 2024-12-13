@@ -34,9 +34,9 @@ export async function POST(req: Request) {
 
     // Tạo bản ghi thanh toán mới
     const payment = await Payment.create({
-      organizerId: organizerId.toString(), // Đảm bảo organizerId là string
+      organizerId: organizerId.toString(),
       eventTitle,
-      amount: price,
+      amount: price * 1000,
       status: 'success',
       paymentDate: new Date(),
       paymentMethod: 'card',

@@ -97,16 +97,25 @@ export function removeKeysFromQuery({ params, keysToRemove }: RemoveUrlQueryPara
 }
 
 export const handleError = (error: unknown) => {
-  console.error("Error details:", error)
-  
   if (error instanceof Error) {
-    console.error("Error name:", error.name)
-    console.error("Error message:", error.message)
-    console.error("Error stack:", error.stack)
+    console.error(error.message);
+    return {
+      error: error.message
+    };
   }
-  
-  throw new Error(typeof error === 'string' ? error : JSON.stringify(error))
-}
+
+  if (typeof error === 'string') {
+    console.error(error);
+    return {
+      error: error
+    };
+  }
+
+  console.error('Lỗi không xác định:', error);
+  return {
+    error: 'Đã xảy ra lỗi không xác định'
+  };
+};
 
 export const formatDateTimeCustom = (dateString: Date) => {
   const options: Intl.DateTimeFormatOptions = {
