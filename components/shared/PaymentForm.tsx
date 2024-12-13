@@ -174,7 +174,7 @@ const CheckoutForm = ({
       <div className="space-y-4">
         <div>
           <p className="text-gray-600">Tên sự kiện: {eventTitle}</p>
-          <p className="text-gray-600">Số tiền: {price.toLocaleString('vi-VN')}đ</p>
+          <p className="text-gray-600">Số tiền: {price.toLocaleString('vi-VN') || 0}đ</p>
         </div>
 
         <div className="space-y-2">

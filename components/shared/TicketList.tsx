@@ -126,7 +126,7 @@ const TicketList = ({ userId, orders, page, totalPages }: TicketListProps) => {
               <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{order.event.title}</td>
               <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{order.event.description.substring(0, 50)}...</td>
               <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                {Number(order.totalAmount).toFixed(3)} đ
+                {Number(order.totalAmount).toLocaleString('vi-VN') || 0} đ
               </td>
               <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{formatDateTime(order.event.startDateTime).dateTime}</td>
               <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{formatDateTime(order.event.endDateTime).dateTime}</td>
@@ -153,7 +153,7 @@ const TicketList = ({ userId, orders, page, totalPages }: TicketListProps) => {
                           <strong className="text-primary-500">Mô tả:</strong> {order.event.description}
                         </p>
                         <p className="text-gray-700">
-                          <strong className="text-primary-500">Giá:</strong> {Number(order.totalAmount).toFixed(3)} đ
+                          <strong className="text-primary-500">Giá:</strong> {Number(order.totalAmount).toLocaleString('vi-VN') || 0} đ
                         </p>
                         <p className="text-gray-700">
                           <strong className="text-primary-500">Vị trí ghế:</strong> Số {order.selectedSeat + 1}

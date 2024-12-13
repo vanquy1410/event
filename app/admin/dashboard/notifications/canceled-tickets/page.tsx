@@ -83,7 +83,7 @@ export default function CanceledTicketsPage() {
                   <td className="py-2 px-4 border-b">{ticket.eventTitle}</td>
                   <td className="py-2 px-4 border-b">{ticket.userEmail}</td>
                   <td className="py-2 px-4 border-b">
-                    {ticket.ticketPrice.toLocaleString()} VNĐ
+                    {ticket.ticketPrice.toLocaleString('vi-VN') || 0} VNĐ
                   </td>
                   <td className="py-2 px-4 border-b">
                     {new Date(ticket.cancelDate).toLocaleString()}

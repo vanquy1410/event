@@ -22,6 +22,7 @@ import { updateEvent } from './event.actions';
 import CancelNotification from '../database/models/cancelNotification.model'
 import Image from 'next/image';
 import { formatDateTime } from '../utils';
+import mongoose from 'mongoose';
 
 export const checkoutOrder = async (order: OrderData) => {
   try {
@@ -323,5 +324,47 @@ export async function cancelOrder({ orderId }: { orderId: string }) {
 
   } catch (error) {
     handleError(error);
+  }
+}
+
+// GET ORDERS BY EVENT ID
+export async function getOrdersByEventId({
+  eventId,
+  limit = 3,
+  page,
+}: {
+  eventId: string
+  limit?: number
+  page: number
+}) {
+  try {
+    await connectToDatabase()
+
+    const skipAmount = (page - 1) * limit
+
+    const conditions = { 
+      event: new mongoose.Types.ObjectId(eventId)
+     }
+
+    const orders = await OrderModel.find(conditions)
+      .sort({ createdAt: 'desc' })
+      .skip(skipAmount)
+      .limit(limit)
+      .populate({
+         path: 'buyer',
+          model: User,
+          select: '_id firstName lastName',
+      })
+        
+
+    const ordersCount = await OrderModel.countDocuments(conditions)
+
+    return {
+      data: JSON.parse(JSON.stringify(orders)),
+      totalPages: Math.ceil(ordersCount / limit),
+    }
+  } catch (error) {
+    handleError(error)
+    return { data: [], totalPages: 0 }
   }
 }

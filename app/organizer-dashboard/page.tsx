@@ -84,7 +84,7 @@ export default function OrganizerDashboard() {
         />
         <StatCard
           title="Giá vé"
-          value={`${organizerData?.price?.toLocaleString() || 0}đ`}
+          value={`${organizerData?.price?.toLocaleString('vi-VN') || 0}đ`}
           bgColor="bg-indigo-50"
           textColor="text-indigo-700"
         />
