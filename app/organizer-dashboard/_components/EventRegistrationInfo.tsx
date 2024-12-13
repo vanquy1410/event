@@ -40,7 +40,7 @@ const EventRegistrationInfo: React.FC<EventRegistrationInfoProps> = ({ data, eve
           <InfoItem label="Loại sự kiện" value={data.eventType} />
           <InfoItem label="Quy mô" value={data.eventScale} />
           <InfoItem label="Dự kiến" value={data.participantLimit.toString() + ' người tham gia'} />
-          <InfoItem label="Giá vé" value={`${data.price.toLocaleString('vi-VN')}đ`} />
+          <InfoItem label="Giá vé" value={`${data.price.toLocaleString('vi-VN') || 0}đ`} />
           <InfoItem label="Đã bán" value={`${data?.currentParticipants}  vé`} />
           <InfoItem label="Còn lại" value={`${data.participantLimit-data?.currentParticipants} vé`} />
           <InfoItem label="Doanh thu" value={`${revenue.toLocaleString('vi-VN')}đ`} />

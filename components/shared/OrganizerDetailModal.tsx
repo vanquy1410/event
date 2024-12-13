@@ -114,7 +114,7 @@ const OrganizerDetailModal = ({ isOpen, onClose, organizer }: OrganizerDetailMod
                   <div className="space-y-3">
                     <InfoItem 
                       label="Chi phí địa điểm" 
-                      value={`${organizer.price?.toLocaleString('vi-VN')}đ`} 
+                      value={`${organizer.price?.toLocaleString('vi-VN') || 0}đ`} 
                     />
                     <InfoItem 
                       label="Số người tham dự dự kiến" 
@@ -122,11 +122,11 @@ const OrganizerDetailModal = ({ isOpen, onClose, organizer }: OrganizerDetailMod
                     />
                     <InfoItem 
                       label="Giá vé dự kiến" 
-                      value={`${organizer.expectedTicketPrice?.toLocaleString('vi-VN')}đ`} 
+                      value={`${organizer.expectedTicketPrice?.toLocaleString('vi-VN') || 0}đ`} 
                     />
                     <InfoItem 
                       label="Doanh thu dự kiến" 
-                      value={`${organizer.expectedRevenue?.toLocaleString('vi-VN')}đ`} 
+                      value={`${organizer.expectedRevenue?.toLocaleString('vi-VN') || 0}đ`} 
                     />
                     <InfoItem 
                       label="Trạng thái" 

@@ -107,7 +107,7 @@ export default function OrganizerDashboard({ params }: { params: { id: string } 
             <InfoItem label="Tên sự kiện" value={organizer.eventTitle} />
             <InfoItem label="Mô tả" value={organizer.description} />
             <InfoItem label="Địa điểm" value={organizer.location} />
-            <InfoItem label="Giá vé" value={`${organizer.price.toLocaleString('vi-VN')}đ`} />
+            <InfoItem label="Giá vé" value={`${organizer.price.toLocaleString('vi-VN') || 0}đ`} />
             <InfoItem label="Số lượng người tham gia" value={organizer.participantLimit} />
           </div>
         </div>
