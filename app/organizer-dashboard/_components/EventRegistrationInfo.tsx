@@ -59,7 +59,7 @@ const EventRegistrationInfo: React.FC<EventRegistrationInfoProps> = ({ data, eve
                 <div key={index} className="bg-gray-100 p-4 rounded-lg grid grid-cols-2 gap-4">
                   <InfoItem label="Mã đơn hàng" value={order._id} />
                   <InfoItem label="Người mua" value={`${order.buyer.firstName} ${order.buyer.lastName }`} />
-                  <InfoItem label="Ngày đặt" value={new Date(order.createdAt).toLocaleDateString('vi-VN')} />
+                  <InfoItem label="Ngày đặt" value={  new Date(order.createdAt).toLocaleDateString('vi-VN')} />
                   <InfoItem label="Tổng tiền" value={`${order.totalAmount.toLocaleString('vi-VN')}đ`} />
                 </div>
               ))}
