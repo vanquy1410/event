@@ -36,11 +36,11 @@ export async function POST(req: Request) {
         return NextResponse.json({ error: 'No metadata found' }, { status: 400 });
       }
 
-      const { eventId, buyerId, selectedSeat, seatType } = session.metadata;
+      const { eventId, buyerId, selectedSeat } = session.metadata;
       
       // Validate metadata
-      if (!eventId || !buyerId || selectedSeat === undefined || !seatType) {
-        console.error('Missing required metadata:', { eventId, buyerId, selectedSeat, seatType });
+      if (!eventId || !buyerId || selectedSeat === undefined) {
+        console.error('Missing required metadata:', { eventId, buyerId, selectedSeat });
         return NextResponse.json({ error: 'Missing required metadata' }, { status: 400 });
       }
 
@@ -48,9 +48,8 @@ export async function POST(req: Request) {
         eventId,
         buyerId,
         selectedSeat: Number(selectedSeat),
-        seatType,
         stripeId: session.id,
-        totalAmount: (session.amount_total! / 100).toString(),
+        totalAmount: session.amount_total!.toString(),
       });
 
       console.log('Created order:', order);
