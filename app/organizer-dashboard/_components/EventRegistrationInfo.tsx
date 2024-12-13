@@ -26,7 +26,7 @@ const EventRegistrationInfo: React.FC<EventRegistrationInfoProps> = ({ data, eve
   }
 
 
-  const revenue = orders.reduce((acc, order) => acc + order?.totalAmount, 0) || 0;
+  const revenue = orders.reduce((acc, order) => acc + +order?.totalAmount, 0) || 0;
 
   return (
     <div className="space-y-6">
@@ -54,15 +54,13 @@ const EventRegistrationInfo: React.FC<EventRegistrationInfoProps> = ({ data, eve
 
           <div className="bg-white rounded-lg shadow-lg p-6">
             <h2 className="text-xl font-semibold mb-4">Lịch sử đơn hàng</h2>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="grid grid-cols-1  gap-4">
               {orders.length > 0 && orders.map((order, index) => (
                 <div key={index} className="bg-gray-100 p-4 rounded-lg grid grid-cols-2 gap-4">
                   <InfoItem label="Mã đơn hàng" value={order._id} />
-                  <InfoItem label="Người mua" value={order.buyer} />
+                  <InfoItem label="Người mua" value={`${order.buyer.firstName} ${order.buyer.lastName }`} />
                   <InfoItem label="Ngày đặt" value={new Date(order.createdAt).toLocaleDateString('vi-VN')} />
-                  <InfoItem label="Số lượng vé" value={order.quantity} />
                   <InfoItem label="Tổng tiền" value={`${order.totalAmount.toLocaleString('vi-VN')}đ`} />
-                  <InfoItem label="Trạng thái" value={getStatusText(order.status)} />
                 </div>
               ))}
             </div>

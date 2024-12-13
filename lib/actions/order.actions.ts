@@ -22,6 +22,7 @@ import { updateEvent } from './event.actions';
 import CancelNotification from '../database/models/cancelNotification.model'
 import Image from 'next/image';
 import { formatDateTime } from '../utils';
+import mongoose from 'mongoose';
 
 export const checkoutOrder = async (order: OrderData) => {
   try {
@@ -341,21 +342,20 @@ export async function getOrdersByEventId({
 
     const skipAmount = (page - 1) * limit
 
-    const conditions = { eventId }
+    const conditions = { 
+      event: new mongoose.Types.ObjectId(eventId)
+     }
 
     const orders = await OrderModel.find(conditions)
       .sort({ createdAt: 'desc' })
       .skip(skipAmount)
       .limit(limit)
       .populate({
-        path: 'event',
-        model: Event,
-        populate: {
-          path: 'organizer',
+         path: 'buyer',
           model: User,
           select: '_id firstName lastName',
-        },
       })
+        
 
     const ordersCount = await OrderModel.countDocuments(conditions)
 

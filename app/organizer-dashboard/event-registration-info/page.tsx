@@ -37,11 +37,24 @@ export default function EventRegistrationInfoPage() {
 
           getEventByEventOrganizerId(events[0]._id).then(event => {
             setEventData(event);
+            getOrdersByEventId({
+              eventId: event._id,
+              limit: Number.MAX_SAFE_INTEGER,
+              page: 1
+            }).then(response => {
+              setOrders(response.data);
+            }).catch((error) => {
+              console.log('====================================');
+              console.log('error', error);
+              console.log('====================================');
+            })  
           }).catch((error) => {
             console.log('====================================');
             console.log('error', error);
             console.log('====================================');
           })
+
+       
         } else {
           setError("Không tìm thấy thông tin đăng ký sự kiện");
         }
@@ -83,7 +96,9 @@ export default function EventRegistrationInfoPage() {
       console.log('====================================');
     }
   }
-
+  console.log('====================================');
+  console.log('orders', orders);
+  console.log('====================================');
 
   return (
     <div className="p-6">
