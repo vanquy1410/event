@@ -86,7 +86,8 @@ const TicketList = ({ userId, orders, page, totalPages }: TicketListProps) => {
       eventTitle: order.event.title,
       buyer: order.buyer,
       totalAmount: order.totalAmount,
-      seatNumber: order.selectedSeat + 1
+      seatNumber: order.selectedSeat + 1,
+      seatType: order.seatType?.name || 'Chưa có thông tin'
     });
     const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?data=${encodeURIComponent(qrData)}&size=900x900`;
     window.open(qrUrl, '_blank');
@@ -131,8 +132,10 @@ const TicketList = ({ userId, orders, page, totalPages }: TicketListProps) => {
               <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{order.event.title}</td>
               <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                 <ReactQuill 
-                  value={order.event.description} 
-                  readOnly={true} 
+                  value={order.event.description.length > 20 ? `${order.event.description.substring(0, 70)}...` : order.event.description}
+                  readOnly={true}
+                  theme="snow"
+                  modules={{ toolbar: false }}   
                 />
               </td>
               <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
@@ -161,13 +164,20 @@ const TicketList = ({ userId, orders, page, totalPages }: TicketListProps) => {
                       <div className="space-y-2">
                         <p className="text-gray-700">
                           <strong className="text-primary-500">Mô tả:</strong>
-                          <ReactQuill value={order.event.description} readOnly={true} theme="bubble" />
+                          <ReactQuill value={order.event.description }
+                          readOnly={true}
+                          theme="snow"
+                          modules={{ toolbar: false }}              
+                          />
                         </p>
                         <p className="text-gray-700">
                           <strong className="text-primary-500">Giá:</strong> {Number(order.totalAmount).toLocaleString('vi-VN') || 0} đ
                         </p>
                         <p className="text-gray-700">
                           <strong className="text-primary-500">Vị trí ghế:</strong> Số {order.selectedSeat + 1}
+                        </p>
+                        <p className="text-gray-700">
+                          <strong className="text-primary-500">Hạng ghế:</strong> {order.seatType?.name || 'Chưa có thông tin'}
                         </p>
                         <p className="text-gray-700">
                           <strong className="text-primary-500">Bắt đầu:</strong> {formatDateTime(order.event.startDateTime).dateTime}
