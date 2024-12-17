@@ -7,6 +7,7 @@ import ViewDocumentsModal from './ViewDocumentsModal';
 import { useState } from 'react';
 import { IOrganizer } from '@/types/organizer';
 import { Dialog, DialogClose, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
+import { IEvent } from '@/types';
 
 interface OrganizerTableProps {
   organizers: IOrganizer[];
@@ -87,6 +88,19 @@ export default function OrganizerTable({ organizers, onStatusUpdate, onSearch, o
   const handleViewDetails = (organizer: IOrganizer) => {
     setSelectedOrganizer(organizer);
     setIsDetailModalOpen(true);
+  };
+
+  const getStatusText = (status: string | undefined) => {
+    switch (status) {
+      case 'approved':
+        return 'Đã duyệt';
+      case 'pending':
+        return 'Chờ duyệt';
+      case 'rejected':
+        return 'Từ chối';
+      default:
+        return 'Chưa duyệt';
+    }
   };
 
   return (
@@ -182,9 +196,6 @@ export default function OrganizerTable({ organizers, onStatusUpdate, onSearch, o
         documents={organizers.find(org => org._id === selectedOrganizerId)?.documents || []}
       />
       <Dialog open={isDetailModalOpen} onOpenChange={setIsDetailModalOpen}>
-        {/* <DialogTrigger asChild>
-          <Button variant="outline" className="text-primary-500 hover:text-primary-600 hover:bg-primary-50 transition-colors">Xem chi tiết</Button>
-        </DialogTrigger> */}
         <DialogContent className="sm:max-w-[425px] bg-white rounded-lg shadow-xl">
           <DialogHeader className="border-b pb-4">
             <DialogTitle className="text-2xl font-bold text-primary-500">{selectedOrganizer?.name}</DialogTitle>
@@ -195,10 +206,16 @@ export default function OrganizerTable({ organizers, onStatusUpdate, onSearch, o
               <strong className="text-primary-500">Tên sự kiện:</strong> {selectedOrganizer?.eventTitle}
             </p>
             <p className="text-gray-700">
-              <strong className="text-primary-500">Mô tả:</strong> {selectedOrganizer?.description}
+              <strong className="text-primary-500">Địa điểm:</strong> {selectedOrganizer?.location}
             </p>
             <p className="text-gray-700">
-              <strong className="text-primary-500">Trạng thái:</strong> {selectedOrganizer?.status}
+              <strong className="text-primary-500">Trạng thái:</strong> {getStatusText(selectedOrganizer?.status)}
+            </p>
+            <p className="text-gray-700">
+              <strong className="text-primary-500">Giá vé:</strong> {Number(selectedOrganizer?.price).toLocaleString('vi-VN') || 0} đ
+            </p>
+            <p className="text-gray-700">
+              <strong className="text-primary-500">Giới hạn người tham gia:</strong> {selectedOrganizer?.participantLimit || 0}
             </p>
           </div>
           <DialogFooter>
