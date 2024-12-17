@@ -6,6 +6,7 @@ import UploadDocumentModal from './UploadDocumentModal';
 import ViewDocumentsModal from './ViewDocumentsModal';
 import { useState } from 'react';
 import { IOrganizer } from '@/types/organizer';
+import { Dialog, DialogClose, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
 
 interface OrganizerTableProps {
   organizers: IOrganizer[];
@@ -18,6 +19,8 @@ export default function OrganizerTable({ organizers, onStatusUpdate, onSearch, o
   const [isUploadModalOpen, setIsUploadModalOpen] = useState(false);
   const [isViewModalOpen, setIsViewModalOpen] = useState(false);
   const [selectedOrganizerId, setSelectedOrganizerId] = useState<string | null>(null);
+  const [isDetailModalOpen, setIsDetailModalOpen] = useState(false);
+  const [selectedOrganizer, setSelectedOrganizer] = useState<IOrganizer | null>(null);
 
   const StatusUpdateConfirmation = ({ organizerId, status, onConfirm }: { organizerId: string, status: 'approved' | 'rejected', onConfirm: () => void }) => {
     return (
@@ -81,6 +84,11 @@ export default function OrganizerTable({ organizers, onStatusUpdate, onSearch, o
     setIsUploadModalOpen(false);
   };
 
+  const handleViewDetails = (organizer: IOrganizer) => {
+    setSelectedOrganizer(organizer);
+    setIsDetailModalOpen(true);
+  };
+
   return (
     <>
       <div className="flex gap-4 mb-4">
@@ -101,6 +109,7 @@ export default function OrganizerTable({ organizers, onStatusUpdate, onSearch, o
             <th className="py-2 px-4 border-b">Trạng thái</th>
             <th className="py-2 px-4 border-b">Tài liệu</th>
             <th className="py-2 px-4 border-b">Hành động</th>
+            <th className="py-2 px-4 border-b">Xem chi tiết</th>
           </tr>
         </thead>
         <tbody>
@@ -151,6 +160,11 @@ export default function OrganizerTable({ organizers, onStatusUpdate, onSearch, o
                   </>
                 )}
               </td>
+              <td className="py-2 px-4 border-b">
+                <Button onClick={() => handleViewDetails(organizer)} title="Xem chi tiết">
+                  Xem chi tiết
+                </Button>
+              </td>
             </tr>
           ))}
         </tbody>
@@ -167,6 +181,33 @@ export default function OrganizerTable({ organizers, onStatusUpdate, onSearch, o
         organizerId={selectedOrganizerId}
         documents={organizers.find(org => org._id === selectedOrganizerId)?.documents || []}
       />
+      <Dialog open={isDetailModalOpen} onOpenChange={setIsDetailModalOpen}>
+        {/* <DialogTrigger asChild>
+          <Button variant="outline" className="text-primary-500 hover:text-primary-600 hover:bg-primary-50 transition-colors">Xem chi tiết</Button>
+        </DialogTrigger> */}
+        <DialogContent className="sm:max-w-[425px] bg-white rounded-lg shadow-xl">
+          <DialogHeader className="border-b pb-4">
+            <DialogTitle className="text-2xl font-bold text-primary-500">{selectedOrganizer?.name}</DialogTitle>
+            <DialogDescription className="text-gray-500">Chi tiết ban tổ chức</DialogDescription>
+          </DialogHeader>
+          <div className="grid gap-6 py-6">
+            <p className="text-gray-700">
+              <strong className="text-primary-500">Tên sự kiện:</strong> {selectedOrganizer?.eventTitle}
+            </p>
+            <p className="text-gray-700">
+              <strong className="text-primary-500">Mô tả:</strong> {selectedOrganizer?.description}
+            </p>
+            <p className="text-gray-700">
+              <strong className="text-primary-500">Trạng thái:</strong> {selectedOrganizer?.status}
+            </p>
+          </div>
+          <DialogFooter>
+            <DialogClose asChild>
+              <Button variant="outline" className="mt-4 bg-primary-500 text-white hover:bg-primary-600 transition-colors">Đóng</Button>
+            </DialogClose>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </>
   );
 }
