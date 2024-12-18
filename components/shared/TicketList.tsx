@@ -115,10 +115,10 @@ const TicketList = ({ userId, orders, page, totalPages }: TicketListProps) => {
             <tr key={order._id} className="hover:bg-gray-50">
               <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{index + 1}</td>
               <td className="px-6 py-4 whitespace-nowrap">
-                {order.event && order.event.imageUrl ? (
+                {order.event?.imageUrl ? (
                   <Image
                     src={order.event.imageUrl}
-                    alt={order.event.title || 'Event image'}
+                    alt={order.event?.title || 'Event image'}
                     width={50}
                     height={50}
                     className="rounded-full"
@@ -129,10 +129,16 @@ const TicketList = ({ userId, orders, page, totalPages }: TicketListProps) => {
                   </div>
                 )}
               </td>
-              <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{order.event.title}</td>
+              <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                {order.event?.title || 'Không có tiêu đề'}
+              </td>
               <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                 <ReactQuill 
-                  value={order.event.description.length > 20 ? `${order.event.description.substring(0, 70)}...` : order.event.description}
+                  value={order.event?.description 
+                    ? (order.event.description.length > 20 
+                        ? `${order.event.description.substring(0, 70)}...` 
+                        : order.event.description)
+                    : 'Không có mô tả'}
                   readOnly={true}
                   theme="snow"
                   modules={{ toolbar: false }}   
@@ -141,8 +147,8 @@ const TicketList = ({ userId, orders, page, totalPages }: TicketListProps) => {
               <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                 {Number(order.totalAmount).toLocaleString('vi-VN') || 0} đ
               </td>
-              <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{formatDateTime(order.event.startDateTime).dateTime}</td>
-              <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{formatDateTime(order.event.endDateTime).dateTime}</td>
+              <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{formatDateTime(order.event?.startDateTime).dateTime}</td>
+              <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{formatDateTime(order.event?.endDateTime).dateTime}</td>
               <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                 <Dialog>
                   <DialogTrigger asChild>
@@ -150,13 +156,13 @@ const TicketList = ({ userId, orders, page, totalPages }: TicketListProps) => {
                   </DialogTrigger>
                   <DialogContent className="sm:max-w-[425px] bg-white rounded-lg shadow-xl">
                     <DialogHeader className="border-b pb-4">
-                      <DialogTitle className="text-2xl font-bold text-primary-500">{order.event.title}</DialogTitle>
+                      <DialogTitle className="text-2xl font-bold text-primary-500">{order.event?.title || 'Không có tiêu đề'}</DialogTitle>
                       <DialogDescription className="text-gray-500">Chi tiết vé</DialogDescription>
                     </DialogHeader>
                     <div className="grid gap-6 py-6">
                       <Image
-                        src={order.event.imageUrl}
-                        alt={order.event.title}
+                        src={order.event?.imageUrl}
+                        alt={order.event?.title}
                         width={100}
                         height={100}
                         className="rounded-md mx-auto"
@@ -164,7 +170,7 @@ const TicketList = ({ userId, orders, page, totalPages }: TicketListProps) => {
                       <div className="space-y-2">
                         <p className="text-gray-700">
                           <strong className="text-primary-500">Mô tả:</strong>
-                          <ReactQuill value={order.event.description }
+                          <ReactQuill value={order.event?.description }
                           readOnly={true}
                           theme="snow"
                           modules={{ toolbar: false }}              
@@ -180,10 +186,10 @@ const TicketList = ({ userId, orders, page, totalPages }: TicketListProps) => {
                           <strong className="text-primary-500">Hạng ghế:</strong> {order.seatType?.name || 'Chưa có thông tin'}
                         </p>
                         <p className="text-gray-700">
-                          <strong className="text-primary-500">Bắt đầu:</strong> {formatDateTime(order.event.startDateTime).dateTime}
+                          <strong className="text-primary-500">Bắt đầu:</strong> {formatDateTime(order.event?.startDateTime).dateTime}
                         </p>
                         <p className="text-gray-700">
-                          <strong className="text-primary-500">Kết thúc:</strong> {formatDateTime(order.event.endDateTime).dateTime}
+                          <strong className="text-primary-500">Kết thúc:</strong> {formatDateTime(order.event?.endDateTime).dateTime}
                         </p>
                       </div>
                     </div>
@@ -201,7 +207,7 @@ const TicketList = ({ userId, orders, page, totalPages }: TicketListProps) => {
               </td>
               <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                 <Button variant="outline" className="text-primary-500 hover:text-primary-600 hover:bg-primary-50 transition-colors">
-                  <Link href={order.event.url || '#'} target="_blank">
+                  <Link href={order.event?.url || '#'} target="_blank">
                     Tải tài liệu
                   </Link>
                 </Button>
