@@ -70,34 +70,28 @@ export const createOrder = async (orderData: {
     await connectToDatabase();
     
     const event = await Event.findById(orderData.eventId);
-    const buyer = await User.findById(orderData.buyerId);
+    if (!event) throw new Error('Event not found');
+
+    // Cập nhật trạng thái ghế
+    const updatedSeats = [...event.seats];
+    updatedSeats[orderData.selectedSeat] = true;
     
-    if (!event || !buyer) {
-      throw new Error('Event or Buyer not found');
-    }
-    
+    // Cập nhật số người tham gia
+    const updatedParticipants = (event.currentParticipants || 0) + 1;
+
+    // Cập nhật event
+    await Event.findByIdAndUpdate(orderData.eventId, {
+      seats: updatedSeats,
+      currentParticipants: updatedParticipants
+    });
+
+    // Tạo order mới
     const newOrder = await OrderModel.create({
       stripeId: orderData.stripeId,
       totalAmount: orderData.totalAmount,
       event: orderData.eventId,
       buyer: orderData.buyerId,
-      eventTitle: event.title,
-      buyerName: `${buyer.firstName} ${buyer.lastName}`,
       selectedSeat: orderData.selectedSeat
-    });
-
-    // Cập nhật trạng thái ghế trong event
-    const updatedSeats = [...(event.seats || [])];
-    updatedSeats[orderData.selectedSeat] = true;
-    
-    await updateEvent({
-      userId: buyer._id,
-      event: {
-        _id: event._id,
-        currentParticipants: (event.currentParticipants || 0) + 1,
-        seats: updatedSeats,
-      },
-      path: `/events/${event._id}`
     });
 
     return JSON.parse(JSON.stringify(newOrder));
