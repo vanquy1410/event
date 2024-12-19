@@ -21,6 +21,9 @@ const SeatingMap: React.FC<SeatingMapProps> = ({
   const SEATS_PER_ROW = 10;
   const rows = Math.ceil(participantLimit / SEATS_PER_ROW);
 
+  // Đảm bảo seats là một mảng hợp lệ
+  const seatArray = Array.isArray(seats) ? seats : new Array(participantLimit).fill(false);
+
   return (
     <div className="w-full max-w-4xl mx-auto p-4">
       <h3 className="text-xl font-bold mb-4">Sơ đồ chỗ ngồi</h3>
@@ -61,7 +64,7 @@ const SeatingMap: React.FC<SeatingMapProps> = ({
                     const seatIndex = rowIndex * SEATS_PER_ROW + colIndex;
                     if (seatIndex >= participantLimit) return null;
 
-                    const isOccupied = seats[seatIndex];
+                    const isOccupied = seatArray[seatIndex];
                     const isSelected = selectedSeat === seatIndex;
 
                     return (
